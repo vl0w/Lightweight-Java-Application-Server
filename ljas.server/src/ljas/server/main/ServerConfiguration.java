@@ -18,10 +18,6 @@ public class ServerConfiguration {
 		return Integer.valueOf(_properties.getProperty("Port"));
 	}
 	
-	public int getJettyPort(){
-		return Integer.valueOf(_properties.getProperty("JettyPort"));
-	}
-	
 	public String getHostName(){
 		return _properties.getProperty("HostName");
 	}

@@ -5,7 +5,7 @@ package ljas.commons.tasking.sendable.task;
  * @author jonashansen
  *
  */
-public class PreparedTaskObserver implements TaskObserver {
+public class TaskObserverAdapter implements TaskObserver {
 
 	@Override
 	public void notifyExecuted(Task task) {

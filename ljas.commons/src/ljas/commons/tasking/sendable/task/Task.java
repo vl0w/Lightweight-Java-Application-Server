@@ -10,7 +10,7 @@ import ljas.commons.tasking.taskspool.TaskSpool;
 
 /**
  * 
- * @author hnj
+ * @author Jonas Hansen
  * 
  */
 public abstract class Task implements Serializable {
@@ -62,13 +62,6 @@ public abstract class Task implements Serializable {
 		return getState() == TaskState.FINISHED;
 	}
 
-//	public boolean hasData() {
-//		if (getClass().getFields().length > 0) {
-//			return true;
-//		}
-//		return false;
-//	}
-
 	public boolean isExpired() {
 		long now = System.currentTimeMillis();
 		long lifetime = now - _creationTimeMS;
@@ -86,29 +79,6 @@ public abstract class Task implements Serializable {
 		}
 		return false;
 	}
-
-//	/**
-//	 * Specifies whether the task can be deleted. <b>Returns true when one of
-//	 * these conditions apply:</b> <li>Task is finished and has <u>no</u> data</li>
-//	 * <li>Task is finished, has data and minimum lifetime has reached</li> <li>
-//	 * Task is expired (maximum lifetime reached)</li>
-//	 * 
-//	 * @return True, when the task can be deleted, false otherwise
-//	 */
-//	public boolean canDelete() {
-//		if (hasData()) {
-//			if (isFinished() && isMinimumLifeTimeReached())
-//				return true;
-//		} else {
-//			if (isFinished())
-//				return true;
-//		}
-//
-//		if (isExpired())
-//			return true;
-//
-//		return false;
-//	}
 
 	public int getMaximumLifetime() {
 		return _maximumLifeTimeSeconds;
@@ -223,9 +193,5 @@ public abstract class Task implements Serializable {
 			}
 			observer.notifyExecuted(this);
 		}
-		
-
-		// Delete from Factory
-		TaskObserverFactory.getInstance().clearObservers(getHeader());
 	}
 }

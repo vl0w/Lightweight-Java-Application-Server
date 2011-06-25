@@ -23,7 +23,6 @@ import ljas.server.tasks.background.ClientConnectionListener;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
-
 public final class Server implements HasTaskSpool, SendsTasks {
 
 	// CONSTANTS
@@ -104,8 +103,8 @@ public final class Server implements HasTaskSpool, SendsTasks {
 				serverConfigurationFilePath);
 		setTaskSpool(new TaskSpool(getServerConfiguration()
 				.getTaskWorkerCount(), getServerConfiguration()
-				.getMaximumClients(), getServerConfiguration()
-				.getTaskWorkerCount() / 2, this, getServerConfiguration().getMaximumTaskCount()));
+				.getMaximumClients(), this, getServerConfiguration()
+				.getMaximumTaskCount()));
 		setState(RuntimeEnvironmentState.OFFLINE);
 		setConnectedClients(new CopyOnWriteArrayList<SocketConnection>());
 		_application = application;
@@ -225,7 +224,7 @@ public final class Server implements HasTaskSpool, SendsTasks {
 		if (!getConnectedClients().remove(con)) {
 			throw new ServerException("Client not found on server");
 		}
-		
+
 		getLogger().info(
 				"Client disconnected (" + con + "), "
 						+ (getConnectedClients().size())

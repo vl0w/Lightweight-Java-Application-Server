@@ -7,7 +7,7 @@ import ljas.commons.network.SocketConnection;
 
 /**
  * Provides a minimalistic standard-implementation
- * @author jonashansen
+ * @author Jonas Hansen
  *
  */
 public class EmptyServerApplication extends ServerApplication {

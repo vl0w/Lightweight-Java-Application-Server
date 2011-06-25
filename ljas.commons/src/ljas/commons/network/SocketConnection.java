@@ -6,10 +6,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import ljas.commons.tasking.sendable.notification.ConnectionLostNotification;
 import ljas.commons.tasking.sendable.task.Task;
 import ljas.commons.tasking.taskspool.HasTaskSpool;
-
 
 public class SocketConnection {
 	// MEMBERS
@@ -75,20 +73,15 @@ public class SocketConnection {
 		return getSocket().getInetAddress().toString();
 	}
 
-	public synchronized void close() {
-		if (!getSocket().isClosed()) {
-			getSocketRoot()
-					.getTaskSpool()
-					.getController()
-					.getNotificationQueue()
-					.add(new ConnectionLostNotification(this
-							.getConnectionInfo(), false));
-			try {
-				getOut().close();
-				getIn().close();
-				getSocket().close();
-			} catch (Exception e) {
-				getSocketRoot().getLogger().error(e);
+	public void close() {
+		try {
+			getOut().close();
+			getIn().close();
+			getSocket().close();
+		} catch (Exception e) {
+			// TODO: Bad...
+			if (!e.getMessage().equals("Broken pipe")) {
+				getSocketRoot().getLogger().error(e, e);
 			}
 		}
 	}

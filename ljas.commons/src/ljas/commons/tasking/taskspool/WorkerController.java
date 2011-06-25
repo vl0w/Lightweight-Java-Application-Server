@@ -5,21 +5,17 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ljas.commons.network.SocketConnection;
-import ljas.commons.tasking.sendable.notification.Notification;
 import ljas.commons.tasking.sendable.task.Task;
+import ljas.commons.tasking.sendable.task.TaskState;
 import ljas.commons.worker.BackgroundWorker;
-import ljas.commons.worker.NotificationWorker;
 import ljas.commons.worker.SocketWorker;
 import ljas.commons.worker.TaskWorker;
 import ljas.commons.worker.Worker;
 
-
 public class WorkerController {
 	// MEMBERS
-	private final Queue<Task> _taskQueue;
-	private final Queue<Notification> _notificationQueue;
+	private Queue<Task> _taskQueue;
 	private final ArrayList<TaskWorker> _taskWorkers;
-	private final ArrayList<NotificationWorker> _notificationWorkers;
 	private final ArrayList<BackgroundWorker> _backgroundWorker;
 	private final ArrayList<SocketWorker> _socketWorkers;
 	private final TaskSpool _taskSpool;
@@ -27,13 +23,7 @@ public class WorkerController {
 	// GETTERS & SETTERS
 	public void addTaskWorkers(int n) {
 		for (int i = 0; i < n; i++) {
-			_taskWorkers.add(new TaskWorker(this));
-		}
-	}
-
-	public void addNotificationWorkers(int n) {
-		for (int i = 0; i < n; i++) {
-			_notificationWorkers.add(new NotificationWorker(this));
+			_taskWorkers.add(new TaskWorker(this, "TaskWorker " + i));
 		}
 	}
 
@@ -50,7 +40,6 @@ public class WorkerController {
 	public ArrayList<Worker> getWorkers() {
 		ArrayList<Worker> workers = new ArrayList<Worker>();
 		workers.addAll(_taskWorkers);
-		workers.addAll(_notificationWorkers);
 		workers.addAll(_backgroundWorker);
 		workers.addAll(_socketWorkers);
 		return workers;
@@ -59,36 +48,29 @@ public class WorkerController {
 	public TaskSpool getTaskspool() {
 		return _taskSpool;
 	}
-	
-	public Queue<Task> getTaskQueue(){
+
+	private Queue<Task> getTaskQueue() {
 		return _taskQueue;
 	}
-	
-	public Queue<Notification> getNotificationQueue() {
-		return _notificationQueue;
+
+	public int getTaskQueueSize() {
+		return getTaskQueue().size();
 	}
 
 	// CONSTRUCTORS
 	public WorkerController(TaskSpool taskSpool, int taskWorkers,
-			int socketWorkers, int notificationWorkers) {
+			int socketWorkers) {
 		_taskSpool = taskSpool;
 		_taskWorkers = new ArrayList<TaskWorker>();
-		_notificationWorkers = new ArrayList<NotificationWorker>();
 		_backgroundWorker = new ArrayList<BackgroundWorker>();
 		_socketWorkers = new ArrayList<SocketWorker>();
 		_taskQueue = new ConcurrentLinkedQueue<Task>();
-		_notificationQueue = new ConcurrentLinkedQueue<Notification>();
 
 		addTaskWorkers(taskWorkers);
 		addSocketWorkers(socketWorkers);
-		addNotificationWorkers(notificationWorkers);
 	}
 
 	// METHODS
-	public void toCache(Task t) {
-		_taskQueue.add(t);
-	}
-
 	public void start() {
 		// Start workers
 		for (Worker w : getWorkers()) {
@@ -98,8 +80,7 @@ public class WorkerController {
 		}
 	}
 
-	public SocketWorker getSocketWorker()
-			throws Exception {
+	public SocketWorker getSocketWorker() throws Exception {
 		for (SocketWorker w : _socketWorkers) {
 			if (w.getConnection() == null) {
 				return w;
@@ -115,6 +96,27 @@ public class WorkerController {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Adds the task to the queue. The task has to have the state DO_PERFORM or
+	 * DO_CHECK!
+	 * 
+	 * @param task
+	 *            The task to add to the queue
+	 */
+	public void addTask(Task task) {
+		if (task.getState() != TaskState.FINISHED
+				&& task.getState() != TaskState.NEW) {
+			getTaskspool().getLogger().debug(
+					"Added task '" + task + "' to queue");
+
+			getTaskQueue().add(task);
+		}
+	}
+
+	public Task removeTask() {
+		return getTaskQueue().remove();
 	}
 
 	public void setSocketWorker(SocketConnection clientConnection,

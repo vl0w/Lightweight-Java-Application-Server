@@ -12,13 +12,12 @@ import ljas.commons.network.SocketConnection;
 import ljas.commons.state.RefusedMessage;
 import ljas.commons.state.RuntimeEnvironmentState;
 import ljas.commons.state.WelcomeMessage;
-import ljas.commons.tasking.sendable.task.PreparedTaskObserver;
+import ljas.commons.tasking.sendable.task.TaskObserverAdapter;
 import ljas.commons.tasking.sendable.task.Task;
 import ljas.commons.tasking.taskspool.TaskSpool;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
-
 
 public class ClientImpl implements Client {
 	// MEMBERS
@@ -61,7 +60,7 @@ public class ClientImpl implements Client {
 	public ClientImpl(ClientUI ui, ClientApplication application) {
 		setServerSocket(null);
 		setState(RuntimeEnvironmentState.OFFLINE);
-		_taskSpool = new TaskSpool(2, 1, 1, this, 0);
+		_taskSpool = new TaskSpool(2, 1, this, 0);
 		_application = application;
 		_application.setClient(this);
 		_ui = ui;
@@ -112,7 +111,7 @@ public class ClientImpl implements Client {
 					e.getClass().getName())) {
 				throw (ConnectionRefusedException) e;
 			} else {
-				throw new ConnectException(e.getMessage()) ;
+				throw new ConnectException(e.getMessage());
 			}
 		}
 	}
@@ -123,9 +122,9 @@ public class ClientImpl implements Client {
 		}
 
 		try {
-			getTaskSpool().sendTask(task, getLocalConnectionInfo());
+			getTaskSpool().remoteTask(task, getLocalConnectionInfo());
 		} catch (Exception e) {
-			getLogger().error("Error while sending task",e);
+			getLogger().error("Error while sending task", e);
 		}
 	}
 
@@ -141,7 +140,7 @@ public class ClientImpl implements Client {
 	public void disconnect() {
 		if (isOnline()) {
 			_taskSpool.deactivate();
-			_taskSpool = new TaskSpool(2, 1, 1, this, 0);
+			_taskSpool = new TaskSpool(2, 1, this, 0);
 			_ui.handleDisconnected();
 			getServerSocket().close();
 			setState(RuntimeEnvironmentState.OFFLINE);
@@ -187,78 +186,80 @@ public class ClientImpl implements Client {
 	@Override
 	public Task runTaskSync(Task task) throws ClientApplicationException {
 		// Private class to provide the runTaskSync function!
-		class TaskWaiter{
+		class TaskWaiter {
 			private Task _finishedTask;
 			private final Task _waitingTask;
 			private ClientApplicationException _exception;
 			private boolean _interrupted;
 			private final int _expiration;
-			
-			public Task getFinishedTask(){
+
+			public Task getFinishedTask() {
 				return _finishedTask;
 			}
-			
+
 			/**
 			 * 
-			 * @param task The task which the TaskWaiter should wait for
-			 * @param autoExpiration Defines after how many seconds the task expires. 0 indicates, that the TaskWaiter will wait forever
+			 * @param task
+			 *            The task which the TaskWaiter should wait for
+			 * @param autoExpiration
+			 *            Defines after how many seconds the task expires. 0
+			 *            indicates, that the TaskWaiter will wait forever
 			 */
-			public TaskWaiter(Task task, int autoExpiration){
-				_waitingTask=task;
-				_exception=null;
-				_expiration=autoExpiration;
+			public TaskWaiter(Task task, int autoExpiration) {
+				_waitingTask = task;
+				_exception = null;
+				_expiration = autoExpiration;
 			}
-			
-			public TaskWaiter(Task task){
-				this(task,0);
+
+			public TaskWaiter(Task task) {
+				this(task, 0);
 			}
-			
-			
+
 			public void doWait() throws ClientApplicationException {
-				_waitingTask.addObserver(new PreparedTaskObserver(){
+				_waitingTask.addObserver(new TaskObserverAdapter() {
 					@Override
 					public void notifyExecuted(Task task) {
-						_finishedTask=task;
-						_interrupted=true;
+						_finishedTask = task;
+						_interrupted = true;
 					}
-					
+
 					@Override
 					public void notifyFail(Task task) {
-						_exception = new ClientApplicationException(task.getResultMessage());
+						_exception = new ClientApplicationException(task
+								.getResultMessage());
 					}
 				});
-				
+
 				sendTask(_waitingTask);
-				
-				int timeCounter=0;
-				while(!_interrupted){
+
+				int timeCounter = 0;
+				while (!_interrupted) {
 					try {
 						Thread.currentThread();
 						Thread.sleep(50);
-						timeCounter+=50;
-						
-						if(_expiration>0 && timeCounter>=_expiration){
-							_exception=new ClientApplicationException("Task "+_waitingTask+" expired");
+						timeCounter += 50;
+
+						if (_expiration > 0 && timeCounter >= _expiration) {
+							_exception = new ClientApplicationException("Task "
+									+ _waitingTask + " expired");
 							break;
 						}
 					} catch (InterruptedException e) {
 						// nothing
 					}
 				}
-				
-				if(_exception!=null){
+
+				if (_exception != null) {
 					throw _exception;
 				}
 			}
 		}
-		
+
 		// Use the waiter
 		TaskWaiter waiter = new TaskWaiter(task);
 		waiter.doWait();
 		return waiter.getFinishedTask();
 	}
-	
-
 
 	@Override
 	public boolean runTaskAsync(Task task) {
