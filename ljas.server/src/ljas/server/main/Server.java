@@ -14,8 +14,8 @@ import ljas.commons.network.SendsTasks;
 import ljas.commons.network.SocketConnection;
 import ljas.commons.state.RefusedMessage;
 import ljas.commons.state.RuntimeEnvironmentState;
-import ljas.commons.tasking.taskspool.HasTaskSpool;
-import ljas.commons.tasking.taskspool.TaskSpool;
+import ljas.commons.tasking.taskqueue.HasTaskQueue;
+import ljas.commons.tasking.taskqueue.TaskQueue;
 import ljas.commons.worker.SocketWorker;
 import ljas.server.exceptions.ServerException;
 import ljas.server.tasks.background.ClientConnectionListener;
@@ -23,22 +23,18 @@ import ljas.server.tasks.background.ClientConnectionListener;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
-public final class Server implements HasTaskSpool, SendsTasks {
-
-	// CONSTANTS
+public final class Server implements HasTaskQueue, SendsTasks {
 	public static final String PROJECT_NAME = "LJAS";
 	public static final String PROJECT_HOMEPAGE = "http://github.com/Ganymed/Lightweight-Java-Application-Server";
 	public static final String SERVER_VERSION = "1.0.2";
 
-	// MEMBERS
 	private CopyOnWriteArrayList<SocketConnection> _clientConnections;
 	private RuntimeEnvironmentState _serverState;
-	private TaskSpool _taskSpool;
+	private TaskQueue _taskQueue;
 	private ServerSocket _serverSocket;
 	private final ServerApplication _application;
 	private final ServerConfiguration _serverConfiguration;
 
-	// GETTERS & SETTERS
 	public synchronized CopyOnWriteArrayList<SocketConnection> getConnectedClients() {
 		return _clientConnections;
 	}
@@ -78,13 +74,13 @@ public final class Server implements HasTaskSpool, SendsTasks {
 		}
 	}
 
-	private void setTaskSpool(TaskSpool value) {
-		_taskSpool = value;
+	private void setTaskQueue(TaskQueue value) {
+		_taskQueue = value;
 	}
 
 	@Override
-	public TaskSpool getTaskSpool() {
-		return _taskSpool;
+	public TaskQueue getTaskQueue() {
+		return _taskQueue;
 	}
 
 	@Override
@@ -101,7 +97,7 @@ public final class Server implements HasTaskSpool, SendsTasks {
 			String serverConfigurationFilePath) throws IOException {
 		_serverConfiguration = new ServerConfiguration(
 				serverConfigurationFilePath);
-		setTaskSpool(new TaskSpool(getServerConfiguration()
+		setTaskQueue(new TaskQueue(getServerConfiguration()
 				.getTaskWorkerCount(), getServerConfiguration()
 				.getMaximumClients(), this, getServerConfiguration()
 				.getMaximumTaskCount()));
@@ -113,7 +109,6 @@ public final class Server implements HasTaskSpool, SendsTasks {
 		DOMConfigurator.configure(getServerConfiguration().getLog4JFilePath());
 	}
 
-	// METHODS
 	public void startup() throws Exception {
 		setState(RuntimeEnvironmentState.STARTUP);
 
@@ -139,17 +134,14 @@ public final class Server implements HasTaskSpool, SendsTasks {
 		// Serversocket
 		setServerSocket(new ServerSocket(getServerConfiguration().getPort()));
 
-		// Initialize TaskSpool
-		getTaskSpool().addBackgroundTask(new ClientConnectionListener());
-		getLogger().info("Activating Taskspool");
-		getTaskSpool().activate();
+		// Initialize TaskQueue
+		getTaskQueue().addBackgroundTask(new ClientConnectionListener());
+		getLogger().info("Activating TaskQueue");
+		getTaskQueue().activate();
 
 		// Start application
 		getLogger().info("Starting application");
 		getApplication().start();
-
-		// Start jetty (not implemented yet!)
-		// _jettyServer.start();
 
 		// Finish Process
 		setState(RuntimeEnvironmentState.ONLINE);
@@ -160,7 +152,7 @@ public final class Server implements HasTaskSpool, SendsTasks {
 			LoginParameters parameters) throws Exception {
 
 		getConnectedClients().add(clientConnection);
-		SocketWorker wrk = getTaskSpool().getController().getSocketWorker();
+		SocketWorker wrk = getTaskQueue().getController().getSocketWorker();
 		wrk.setConnection(clientConnection);
 		getApplication().registerUser(clientConnection, parameters);
 	}

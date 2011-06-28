@@ -1,26 +1,21 @@
-package ljas.commons.tasking.taskspool;
+package ljas.commons.tasking.taskqueue;
 
 import java.util.ArrayList;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ljas.commons.network.SocketConnection;
-import ljas.commons.tasking.sendable.task.Task;
-import ljas.commons.tasking.sendable.task.TaskState;
+import ljas.commons.tasking.task.Task;
+import ljas.commons.tasking.task.TaskState;
 import ljas.commons.worker.BackgroundWorker;
 import ljas.commons.worker.SocketWorker;
 import ljas.commons.worker.TaskWorker;
 import ljas.commons.worker.Worker;
 
 public class WorkerController {
-	// MEMBERS
-	private Queue<Task> _taskQueue;
 	private final ArrayList<TaskWorker> _taskWorkers;
 	private final ArrayList<BackgroundWorker> _backgroundWorker;
 	private final ArrayList<SocketWorker> _socketWorkers;
-	private final TaskSpool _taskSpool;
+	private final TaskQueue _taskQueue;
 
-	// GETTERS & SETTERS
 	public void addTaskWorkers(int n) {
 		for (int i = 0; i < n; i++) {
 			_taskWorkers.add(new TaskWorker(this, "TaskWorker " + i));
@@ -45,32 +40,21 @@ public class WorkerController {
 		return workers;
 	}
 
-	public TaskSpool getTaskspool() {
-		return _taskSpool;
-	}
-
-	private Queue<Task> getTaskQueue() {
+	public TaskQueue getTaskQueue() {
 		return _taskQueue;
 	}
 
-	public int getTaskQueueSize() {
-		return getTaskQueue().size();
-	}
-
-	// CONSTRUCTORS
-	public WorkerController(TaskSpool taskSpool, int taskWorkers,
+	public WorkerController(TaskQueue taskQueue, int taskWorkers,
 			int socketWorkers) {
-		_taskSpool = taskSpool;
+		_taskQueue = taskQueue;
 		_taskWorkers = new ArrayList<TaskWorker>();
 		_backgroundWorker = new ArrayList<BackgroundWorker>();
 		_socketWorkers = new ArrayList<SocketWorker>();
-		_taskQueue = new ConcurrentLinkedQueue<Task>();
 
 		addTaskWorkers(taskWorkers);
 		addSocketWorkers(socketWorkers);
 	}
 
-	// METHODS
 	public void start() {
 		// Start workers
 		for (Worker w : getWorkers()) {
@@ -96,27 +80,6 @@ public class WorkerController {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Adds the task to the queue. The task has to have the state DO_PERFORM or
-	 * DO_CHECK!
-	 * 
-	 * @param task
-	 *            The task to add to the queue
-	 */
-	public void addTask(Task task) {
-		if (task.getState() != TaskState.FINISHED
-				&& task.getState() != TaskState.NEW) {
-			getTaskspool().getLogger().debug(
-					"Added task '" + task + "' to queue");
-
-			getTaskQueue().add(task);
-		}
-	}
-
-	public Task removeTask() {
-		return getTaskQueue().remove();
 	}
 
 	public void setSocketWorker(SocketConnection clientConnection,

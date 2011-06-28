@@ -16,7 +16,7 @@ public class AutoVariable<V> extends Thread {
 	private int _accessCount;
 
 	public synchronized void setValue(V value) {
-		_accessCount = _counter.getAndSet(0) + 1 ;
+		_accessCount = _counter.getAndSet(0) + 1;
 		_value = value;
 	}
 

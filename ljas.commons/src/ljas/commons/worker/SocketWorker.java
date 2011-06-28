@@ -1,13 +1,13 @@
 package ljas.commons.worker;
 
 import ljas.commons.network.SocketConnection;
-import ljas.commons.tasking.sendable.task.Task;
-import ljas.commons.tasking.taskspool.WorkerController;
+import ljas.commons.tasking.task.Task;
+import ljas.commons.tasking.taskqueue.WorkerController;
 
 public class SocketWorker extends Worker {
 
 	private SocketConnection _connection;
-	private static int SOCKET_WORKER_COUNT=0;
+	private static int SOCKET_WORKER_COUNT = 0;
 
 	public SocketConnection getConnection() {
 		return _connection;
@@ -34,8 +34,8 @@ public class SocketWorker extends Worker {
 			Object o = _connection.readObject();
 			if (o != null) {
 				if (o instanceof Task) {
-					if (getController().getTaskspool().checkTask((Task) o)) {
-						getController().addTask((Task)o);
+					if (getController().getTaskQueue().checkTask((Task) o)) {
+						getController().getTaskQueue().addTask((Task) o);
 					}
 				} else {
 					throw new Exception("Client sended unknown object!");
@@ -44,10 +44,14 @@ public class SocketWorker extends Worker {
 		} catch (Exception e) {
 			// Close connection
 			_connection.close();
-			
+
 			// Notify thread owner
-			getController().getTaskspool().getLocal().notifyDisconnectedTaskReceiver(_connection.getConnectionInfo());
-			
+			getController()
+					.getTaskQueue()
+					.getLocal()
+					.notifyDisconnectedTaskReceiver(
+							_connection.getConnectionInfo());
+
 			// Kill this process
 			kill();
 		}

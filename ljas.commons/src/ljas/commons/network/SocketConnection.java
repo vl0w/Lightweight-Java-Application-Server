@@ -6,17 +6,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import ljas.commons.tasking.sendable.task.Task;
-import ljas.commons.tasking.taskspool.HasTaskSpool;
+import ljas.commons.tasking.task.Task;
+import ljas.commons.tasking.taskqueue.HasTaskQueue;
 
 public class SocketConnection {
-	// MEMBERS
-	protected HasTaskSpool _socketRoot;
+	protected HasTaskQueue _socketRoot;
 	protected Socket _socket;
 	protected ObjectOutputStream _out;
 	protected ObjectInputStream _in;
 
-	// GETTERS & SETTERS
 	public Socket getSocket() {
 		return _socket;
 	}
@@ -41,11 +39,11 @@ public class SocketConnection {
 		_in = value;
 	}
 
-	private void setSocketRoot(HasTaskSpool root) {
+	private void setSocketRoot(HasTaskQueue root) {
 		_socketRoot = root;
 	}
 
-	private HasTaskSpool getSocketRoot() {
+	private HasTaskQueue getSocketRoot() {
 		return _socketRoot;
 	}
 
@@ -54,8 +52,7 @@ public class SocketConnection {
 				getSocket().getPort());
 	}
 
-	// CONSTRUCTORS
-	public SocketConnection(Socket socket, HasTaskSpool socketRoot) {
+	public SocketConnection(Socket socket, HasTaskQueue socketRoot) {
 		try {
 			setSocketRoot(socketRoot);
 			setSocket(socket);
@@ -67,7 +64,6 @@ public class SocketConnection {
 		}
 	}
 
-	// METHODS
 	@Override
 	public String toString() {
 		return getSocket().getInetAddress().toString();
@@ -79,10 +75,7 @@ public class SocketConnection {
 			getIn().close();
 			getSocket().close();
 		} catch (Exception e) {
-			// TODO: Bad...
-			if (!e.getMessage().equals("Broken pipe")) {
-				getSocketRoot().getLogger().error(e, e);
-			}
+			getSocketRoot().getLogger().error(e, e);
 		}
 	}
 

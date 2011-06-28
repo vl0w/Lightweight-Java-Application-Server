@@ -7,8 +7,9 @@ import ljas.commons.network.SocketConnection;
 
 /**
  * Provides a minimalistic standard-implementation
+ * 
  * @author Jonas Hansen
- *
+ * 
  */
 public class EmptyServerApplication extends ServerApplication {
 
@@ -20,20 +21,17 @@ public class EmptyServerApplication extends ServerApplication {
 	public void registerUser(SocketConnection connection,
 			LoginParameters parameter) throws ServerApplicationException {
 		// nothing
-		
 	}
 
 	@Override
 	public void removeUser(SocketConnection connectino)
 			throws ServerApplicationException {
 		// nothing
-		
 	}
 
 	@Override
 	public void start() {
 		// nothing
 	}
-	
-	
+
 }

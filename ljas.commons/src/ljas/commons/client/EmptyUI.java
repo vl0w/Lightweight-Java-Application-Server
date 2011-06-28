@@ -2,7 +2,7 @@ package ljas.commons.client;
 
 import ljas.commons.state.RefusedMessage;
 import ljas.commons.state.WelcomeMessage;
-import ljas.commons.tasking.sendable.task.Task;
+import ljas.commons.tasking.task.Task;
 
 public class EmptyUI implements ClientUI {
 	private boolean _printStatus;
@@ -11,8 +11,8 @@ public class EmptyUI implements ClientUI {
 	public EmptyUI(boolean printStatus) {
 		_printStatus = printStatus;
 	}
-	
-	public EmptyUI(){
+
+	public EmptyUI() {
 		this(false);
 	}
 
@@ -26,7 +26,7 @@ public class EmptyUI implements ClientUI {
 		// nothing
 		return null;
 	}
-	
+
 	@Override
 	public void setClient(Client client) {
 		// nothing
@@ -34,10 +34,12 @@ public class EmptyUI implements ClientUI {
 
 	@Override
 	public void handleConnected(WelcomeMessage welcomeMessage) {
-		if(_printStatus){
-			System.out.println(PREFIX+"You are now connected");
-			System.out.println(PREFIX+"Server: "+welcomeMessage.getHostName());
-			System.out.println(PREFIX+"MOTD: "+welcomeMessage.getMessageOfTheDay());
+		if (_printStatus) {
+			System.out.println(PREFIX + "You are now connected");
+			System.out.println(PREFIX + "Server: "
+					+ welcomeMessage.getHostName());
+			System.out.println(PREFIX + "MOTD: "
+					+ welcomeMessage.getMessageOfTheDay());
 		}
 	}
 
@@ -55,15 +57,4 @@ public class EmptyUI implements ClientUI {
 			System.out.println(PREFIX + "You have been disconnected");
 		}
 	}
-
-	@Override
-	public void handleTaskExecuted(Task executedTask) {
-		if (_printStatus) {
-//			if (executedTask.hasFailed()) {
-//				new Exception(PREFIX + "Task failed. Reason: "
-//						+ executedTask.getResultMessage()).printStackTrace();
-//			}
-		}
-	}
-
 }

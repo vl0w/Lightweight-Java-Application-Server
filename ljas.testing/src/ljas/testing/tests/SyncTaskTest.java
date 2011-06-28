@@ -3,10 +3,9 @@ package ljas.testing.tests;
 import junit.framework.TestCase;
 import ljas.commons.application.client.ClientApplicationException;
 import ljas.commons.client.Client;
-import ljas.commons.tasking.sendable.task.Task;
+import ljas.commons.tasking.task.Task;
 import ljas.testing.commons.tasks.AdditionTask;
 import ljas.testing.commons.tasks.HaxxorTask;
-
 
 public class SyncTaskTest extends TestCase {
 	public void testSyncTask() {
@@ -28,21 +27,20 @@ public class SyncTaskTest extends TestCase {
 			client.disconnect();
 		}
 	}
-	
-	public void testFakedTask(){
+
+	public void testFakedTask() {
 		Client client = Constants.createClient();
 
 		try {
 			Constants.doConnect(client);
 
 			client.runTaskSync(new HaxxorTask(client.getLocalConnectionInfo()));
-			
+
 			fail("Task should not be ok");
 
-		} catch (ClientApplicationException e){
-			assertEquals(Task.MSG_SAFETY_CONCERN,e.getMessage());
-		}
-		catch (Exception e) {
+		} catch (ClientApplicationException e) {
+			assertEquals(Task.MSG_SAFETY_CONCERN, e.getMessage());
+		} catch (Exception e) {
 			fail(e.getMessage());
 		} finally {
 			client.disconnect();

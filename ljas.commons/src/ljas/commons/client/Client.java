@@ -6,8 +6,8 @@ import ljas.commons.application.LoginParameters;
 import ljas.commons.application.client.ClientApplicationException;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.network.SendsTasks;
-import ljas.commons.tasking.sendable.task.Task;
-import ljas.commons.tasking.sendable.task.TaskObserver;
+import ljas.commons.tasking.task.Task;
+import ljas.commons.tasking.task.TaskObserver;
 
 
 public interface Client extends SendsTasks {

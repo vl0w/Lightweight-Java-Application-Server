@@ -9,9 +9,8 @@ import ljas.commons.network.ConnectionInfo;
 import ljas.commons.network.SocketConnection;
 import ljas.commons.state.RefusedMessage;
 import ljas.commons.state.WelcomeMessage;
-import ljas.commons.tasking.sendable.task.Task;
+import ljas.commons.tasking.task.Task;
 import ljas.server.main.Server;
-
 
 public class ClientConnectionListener extends Task {
 	private static final long serialVersionUID = -3839564995881410292L;

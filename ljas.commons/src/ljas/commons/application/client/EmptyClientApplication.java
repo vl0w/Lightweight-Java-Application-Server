@@ -4,8 +4,9 @@ import ljas.commons.application.client.ClientApplication;
 
 /**
  * Provides a minimalistic standard-implementation
+ * 
  * @author jonashansen
- *
+ * 
  */
 public class EmptyClientApplication extends ClientApplication {
 
@@ -13,12 +14,9 @@ public class EmptyClientApplication extends ClientApplication {
 		super(name, version);
 	}
 
-
 	@Override
 	public void start() {
 		// nothing
-		
 	}
-
 
 }

@@ -1,31 +1,29 @@
-package ljas.commons.tasking.taskspool;
+package ljas.commons.tasking.taskqueue;
+
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ljas.commons.network.ConnectionInfo;
 import ljas.commons.network.SendsTasks;
-import ljas.commons.tasking.sendable.task.Task;
-import ljas.commons.tasking.sendable.task.TaskResult;
-import ljas.commons.tasking.sendable.task.TaskState;
+import ljas.commons.tasking.task.Task;
+import ljas.commons.tasking.task.TaskResult;
+import ljas.commons.tasking.task.TaskState;
 import ljas.commons.tools.AutoVariable;
 import ljas.commons.worker.Worker;
 
 import org.apache.log4j.Logger;
 
-public class TaskSpool {
-	// MEMBERS
+public class TaskQueue {
 	private final WorkerController _controller;
 	private final int _workerDelay;
 	private SendsTasks _local;
 	private final int _maximumTasks;
 	private final AutoVariable<Boolean> _autoWarnSystemOverloaded;
+	private Queue<Task> _taskQueue;
 	private static long TASKIDCOUNTER = 0;
 
-	// GETTERS & SETTERS
 	public int getWorkerDelay() {
 		return _workerDelay;
-	}
-
-	private void setLocal(SendsTasks value) {
-		_local = value;
 	}
 
 	public SendsTasks getLocal() {
@@ -44,24 +42,51 @@ public class TaskSpool {
 		return _maximumTasks;
 	}
 
-	// CONSTRUCTORS
-	public TaskSpool(int taskWorkers, int socketWorkers, SendsTasks local,
+	private Queue<Task> getQueue() {
+		return _taskQueue;
+	}
+
+	/**
+	 * Adds the task to the queue. The task has to have the state DO_PERFORM or
+	 * DO_CHECK!
+	 * 
+	 * @param task
+	 *            The task to add to the queue
+	 */
+	public void addTask(Task task) {
+		if (task.getState() != TaskState.FINISHED
+				&& task.getState() != TaskState.NEW) {
+			getLogger().debug("Added task '" + task + "' to queue");
+
+			getQueue().add(task);
+		}
+	}
+
+	public Task removeTask() {
+		return getQueue().remove();
+	}
+
+	public void addBackgroundTask(Task task) {
+		task.setLocal(getLocal());
+		_controller.addBackgroundWorker(task);
+	}
+
+	public TaskQueue(int taskWorkers, int socketWorkers, SendsTasks local,
 			int maximumTasks) {
-		// Initialize
-		setLocal(local);
+		_local = local;
+		_taskQueue = new ConcurrentLinkedQueue<Task>();
 		_maximumTasks = maximumTasks;
 		_workerDelay = 10;
 		_controller = new WorkerController(this, taskWorkers, socketWorkers);
 		_autoWarnSystemOverloaded = new AutoVariable<Boolean>(true, 5000);
 	}
 
-	// METHODS
 	public void activate() {
 		// Start Workers
 		_controller.start();
 
 		// Print some info
-		getLogger().debug("Taskspool is running");
+		getLogger().debug("Taskqueue is running");
 	}
 
 	/**
@@ -77,9 +102,9 @@ public class TaskSpool {
 
 		if (task.getState() == TaskState.NEW) {
 			// Complete TaskHeader
-			task.getHeader().setApplicationId(
-					getLocal().getApplication().getApplicationId());
-			task.getHeader().setSenderInfo(getLocal().getLocalConnectionInfo());
+			task.setApplicationId(getLocal().getApplication()
+					.getApplicationId());
+			task.setSenderInfo(getLocal().getLocalConnectionInfo());
 
 			// Set state
 			task.setState(TaskState.DO_PERFORM);
@@ -88,39 +113,19 @@ public class TaskSpool {
 		return task;
 	}
 
-	public void remoteTask(Task task, ConnectionInfo connectionInfo)
+	public void executeTaskRemote(Task task, ConnectionInfo connectionInfo)
 			throws Exception {
 		getLocal().getTaskReceiver(connectionInfo).writeObject(
 				prepareTask(task));
 	}
 
-	public void localTask(Task task) throws Exception {
-		getController().addTask(prepareTask(task));
+	public void executeTaskLocal(Task task) throws Exception {
+		addTask(prepareTask(task));
 	}
-	
 
 	public static long createTaskId() {
 		return ++TASKIDCOUNTER;
 	}
-
-	public void addBackgroundTask(Task task) {
-		task.setLocal(getLocal());
-		_controller.addBackgroundWorker(task);
-	}
-
-	// public synchronized Notification getNotification()
-	// throws TaskNotFoundException {
-	// if (getNotificationQueue().size() <= 0) {
-	// throw new TaskNotFoundException(0);
-	// }
-	//
-	// Notification n = null;
-	// synchronized (getNotificationQueue()) {
-	// n = getNotificationQueue().get(0);
-	// getNotificationQueue().remove(0);
-	// }
-	// return n;
-	// }
 
 	public void deactivate() {
 		for (Worker w : getController().getWorkers()) {
@@ -132,10 +137,11 @@ public class TaskSpool {
 
 	/**
 	 * <ol>
-	 * <li>Checks a task. If the task is not correct it will automatically will be
-	 * send back with an error.</li>
+	 * <li>Checks a task. If the task is not correct it will automatically will
+	 * be send back with an error.</li>
 	 * <li>Checks whether the system is overloaded</li>
 	 * </ol>
+	 * 
 	 * @param task
 	 *            The task to be checked
 	 * @return True when the task is all right
@@ -145,8 +151,7 @@ public class TaskSpool {
 		/*
 		 * System is overloaded
 		 */
-		if (getMaximumTasks() > 0
-				&& getController().getTaskQueueSize() >= getMaximumTasks()) {
+		if (getMaximumTasks() > 0 && getQueue().size() >= getMaximumTasks()) {
 			// Warn!
 			synchronized (this) {
 				if (_autoWarnSystemOverloaded.getValue()) {
@@ -162,7 +167,7 @@ public class TaskSpool {
 			task.setResult(TaskResult.ERROR);
 			task.setState(TaskState.DO_CHECK);
 			task.setResultMessage(Task.MSG_SYSTEM_OVERLOAD);
-			remoteTask(task, task.getHeader().getSenderInfo());
+			executeTaskRemote(task, task.getSenderInfo());
 
 			return false;
 		}
@@ -170,14 +175,14 @@ public class TaskSpool {
 		/*
 		 * Wrong application id, do not execute due to safety concerns
 		 */
-		if (getLocal().getApplication().getApplicationId() != task.getHeader()
+		if (getLocal().getApplication().getApplicationId() != task
 				.getApplicationId() && task.getState() == TaskState.DO_PERFORM) {
 			getLogger().warn(Task.MSG_SAFETY_CONCERN);
 
 			task.setResult(TaskResult.ERROR);
 			task.setState(TaskState.DO_CHECK);
 			task.setResultMessage(Task.MSG_SAFETY_CONCERN);
-			remoteTask(task, task.getHeader().getSenderInfo());
+			executeTaskRemote(task, task.getSenderInfo());
 
 			return false;
 		}

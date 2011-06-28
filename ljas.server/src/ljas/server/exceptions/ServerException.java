@@ -1,8 +1,9 @@
 package ljas.server.exceptions;
 
-@SuppressWarnings("serial")
 public class ServerException extends Exception {
-	public ServerException(String message){
+	private static final long serialVersionUID = 4032682994141203749L;
+
+	public ServerException(String message) {
 		super(message);
 	}
 }

@@ -10,7 +10,6 @@ import ljas.commons.client.Client;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.state.RefusedMessage;
 
-
 public class ConnectionTest extends TestCase {
 	public void testConnectionOk() {
 		Client client = Constants.createClient();

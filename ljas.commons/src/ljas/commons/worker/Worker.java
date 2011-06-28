@@ -1,21 +1,17 @@
 package ljas.commons.worker;
 
 import ljas.commons.state.RuntimeEnvironmentState;
-import ljas.commons.tasking.taskspool.WorkerController;
+import ljas.commons.tasking.taskqueue.WorkerController;
 
 import org.apache.log4j.Logger;
 
-
 public abstract class Worker extends Thread {
-	// MEMBERS
-	// private Task _task;
 	private WorkerController _controller;
 	private volatile Thread _blinker;
 	private Thread thisThread;
 	private Logger _log;
 	private boolean _delete;
 
-	// GETTERS & SETTERS
 	protected void setController(WorkerController value) {
 		_controller = value;
 	}
@@ -28,23 +24,29 @@ public abstract class Worker extends Thread {
 		return _log;
 	}
 
-	// CONSTRUCTORS
+	public boolean isKilled() {
+		if (getController().getTaskQueue().getLocal().getState() == RuntimeEnvironmentState.OFFLINE)
+			return true;
+		if (_delete)
+			return true;
+		return false;
+	}
+
 	public Worker(WorkerController controller, int priority, boolean daemon) {
 		setController(controller);
-		_log = getController().getTaskspool().getLocal().getLogger();
+		_log = getController().getTaskQueue().getLocal().getLogger();
 		setPriority(priority);
 		setDaemon(daemon);
 		_delete = false;
 	}
 
-	// METHODE
 	@Override
 	public void run() {
 		while (!isKilled()) {
 			while (_blinker == thisThread) {
 				try {
 					((Worker) thisThread).runItOnce();
-					sleep(getController().getTaskspool().getWorkerDelay());
+					sleep(getController().getTaskQueue().getWorkerDelay());
 				} catch (Exception e) {
 					getLogger().error(e);
 				}
@@ -63,14 +65,6 @@ public abstract class Worker extends Thread {
 	public void kill() {
 		pause();
 		_delete = true;
-	}
-
-	public boolean isKilled() {
-		if (getController().getTaskspool().getLocal().getState() == RuntimeEnvironmentState.OFFLINE)
-			return true;
-		if (_delete)
-			return true;
-		return false;
 	}
 
 	public abstract void runItOnce() throws Exception;

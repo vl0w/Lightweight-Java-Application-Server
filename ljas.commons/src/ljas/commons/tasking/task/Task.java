@@ -1,12 +1,12 @@
-package ljas.commons.tasking.sendable.task;
+package ljas.commons.tasking.task;
 
 import java.io.Serializable;
 import java.util.List;
 
 import ljas.commons.exceptions.TaskException;
+import ljas.commons.network.ConnectionInfo;
 import ljas.commons.network.SendsTasks;
-import ljas.commons.tasking.taskspool.TaskSpool;
-
+import ljas.commons.tasking.taskqueue.TaskQueue;
 
 /**
  * 
@@ -15,22 +15,20 @@ import ljas.commons.tasking.taskspool.TaskSpool;
  */
 public abstract class Task implements Serializable {
 	private static final long serialVersionUID = -8887389539021809582L;
-	
-	// CONSTANTS
-	public static String MSG_SYSTEM_OVERLOAD="System overloaded. Try again later";
-	public static String MSG_SAFETY_CONCERN="Task not executed due to safety concerns (Wrong Application ID)";
 
-	// MEMBERS
+	public static String MSG_SYSTEM_OVERLOAD = "System overloaded. Try again later";
+	public static String MSG_SAFETY_CONCERN = "Task not executed due to safety concerns (Wrong Application ID)";
+
+	private long _id;
+	private ConnectionInfo _sender;
+	private long _applicationId;
 	private final int _maximumLifeTimeSeconds;
 	private final int _minimumLifeTimeSeconds;
-	private TaskHeader _header;
 	private SendsTasks _local;
 	private TaskState _state;
 	private final long _creationTimeMS;
 	private TaskResult _result;
 	private String _resultMessage;
-
-	// GETTERS & SETTERS
 
 	public SendsTasks getLocal() {
 		return _local;
@@ -38,16 +36,6 @@ public abstract class Task implements Serializable {
 
 	public void setLocal(SendsTasks value) {
 		_local = value;
-	}
-
-	public TaskHeader getHeader() {
-		return _header;
-	}
-
-	public void setHeader(TaskHeader value) {
-		if (getHeader() == null) {
-			_header = value;
-		}
 	}
 
 	public TaskState getState() {
@@ -125,9 +113,38 @@ public abstract class Task implements Serializable {
 		_resultMessage = value;
 	}
 
-	// CONSTRUCTOR
+	public long getId() {
+		return _id;
+	}
+
+	public void setId(long taskId) {
+		_id = taskId;
+	}
+
+	public ConnectionInfo getSenderInfo() {
+		return _sender;
+	}
+
+	public void setSenderInfo(ConnectionInfo info) {
+		if (getSenderInfo() == null) {
+			_sender = info;
+		}
+	}
+
+	public long getApplicationId() {
+		return _applicationId;
+	}
+
+	public void setApplicationId(long id) {
+		if (getApplicationId() == 0) {
+			_applicationId = id;
+		}
+	}
+
 	public Task(int maximumLifetimeSeconds, int minimumLifeTimeSeconds) {
-		_header = new TaskHeader(TaskSpool.createTaskId());
+		setId(TaskQueue.createTaskId());
+		setApplicationId(0);
+		setSenderInfo(null);
 		_state = TaskState.NEW;
 		_creationTimeMS = System.currentTimeMillis();
 		_result = TaskResult.NONE;
@@ -138,17 +155,6 @@ public abstract class Task implements Serializable {
 
 	public Task() {
 		this(120, 10);
-	}
-
-	// METHODS
-	@Override
-	public boolean equals(Object obj) {
-		return getHeader().equals(obj);
-	}
-
-	@Override
-	public int hashCode() {
-		return getHeader().hashCode();
 	}
 
 	public void perform() {
@@ -168,27 +174,44 @@ public abstract class Task implements Serializable {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Task) {
+			Task tObj = (Task) obj;
+			if (getId() == tObj.getId())
+				return true;
+			return false;
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int h = (int) _id;
+		return h;
+	}
+
+	@Override
 	public String toString() {
-		return "[" + getClass().getSimpleName() + "," + getHeader().getId()
-				+ "," + getState() + "]";
+		return "Task [" + getId() + "," + getSenderInfo() + ","
+				+ getClass().getSimpleName() + "]";
 	}
 
 	public void addObserver(TaskObserver observer) {
-		TaskObserverFactory.getInstance().putObserver(getHeader(), observer);
+		TaskObserverFactory.getInstance().putObserver(this, observer);
 	}
 
 	public void removeObserver(TaskObserver observer) {
-		TaskObserverFactory.getInstance().removeObserver(getHeader(), observer);
+		TaskObserverFactory.getInstance().removeObserver(this, observer);
 	}
 
 	public void notifyAllExecuted() {
 		// Notify observers
 		List<TaskObserver> observers = TaskObserverFactory.getInstance()
-				.getTaskObservers(getHeader());
+				.getTaskObservers(this);
 		for (TaskObserver observer : observers) {
-			if(hasFailed()){
+			if (hasFailed()) {
 				observer.notifyFail(this);
-			} else{
+			} else {
 				observer.notifySuccess(this);
 			}
 			observer.notifyExecuted(this);

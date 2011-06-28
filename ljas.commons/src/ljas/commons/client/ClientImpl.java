@@ -12,23 +12,21 @@ import ljas.commons.network.SocketConnection;
 import ljas.commons.state.RefusedMessage;
 import ljas.commons.state.RuntimeEnvironmentState;
 import ljas.commons.state.WelcomeMessage;
-import ljas.commons.tasking.sendable.task.TaskObserverAdapter;
-import ljas.commons.tasking.sendable.task.Task;
-import ljas.commons.tasking.taskspool.TaskSpool;
+import ljas.commons.tasking.task.Task;
+import ljas.commons.tasking.task.TaskObserverAdapter;
+import ljas.commons.tasking.taskqueue.TaskQueue;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
 public class ClientImpl implements Client {
-	// MEMBERS
 	private RuntimeEnvironmentState _clientState;
 	private SocketConnection _serverSocket;
 	private final ClientApplication _application;
-	private TaskSpool _taskSpool;
+	private TaskQueue _taskQueue;
 	private final ClientUI _ui;
 	private ConnectionInfo _myConnectionInfo;
 
-	// GETTERS & SETTERS
 	public void setState(RuntimeEnvironmentState value) {
 		_clientState = value;
 	}
@@ -47,8 +45,8 @@ public class ClientImpl implements Client {
 	}
 
 	@Override
-	public TaskSpool getTaskSpool() {
-		return _taskSpool;
+	public TaskQueue getTaskQueue() {
+		return _taskQueue;
 	}
 
 	@Override
@@ -56,22 +54,19 @@ public class ClientImpl implements Client {
 		return _ui;
 	}
 
-	// CONSTRUCTORS
 	public ClientImpl(ClientUI ui, ClientApplication application) {
 		setServerSocket(null);
 		setState(RuntimeEnvironmentState.OFFLINE);
-		_taskSpool = new TaskSpool(2, 1, this, 0);
+		_taskQueue = new TaskQueue(2, 1, this, 0);
 		_application = application;
 		_application.setClient(this);
 		_ui = ui;
 		_ui.setClient(this);
 		DOMConfigurator.configure("./configuration/log4j.xml");
 
-		// Go!
 		_ui.handleStart();
 	}
 
-	// METHODS
 	@Override
 	public void connect(String ip, int port, LoginParameters parameters)
 			throws ConnectionRefusedException, ConnectException {
@@ -80,7 +75,7 @@ public class ClientImpl implements Client {
 		}
 
 		setState(RuntimeEnvironmentState.STARTUP);
-		_taskSpool.activate();
+		_taskQueue.activate();
 		try {
 			// Connecting to server
 			setServerSocket(new SocketConnection(new Socket(ip, port), this));
@@ -94,7 +89,7 @@ public class ClientImpl implements Client {
 				setState(RuntimeEnvironmentState.ONLINE);
 				WelcomeMessage message = (WelcomeMessage) o;
 				_myConnectionInfo = message.getConnectionInfo();
-				_taskSpool.getController().getSocketWorker()
+				_taskQueue.getController().getSocketWorker()
 						.setConnection(getServerSocket());
 				_ui.handleConnected(message);
 			} else if (o instanceof RefusedMessage) {
@@ -105,7 +100,7 @@ public class ClientImpl implements Client {
 				throw new Exception("Unknown server response");
 			}
 		} catch (Exception e) {
-			_taskSpool.deactivate();
+			_taskQueue.deactivate();
 			setState(RuntimeEnvironmentState.OFFLINE);
 			if (ConnectionRefusedException.class.getName().equals(
 					e.getClass().getName())) {
@@ -122,7 +117,7 @@ public class ClientImpl implements Client {
 		}
 
 		try {
-			getTaskSpool().remoteTask(task, getLocalConnectionInfo());
+			getTaskQueue().executeTaskRemote(task, getLocalConnectionInfo());
 		} catch (Exception e) {
 			getLogger().error("Error while sending task", e);
 		}
@@ -139,8 +134,8 @@ public class ClientImpl implements Client {
 	@Override
 	public void disconnect() {
 		if (isOnline()) {
-			_taskSpool.deactivate();
-			_taskSpool = new TaskSpool(2, 1, this, 0);
+			_taskQueue.deactivate();
+			_taskQueue = new TaskQueue(2, 1, this, 0);
 			_ui.handleDisconnected();
 			getServerSocket().close();
 			setState(RuntimeEnvironmentState.OFFLINE);
