@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import ljas.commons.network.SocketConnection;
 import ljas.commons.tasking.task.Task;
-import ljas.commons.tasking.task.TaskState;
 import ljas.commons.worker.BackgroundWorker;
 import ljas.commons.worker.SocketWorker;
 import ljas.commons.worker.TaskWorker;
