@@ -11,9 +11,9 @@ import ljas.commons.network.SocketConnection;
  * @author Jonas Hansen
  * 
  */
-public class EmptyServerApplication extends ServerApplication {
+public class ServerApplicationAdapter extends ServerApplication {
 
-	public EmptyServerApplication(String name, String version) {
+	public ServerApplicationAdapter(String name, String version) {
 		super(name, version);
 	}
 

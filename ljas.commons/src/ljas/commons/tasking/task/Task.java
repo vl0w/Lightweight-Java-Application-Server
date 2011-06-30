@@ -5,7 +5,7 @@ import java.util.List;
 
 import ljas.commons.exceptions.TaskException;
 import ljas.commons.network.ConnectionInfo;
-import ljas.commons.network.SendsTasks;
+import ljas.commons.network.TaskSender;
 import ljas.commons.tasking.taskqueue.TaskQueue;
 
 /**
@@ -24,17 +24,17 @@ public abstract class Task implements Serializable {
 	private long _applicationId;
 	private final int _maximumLifeTimeSeconds;
 	private final int _minimumLifeTimeSeconds;
-	private SendsTasks _local;
+	private TaskSender _local;
 	private TaskState _state;
 	private final long _creationTimeMS;
 	private TaskResult _result;
 	private String _resultMessage;
 
-	public SendsTasks getLocal() {
+	public TaskSender getLocal() {
 		return _local;
 	}
 
-	public void setLocal(SendsTasks value) {
+	public void setLocal(TaskSender value) {
 		_local = value;
 	}
 

@@ -2,17 +2,17 @@ package ljas.commons.application.server;
 
 import ljas.commons.application.Application;
 import ljas.commons.application.LoginParameters;
-import ljas.commons.network.SendsTasks;
+import ljas.commons.network.TaskSender;
 import ljas.commons.network.SocketConnection;
 
 public abstract class ServerApplication extends Application {
-	private SendsTasks _local;
+	private TaskSender _local;
 
-	public SendsTasks getLocal() {
+	public TaskSender getLocal() {
 		return _local;
 	}
 
-	public void setLocal(SendsTasks value) {
+	public void setLocal(TaskSender value) {
 		_local = value;
 	}
 

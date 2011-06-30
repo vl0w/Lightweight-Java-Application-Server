@@ -8,9 +8,9 @@ import ljas.commons.application.client.ClientApplication;
  * @author jonashansen
  * 
  */
-public class EmptyClientApplication extends ClientApplication {
+public class ClientApplicationAdapter extends ClientApplication {
 
-	public EmptyClientApplication(String name, String version) {
+	public ClientApplicationAdapter(String name, String version) {
 		super(name, version);
 	}
 

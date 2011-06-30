@@ -4,11 +4,11 @@ import ljas.commons.application.Application;
 import ljas.commons.exceptions.TaskReceiverNotFoundException;
 import ljas.commons.tasking.taskqueue.HasTaskQueue;
 
-public interface SendsTasks extends HasTaskQueue {
+public interface TaskSender extends HasTaskQueue {
 	/**
 	 * Gets the specific SocketConnection to which the sender sends tasks to.
-	 * Examples: -The Client class returns the socket connection to the server.
-	 * -The Server returns the socket connection to the client.
+	 * Examples: -The Client class returns the socketconnection to the server.
+	 * -The Server returns the socket connection to a client.
 	 * 
 	 * @param connectionInfo
 	 *            Due to the server has more than one task receiver he needs

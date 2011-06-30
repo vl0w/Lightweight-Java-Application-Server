@@ -1,19 +1,19 @@
 package ljas.commons.application;
 
-import ljas.commons.network.SendsTasks;
+import ljas.commons.network.TaskSender;
 
 import org.apache.log4j.Logger;
 
 public abstract class Application {
 	private final String _version;
 	private final String _name;
-	private SendsTasks _local;
+	private TaskSender _local;
 
-	public SendsTasks getLocal() {
+	public TaskSender getLocal() {
 		return _local;
 	}
 
-	public void setLocal(SendsTasks value) {
+	public void setLocal(TaskSender value) {
 		_local = value;
 	}
 

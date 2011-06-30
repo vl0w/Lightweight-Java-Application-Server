@@ -10,7 +10,7 @@ import ljas.commons.application.server.ServerApplicationException;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.exceptions.TaskReceiverNotFoundException;
 import ljas.commons.network.ConnectionInfo;
-import ljas.commons.network.SendsTasks;
+import ljas.commons.network.TaskSender;
 import ljas.commons.network.SocketConnection;
 import ljas.commons.state.RefusedMessage;
 import ljas.commons.state.RuntimeEnvironmentState;
@@ -23,7 +23,7 @@ import ljas.server.tasks.background.ClientConnectionListener;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
-public final class Server implements HasTaskQueue, SendsTasks {
+public final class Server implements HasTaskQueue, TaskSender {
 	public static final String PROJECT_NAME = "LJAS";
 	public static final String PROJECT_HOMEPAGE = "http://github.com/Ganymed/Lightweight-Java-Application-Server";
 	public static final String SERVER_VERSION = "1.0.2";

@@ -4,7 +4,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ljas.commons.network.ConnectionInfo;
-import ljas.commons.network.SendsTasks;
+import ljas.commons.network.TaskSender;
 import ljas.commons.tasking.task.Task;
 import ljas.commons.tasking.task.TaskResult;
 import ljas.commons.tasking.task.TaskState;
@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 public class TaskQueue {
 	private final WorkerController _controller;
 	private final int _workerDelay;
-	private SendsTasks _local;
+	private TaskSender _local;
 	private final int _maximumTasks;
 	private final AutoVariable<Boolean> _autoWarnSystemOverloaded;
 	private Queue<Task> _taskQueue;
@@ -26,7 +26,7 @@ public class TaskQueue {
 		return _workerDelay;
 	}
 
-	public SendsTasks getLocal() {
+	public TaskSender getLocal() {
 		return _local;
 	}
 
@@ -71,7 +71,7 @@ public class TaskQueue {
 		_controller.addBackgroundWorker(task);
 	}
 
-	public TaskQueue(int taskWorkers, int socketWorkers, SendsTasks local,
+	public TaskQueue(int taskWorkers, int socketWorkers, TaskSender local,
 			int maximumTasks) {
 		_local = local;
 		_taskQueue = new ConcurrentLinkedQueue<Task>();

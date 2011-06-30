@@ -2,7 +2,7 @@ package ljas.commons.application;
 
 import ljas.commons.application.LoginParameters;
 import ljas.commons.exceptions.ConnectionRefusedException;
-import ljas.commons.network.SendsTasks;
+import ljas.commons.network.TaskSender;
 
 public class LoginParametersImpl implements LoginParameters {
 	private static final long serialVersionUID = -6656736060800905192L;
@@ -30,7 +30,7 @@ public class LoginParametersImpl implements LoginParameters {
 	}
 
 	@Override
-	public void check(SendsTasks server) throws ConnectionRefusedException {
+	public void check(TaskSender server) throws ConnectionRefusedException {
 		// nothing
 	}
 

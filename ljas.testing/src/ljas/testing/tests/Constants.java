@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 
 import ljas.commons.application.LoginParametersImpl;
-import ljas.commons.application.client.EmptyClientApplication;
+import ljas.commons.application.client.ClientApplicationAdapter;
 import ljas.commons.client.Client;
 import ljas.commons.client.ClientImpl;
 import ljas.commons.client.EmptyUI;
@@ -24,7 +24,7 @@ public abstract class Constants {
 	}
 
 	public static Client createClient(String applId, String applVersion) {
-		return new ClientImpl(new EmptyUI(), new EmptyClientApplication(applId,
+		return new ClientImpl(new EmptyUI(), new ClientApplicationAdapter(applId,
 				applVersion));
 	}
 
