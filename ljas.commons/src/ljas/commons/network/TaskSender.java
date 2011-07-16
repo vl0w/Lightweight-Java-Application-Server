@@ -7,22 +7,28 @@ import ljas.commons.tasking.taskqueue.HasTaskQueue;
 public interface TaskSender extends HasTaskQueue {
 	/**
 	 * Gets the specific SocketConnection to which the sender sends tasks to.
-	 * Examples: -The Client class returns the socketconnection to the server.
-	 * -The Server returns the socket connection to a client.
+	 * <br>Examples: 
+	 * <ul>
+	 * <li>The Client class returns the socketconnection to the server</li>
+	 * <li>The Server returns the socket connection to a client</li>
+	 * </ul>
 	 * 
 	 * @param connectionInfo
 	 *            Due to the server has more than one task receiver he needs
-	 *            some additional information to specify the correct client.
+	 *            some additional information to specify the correct client. Nullable.
 	 * @return null if the receiver could not be found
 	 */
 	public SocketConnection getTaskReceiver(ConnectionInfo connectionInfo)
 			throws TaskReceiverNotFoundException, IllegalArgumentException;
 
 	/**
-	 * Gets the local connection information
+	 * Returns the local connection information
 	 */
 	public ConnectionInfo getLocalConnectionInfo();
 
+	/**
+	 * Returns the application of the TaskSender
+	 */
 	public Application getApplication();
 
 	/**
