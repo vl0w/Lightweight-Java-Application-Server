@@ -14,7 +14,6 @@ import ljas.commons.network.TaskSender;
 import ljas.commons.network.SocketConnection;
 import ljas.commons.state.RefusedMessage;
 import ljas.commons.state.RuntimeEnvironmentState;
-import ljas.commons.tasking.taskqueue.HasTaskQueue;
 import ljas.commons.tasking.taskqueue.TaskQueue;
 import ljas.commons.worker.SocketWorker;
 import ljas.server.exceptions.ServerException;
@@ -23,7 +22,7 @@ import ljas.server.tasks.background.ClientConnectionListener;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
-public final class Server implements HasTaskQueue, TaskSender {
+public final class Server implements TaskSender {
 	public static final String PROJECT_NAME = "LJAS";
 	public static final String PROJECT_HOMEPAGE = "http://github.com/Ganymed/Lightweight-Java-Application-Server";
 	public static final String SERVER_VERSION = "1.0.2";
@@ -41,7 +40,7 @@ public final class Server implements HasTaskQueue, TaskSender {
 
 	private void setConnectedClients(
 			CopyOnWriteArrayList<SocketConnection> _connectedClients) {
-		this._clientConnections = _connectedClients;
+		_clientConnections = _connectedClients;
 	}
 
 	@Override
@@ -67,11 +66,7 @@ public final class Server implements HasTaskQueue, TaskSender {
 	}
 
 	public boolean isOnline() {
-		if (getState() == RuntimeEnvironmentState.ONLINE) {
-			return true;
-		} else {
-			return false;
-		}
+		return getState() == RuntimeEnvironmentState.ONLINE;
 	}
 
 	private void setTaskQueue(TaskQueue value) {
@@ -145,7 +140,7 @@ public final class Server implements HasTaskQueue, TaskSender {
 
 		// Finish Process
 		setState(RuntimeEnvironmentState.ONLINE);
-		getLogger().info(this + " has been started up");
+		getLogger().info(this + " has been started");
 	}
 
 	public void registerClient(SocketConnection clientConnection,
@@ -161,7 +156,7 @@ public final class Server implements HasTaskQueue, TaskSender {
 			throws ConnectionRefusedException {
 
 		// Check server state
-		if (getState() != RuntimeEnvironmentState.ONLINE) {
+		if (!isOnline()) {
 			throw new ConnectionRefusedException(RefusedMessage.ILLEGAL_STATE);
 		}
 

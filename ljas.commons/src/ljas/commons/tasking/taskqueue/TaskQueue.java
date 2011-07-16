@@ -137,8 +137,8 @@ public class TaskQueue {
 
 	/**
 	 * <ol>
-	 * <li>Checks a task. If the task is not correct it will automatically will
-	 * be send back with an error.</li>
+	 * <li>Checks a task. If the task is not correct (not same applId or applVersion) it will automatically 
+	 * be sent back with an error.</li>
 	 * <li>Checks whether the system is overloaded</li>
 	 * </ol>
 	 * 
