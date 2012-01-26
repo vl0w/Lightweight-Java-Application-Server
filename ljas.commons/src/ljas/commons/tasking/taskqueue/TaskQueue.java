@@ -2,32 +2,25 @@ package ljas.commons.tasking.taskqueue;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import ljas.commons.network.ConnectionInfo;
 import ljas.commons.network.TaskSender;
 import ljas.commons.tasking.task.Task;
 import ljas.commons.tasking.task.TaskResult;
 import ljas.commons.tasking.task.TaskState;
-import ljas.commons.tools.AutoVariable;
 import ljas.commons.worker.Worker;
-
 import org.apache.log4j.Logger;
 
-public class TaskQueue {
-	private final WorkerController _controller;
-	private final int _workerDelay;
-	private TaskSender _local;
-	private final int _maximumTasks;
-	private final AutoVariable<Boolean> _autoWarnSystemOverloaded;
-	private Queue<Task> _taskQueue;
-	private static long TASKIDCOUNTER = 0;
 
-	public int getWorkerDelay() {
-		return _workerDelay;
-	}
+public class TaskQueue {
+	private WorkerController		_controller;
+	public final int				WORKER_DELAY	= 10;
+	private Queue<Task>				_taskQueue;
+	private static long				TASKIDCOUNTER	= 0;
+	private TaskQueueConfiguration	_configuration;
+	private boolean					_initialized;
 
 	public TaskSender getLocal() {
-		return _local;
+		return getConfiguration().getLocal();
 	}
 
 	public Logger getLogger() {
@@ -38,24 +31,39 @@ public class TaskQueue {
 		return _controller;
 	}
 
-	public int getMaximumTasks() {
-		return _maximumTasks;
+	private void setWorkerController(WorkerController controller) {
+		_controller = controller;
+	}
+
+	public boolean isInitialized() {
+		return _initialized;
+	}
+
+	private void setInitialized(boolean initialized) {
+		_initialized = initialized;
 	}
 
 	private Queue<Task> getQueue() {
 		return _taskQueue;
 	}
 
+	public TaskQueueConfiguration getConfiguration() {
+		return _configuration;
+	}
+
+	private void setConfiguration(TaskQueueConfiguration configuration) {
+		_configuration = configuration;
+	}
+
 	/**
 	 * Adds the task to the queue. The task has to have the state DO_PERFORM or
 	 * DO_CHECK!
-	 * 
+	 *
 	 * @param task
 	 *            The task to add to the queue
 	 */
 	public void addTask(Task task) {
-		if (task.getState() != TaskState.FINISHED
-				&& task.getState() != TaskState.NEW) {
+		if (task.getState() != TaskState.FINISHED && task.getState() != TaskState.NEW) {
 			getLogger().debug("Added task '" + task + "' to queue");
 
 			getQueue().add(task);
@@ -71,17 +79,22 @@ public class TaskQueue {
 		_controller.addBackgroundWorker(task);
 	}
 
-	public TaskQueue(int taskWorkers, int socketWorkers, TaskSender local,
-			int maximumTasks) {
-		_local = local;
-		_taskQueue = new ConcurrentLinkedQueue<Task>();
-		_maximumTasks = maximumTasks;
-		_workerDelay = 10;
-		_controller = new WorkerController(this, taskWorkers, socketWorkers);
-		_autoWarnSystemOverloaded = new AutoVariable<Boolean>(true, 5000);
+	public TaskQueue(TaskQueueConfiguration configuration) {
+		setConfiguration(configuration);
+		setWorkerController(new WorkerController(this));
+		setInitialized(false);
 	}
 
-	public void activate() {
+	public void activate(Task... backgroundTasks) {
+		if (!isInitialized()) {
+			initialize();
+		}
+
+		// Add background tasks
+		for (Task task : backgroundTasks) {
+			_controller.addBackgroundWorker(task);
+		}
+
 		// Start Workers
 		_controller.start();
 
@@ -91,7 +104,7 @@ public class TaskQueue {
 
 	/**
 	 * Prepares a task for performing
-	 * 
+	 *
 	 * @param task
 	 *            The task to prepare
 	 * @return The prepared task
@@ -102,8 +115,7 @@ public class TaskQueue {
 
 		if (task.getState() == TaskState.NEW) {
 			// Complete TaskHeader
-			task.setApplicationId(getLocal().getApplication()
-					.getApplicationId());
+			task.setApplicationId(getLocal().getApplication().getApplicationId());
 			task.setSenderInfo(getLocal().getLocalConnectionInfo());
 
 			// Set state
@@ -113,10 +125,8 @@ public class TaskQueue {
 		return task;
 	}
 
-	public void executeTaskRemote(Task task, ConnectionInfo connectionInfo)
-			throws Exception {
-		getLocal().getTaskReceiver(connectionInfo).writeObject(
-				prepareTask(task));
+	public void executeTaskRemote(Task task, ConnectionInfo connectionInfo) throws Exception {
+		getLocal().getTaskReceiver(connectionInfo).writeObject(prepareTask(task));
 	}
 
 	public void executeTaskLocal(Task task) throws Exception {
@@ -127,21 +137,32 @@ public class TaskQueue {
 		return ++TASKIDCOUNTER;
 	}
 
+	/**
+	 * Deactivates the {@link TaskQueue}
+	 */
 	public void deactivate() {
 		for (Worker w : getController().getWorkers()) {
 			w.kill();
 		}
+		setInitialized(false);
+	}
 
-		_autoWarnSystemOverloaded.interrupt();
+	/**
+	 * Initialize the {@link TaskQueue} to its initial state
+	 */
+	private void initialize() {
+		setWorkerController(new WorkerController(this));
+		_taskQueue = new ConcurrentLinkedQueue<Task>();
+		setInitialized(true);
 	}
 
 	/**
 	 * <ol>
-	 * <li>Checks a task. If the task is not correct (not same applId or applVersion) it will automatically 
-	 * be sent back with an error.</li>
+	 * <li>Checks a task. If the task is not correct (not same applId or
+	 * applVersion) it will automatically be sent back with an error.</li>
 	 * <li>Checks whether the system is overloaded</li>
 	 * </ol>
-	 * 
+	 *
 	 * @param task
 	 *            The task to be checked
 	 * @return True when the task is all right
@@ -151,18 +172,9 @@ public class TaskQueue {
 		/*
 		 * System is overloaded
 		 */
-		if (getMaximumTasks() > 0 && getQueue().size() >= getMaximumTasks()) {
-			// Warn!
-			synchronized (this) {
-				if (_autoWarnSystemOverloaded.getValue()) {
-					getLogger().warn(
-							"Server overloaded! ("
-									+ _autoWarnSystemOverloaded
-											.getAccessCount()
-									+ " tasks refused)");
-					_autoWarnSystemOverloaded.setValue(false);
-				}
-			}
+		if (getConfiguration().getMaximumTaskCount() > 0
+				&& getQueue().size() >= getConfiguration().getMaximumTaskCount()) {
+			// TODO: Print an error
 
 			task.setResult(TaskResult.ERROR);
 			task.setState(TaskState.DO_CHECK);
@@ -175,8 +187,8 @@ public class TaskQueue {
 		/*
 		 * Wrong application id, do not execute due to safety concerns
 		 */
-		if (getLocal().getApplication().getApplicationId() != task
-				.getApplicationId() && task.getState() == TaskState.DO_PERFORM) {
+		if (getLocal().getApplication().getApplicationId() != task.getApplicationId()
+				&& task.getState() == TaskState.DO_PERFORM) {
 			getLogger().warn(Task.MSG_SAFETY_CONCERN);
 
 			task.setResult(TaskResult.ERROR);

@@ -4,10 +4,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Automatically sets its value back to a default after x seconds
- * 
+ *
  * @author jonashansen
- * 
+ *
  */
+@Deprecated
 public class AutoVariable<V> extends Thread {
 	private V _defaultValue;
 	private V _value;

@@ -5,15 +5,12 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-
 import ljas.commons.tasking.task.Task;
 import ljas.commons.tasking.taskqueue.HasTaskQueue;
 
 public class SocketConnection {
 	protected HasTaskQueue _socketRoot;
 	protected Socket _socket;
-	protected ObjectOutputStream _out;
-	protected ObjectInputStream _in;
 
 	public Socket getSocket() {
 		return _socket;
@@ -23,21 +20,15 @@ public class SocketConnection {
 		_socket = value;
 	}
 
-	private ObjectOutputStream getOut() {
-		return _out;
+	private ObjectOutputStream getOut() throws IOException {
+		return new ObjectOutputStream(getSocket().getOutputStream());
 	}
 
-	private void setOut(ObjectOutputStream value) {
-		_out = value;
+
+	private ObjectInputStream getIn() throws IOException {
+		return new ObjectInputStream(getSocket().getInputStream());
 	}
 
-	private ObjectInputStream getIn() {
-		return _in;
-	}
-
-	private void setIn(ObjectInputStream value) {
-		_in = value;
-	}
 
 	private void setSocketRoot(HasTaskQueue root) {
 		_socketRoot = root;
@@ -57,8 +48,6 @@ public class SocketConnection {
 			setSocketRoot(socketRoot);
 			setSocket(socket);
 			getSocket().setKeepAlive(true);
-			setOut(new ObjectOutputStream(getSocket().getOutputStream()));
-			setIn(new ObjectInputStream(getSocket().getInputStream()));
 		} catch (IOException e) {
 			getSocketRoot().getLogger().error(e);
 		}
@@ -71,8 +60,6 @@ public class SocketConnection {
 
 	public void close() {
 		try {
-			getOut().close();
-			getIn().close();
 			getSocket().close();
 		} catch (Exception e) {
 			getSocketRoot().getLogger().error(e, e);

@@ -2,7 +2,6 @@ package ljas.commons.worker;
 
 import ljas.commons.state.RuntimeEnvironmentState;
 import ljas.commons.tasking.taskqueue.WorkerController;
-
 import org.apache.log4j.Logger;
 
 public abstract class Worker extends Thread {
@@ -25,10 +24,12 @@ public abstract class Worker extends Thread {
 	}
 
 	public boolean isKilled() {
-		if (getController().getTaskQueue().getLocal().getState() == RuntimeEnvironmentState.OFFLINE)
+		if (getController().getTaskQueue().getLocal().getState() == RuntimeEnvironmentState.OFFLINE) {
 			return true;
-		if (_delete)
+		}
+		if (_delete) {
 			return true;
+		}
 		return false;
 	}
 
@@ -46,7 +47,7 @@ public abstract class Worker extends Thread {
 			while (_blinker == thisThread) {
 				try {
 					((Worker) thisThread).runItOnce();
-					sleep(getController().getTaskQueue().getWorkerDelay());
+					sleep(getController().getTaskQueue().WORKER_DELAY);
 				} catch (Exception e) {
 					getLogger().error(e);
 				}

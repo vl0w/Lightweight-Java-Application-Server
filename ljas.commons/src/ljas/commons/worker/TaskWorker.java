@@ -1,7 +1,6 @@
 package ljas.commons.worker;
 
 import java.util.NoSuchElementException;
-
 import ljas.commons.network.ConnectionInfo;
 import ljas.commons.tasking.task.Task;
 import ljas.commons.tasking.task.TaskResult;
@@ -36,7 +35,7 @@ public class TaskWorker extends Worker {
 		} catch (NoSuchElementException e) {
 			// nothing
 		} catch (NullPointerException e) {
-			Thread.sleep(getController().getTaskQueue().getWorkerDelay());
+			Thread.sleep(getController().getTaskQueue().WORKER_DELAY);
 		} catch (Exception e) {
 			getLogger().error(e.getMessage(), e);
 		}
@@ -80,7 +79,7 @@ public class TaskWorker extends Worker {
 					.getTaskReceiver(task.getSenderInfo())
 					.getConnectionInfo();
 			ConnectionInfo local = getController().getTaskQueue().getLocal().getLocalConnectionInfo();
-			
+
 			if(remote.equals(local)){
 				// Local task
 				getController().getTaskQueue().executeTaskLocal(task);
@@ -88,7 +87,7 @@ public class TaskWorker extends Worker {
 				// Remote task
 				getController().getTaskQueue().executeTaskRemote(task, remote);
 			}
-			
+
 
 			// Log
 			getController().getTaskQueue().getLogger()

@@ -1,7 +1,6 @@
 package ljas.commons.tasking.taskqueue;
 
 import java.util.ArrayList;
-
 import ljas.commons.network.SocketConnection;
 import ljas.commons.tasking.task.Task;
 import ljas.commons.worker.BackgroundWorker;
@@ -43,15 +42,14 @@ public class WorkerController {
 		return _taskQueue;
 	}
 
-	public WorkerController(TaskQueue taskQueue, int taskWorkers,
-			int socketWorkers) {
+	public WorkerController(TaskQueue taskQueue) {
 		_taskQueue = taskQueue;
 		_taskWorkers = new ArrayList<TaskWorker>();
 		_backgroundWorker = new ArrayList<BackgroundWorker>();
 		_socketWorkers = new ArrayList<SocketWorker>();
 
-		addTaskWorkers(taskWorkers);
-		addSocketWorkers(socketWorkers);
+		addTaskWorkers(getTaskQueue().getConfiguration().getTaskWorkerCount());
+		addSocketWorkers(getTaskQueue().getConfiguration().getSocketWorkerCount());
 	}
 
 	public void start() {

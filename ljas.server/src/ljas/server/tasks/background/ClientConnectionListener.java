@@ -2,11 +2,11 @@ package ljas.server.tasks.background;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-
 import ljas.commons.application.LoginParameters;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.network.ConnectionInfo;
 import ljas.commons.network.SocketConnection;
+import ljas.commons.network.TaskSender;
 import ljas.commons.state.RefusedMessage;
 import ljas.commons.state.WelcomeMessage;
 import ljas.commons.tasking.task.Task;
@@ -14,6 +14,10 @@ import ljas.server.main.Server;
 
 public class ClientConnectionListener extends Task {
 	private static final long serialVersionUID = -3839564995881410292L;
+
+	public ClientConnectionListener(TaskSender local) {
+		setLocal(local);
+	}
 
 	@Override
 	public void performTask() {
@@ -72,7 +76,8 @@ public class ClientConnectionListener extends Task {
 		} catch (SocketTimeoutException e) {
 			// Log nothing, let it be
 		} catch (IOException e) {
-			getLocal().getLogger().error(e);
+			// Log nothing, let it be
+//			getLocal().getLogger().error(e);
 		} catch (Exception e) {
 			getLocal().getLogger().error(e);
 		}

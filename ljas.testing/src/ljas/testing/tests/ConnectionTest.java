@@ -1,20 +1,16 @@
 package ljas.testing.tests;
 
-import java.io.IOException;
 import java.net.ConnectException;
-import java.util.ArrayList;
-import java.util.List;
-
-import junit.framework.TestCase;
 import ljas.commons.client.Client;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.state.RefusedMessage;
+import ljas.testing.ServerTestCase;
 
-public class ConnectionTest extends TestCase {
+public class ConnectionTest extends ServerTestCase {
 	public void testConnectionOk() {
-		Client client = Constants.createClient();
+		Client client=null;
 		try {
-			Constants.doConnect(client);
+			client = createClient();
 		} catch (Exception e) {
 			fail(e.getMessage());
 		} finally {
@@ -23,10 +19,9 @@ public class ConnectionTest extends TestCase {
 	}
 
 	public void testWrongApplicationId() {
-		Client client = Constants.createClient("com.maps.haxxor",
-				Constants.APPLICATION_VERSION);
+		Client client = null;
 		try {
-			Constants.doConnect(client);
+			client=createClient("com.maps.haxxor",ServerTestCase.APPLICATION_VERSION);
 			fail("Should throw exception.");
 		} catch (ConnectException e) {
 			fail("Can not connect to server");
@@ -39,9 +34,9 @@ public class ConnectionTest extends TestCase {
 	}
 
 	public void testWrongVersion() {
-		Client client = Constants.createClient(Constants.APPLICATION_ID, "0.5");
+		Client client = null;
 		try {
-			Constants.doConnect(client);
+			client = createClient(ServerTestCase.APPLICATION_ID, "0.5");
 			fail("Should throw exception.");
 		} catch (ConnectException e) {
 			fail("Can not connect to server");
@@ -50,44 +45,6 @@ public class ConnectionTest extends TestCase {
 					e.getRefusedMessage());
 		} finally {
 			client.disconnect();
-		}
-	}
-
-	public void testServerFull() {
-		List<Client> clientList = new ArrayList<Client>();
-		try {
-			int maxUsers = Constants.getServerConfiguration()
-					.getMaximumClients();
-			for (int i = 0; i < maxUsers; i++) {
-				clientList.add(Constants.createClient());
-			}
-
-			// Fill server
-			for (Client client : clientList) {
-				try {
-					Constants.doConnect(client);
-				} catch (ConnectionRefusedException e) {
-					fail(e.getMessage());
-				}
-			}
-
-			// Another user, but server should be full
-			Client failClient = Constants.createClient();
-
-			try {
-				Constants.doConnect(failClient);
-			} catch (ConnectionRefusedException e) {
-				assertEquals(RefusedMessage.SERVER_FULL, e.getRefusedMessage());
-			} finally {
-				failClient.disconnect();
-			}
-
-		} catch (IOException e) {
-			fail(e.getMessage());
-		} finally {
-			for (Client client : clientList) {
-				client.disconnect();
-			}
 		}
 	}
 }

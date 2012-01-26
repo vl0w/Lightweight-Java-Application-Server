@@ -2,7 +2,6 @@ package ljas.commons.client;
 
 import java.net.ConnectException;
 import java.net.Socket;
-
 import ljas.commons.application.LoginParameters;
 import ljas.commons.application.client.ClientApplication;
 import ljas.commons.application.client.ClientApplicationException;
@@ -15,7 +14,7 @@ import ljas.commons.state.WelcomeMessage;
 import ljas.commons.tasking.task.Task;
 import ljas.commons.tasking.task.TaskObserverAdapter;
 import ljas.commons.tasking.taskqueue.TaskQueue;
-
+import ljas.commons.tasking.taskqueue.TaskQueueConfiguration;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
@@ -57,7 +56,7 @@ public class ClientImpl implements Client {
 	public ClientImpl(ClientUI ui, ClientApplication application) {
 		setServerSocket(null);
 		setState(RuntimeEnvironmentState.OFFLINE);
-		_taskQueue = new TaskQueue(2, 1, this, 0);
+		_taskQueue = new TaskQueue(new TaskQueueConfiguration(this,1,2));
 		_application = application;
 		_application.setClient(this);
 		_ui = ui;
@@ -135,7 +134,6 @@ public class ClientImpl implements Client {
 	public void disconnect() {
 		if (isOnline()) {
 			_taskQueue.deactivate();
-			_taskQueue = new TaskQueue(2, 1, this, 0);
 			_ui.handleDisconnected();
 			getServerSocket().close();
 			setState(RuntimeEnvironmentState.OFFLINE);
@@ -171,7 +169,7 @@ public class ClientImpl implements Client {
 
 	/**
 	 * Runs a task, waits for it and throws an exception when it has failed
-	 * 
+	 *
 	 * @param task
 	 *            The task to execute
 	 * @return The executed task
@@ -193,7 +191,7 @@ public class ClientImpl implements Client {
 			}
 
 			/**
-			 * 
+			 *
 			 * @param task
 			 *            The task which the TaskWaiter should wait for
 			 * @param autoExpiration

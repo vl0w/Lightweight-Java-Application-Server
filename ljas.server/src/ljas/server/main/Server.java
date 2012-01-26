@@ -3,43 +3,42 @@ package ljas.server.main;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import ljas.commons.application.LoginParameters;
 import ljas.commons.application.server.ServerApplication;
 import ljas.commons.application.server.ServerApplicationException;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.exceptions.TaskReceiverNotFoundException;
 import ljas.commons.network.ConnectionInfo;
-import ljas.commons.network.TaskSender;
 import ljas.commons.network.SocketConnection;
+import ljas.commons.network.TaskSender;
 import ljas.commons.state.RefusedMessage;
 import ljas.commons.state.RuntimeEnvironmentState;
 import ljas.commons.tasking.taskqueue.TaskQueue;
+import ljas.commons.tasking.taskqueue.TaskQueueConfiguration;
 import ljas.commons.worker.SocketWorker;
 import ljas.server.exceptions.ServerException;
 import ljas.server.tasks.background.ClientConnectionListener;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
-public final class Server implements TaskSender {
-	public static final String PROJECT_NAME = "LJAS";
-	public static final String PROJECT_HOMEPAGE = "http://github.com/Ganymed/Lightweight-Java-Application-Server";
-	public static final String SERVER_VERSION = "1.0.2";
 
-	private CopyOnWriteArrayList<SocketConnection> _clientConnections;
-	private RuntimeEnvironmentState _serverState;
-	private TaskQueue _taskQueue;
-	private ServerSocket _serverSocket;
-	private final ServerApplication _application;
-	private final ServerConfiguration _serverConfiguration;
+public final class Server implements TaskSender {
+	public static final String						PROJECT_NAME		= "LJAS";
+	public static final String						PROJECT_HOMEPAGE	= "http://github.com/Ganymed/Lightweight-Java-Application-Server";
+	public static final String						SERVER_VERSION		= "1.0.2";
+
+	private CopyOnWriteArrayList<SocketConnection>	_clientConnections;
+	private RuntimeEnvironmentState					_serverState;
+	private TaskQueue								_taskQueue;
+	private ServerSocket							_serverSocket;
+	private final ServerApplication					_application;
+	private final ServerConfiguration				_serverConfiguration;
 
 	public synchronized CopyOnWriteArrayList<SocketConnection> getConnectedClients() {
 		return _clientConnections;
 	}
 
-	private void setConnectedClients(
-			CopyOnWriteArrayList<SocketConnection> _connectedClients) {
+	private void setConnectedClients(CopyOnWriteArrayList<SocketConnection> _connectedClients) {
 		_clientConnections = _connectedClients;
 	}
 
@@ -88,14 +87,13 @@ public final class Server implements TaskSender {
 	}
 
 	// CONSTRUCTORS
-	public Server(ServerApplication application,
-			String serverConfigurationFilePath) throws IOException {
-		_serverConfiguration = new ServerConfiguration(
-				serverConfigurationFilePath);
-		setTaskQueue(new TaskQueue(getServerConfiguration()
-				.getTaskWorkerCount(), getServerConfiguration()
-				.getMaximumClients(), this, getServerConfiguration()
-				.getMaximumTaskCount()));
+	public Server(ServerApplication application, String serverConfigurationFilePath)
+			throws IOException {
+		_serverConfiguration = new ServerConfiguration(serverConfigurationFilePath);
+
+		setTaskQueue(new TaskQueue(new TaskQueueConfiguration(this, getServerConfiguration()
+				.getTaskWorkerCount(), getServerConfiguration().getMaximumClients(),
+				getServerConfiguration().getMaximumTaskCount())));
 		setState(RuntimeEnvironmentState.OFFLINE);
 		setConnectedClients(new CopyOnWriteArrayList<SocketConnection>());
 		_application = application;
@@ -109,19 +107,15 @@ public final class Server implements TaskSender {
 
 		// Print some information
 		getLogger().info(
-				"Starting " + this + " (v" + SERVER_VERSION
-						+ ") with application " + getApplication().getName()
-						+ " (" + getApplication().getVersion() + ")");
+				"Starting " + this + " (v" + SERVER_VERSION + ") with application "
+						+ getApplication().getName() + " (" + getApplication().getVersion() + ")");
 
+		getLogger().info("See \"" + PROJECT_HOMEPAGE + "\" for more information");
 		getLogger().info(
-				"See \"" + PROJECT_HOMEPAGE + "\" for more information");
-		getLogger().info(
-				"This server is hosted by "
-						+ getServerConfiguration().getHostName() + " ("
+				"This server is hosted by " + getServerConfiguration().getHostName() + " ("
 						+ getServerConfiguration().getHostContact() + ")");
 
-		getLogger().debug(
-				"Configuration: " + getServerConfiguration().toString());
+		getLogger().debug("Configuration: " + getServerConfiguration().toString());
 
 		// Internet connection
 		getLogger().info("Getting internet connection, starting socket");
@@ -130,9 +124,8 @@ public final class Server implements TaskSender {
 		setServerSocket(new ServerSocket(getServerConfiguration().getPort()));
 
 		// Initialize TaskQueue
-		getTaskQueue().addBackgroundTask(new ClientConnectionListener());
 		getLogger().info("Activating TaskQueue");
-		getTaskQueue().activate();
+		getTaskQueue().activate(new ClientConnectionListener(this));
 
 		// Start application
 		getLogger().info("Starting application");
@@ -143,8 +136,8 @@ public final class Server implements TaskSender {
 		getLogger().info(this + " has been started");
 	}
 
-	public void registerClient(SocketConnection clientConnection,
-			LoginParameters parameters) throws Exception {
+	public void registerClient(SocketConnection clientConnection, LoginParameters parameters)
+			throws Exception {
 
 		getConnectedClients().add(clientConnection);
 		SocketWorker wrk = getTaskQueue().getController().getSocketWorker();
@@ -152,8 +145,7 @@ public final class Server implements TaskSender {
 		getApplication().registerUser(clientConnection, parameters);
 	}
 
-	public void checkClient(LoginParameters parameters)
-			throws ConnectionRefusedException {
+	public void checkClient(LoginParameters parameters) throws ConnectionRefusedException {
 
 		// Check server state
 		if (!isOnline()) {
@@ -161,23 +153,18 @@ public final class Server implements TaskSender {
 		}
 
 		// Check server full
-		if (getConnectedClients().size() >= getServerConfiguration()
-				.getMaximumClients()) {
+		if (getConnectedClients().size() >= getServerConfiguration().getMaximumClients()) {
 			throw new ConnectionRefusedException(RefusedMessage.SERVER_FULL);
 		}
 
 		// Check application id
-		if (parameters.getApplicationId() != getApplication()
-				.getApplicationId()) {
-			throw new ConnectionRefusedException(
-					RefusedMessage.WRONG_APPLICATION_ID);
+		if (parameters.getApplicationId() != getApplication().getApplicationId()) {
+			throw new ConnectionRefusedException(RefusedMessage.WRONG_APPLICATION_ID);
 		}
 
 		// Check application version
-		if (!parameters.getApplicationVersion().equals(
-				getApplication().getVersion())) {
-			throw new ConnectionRefusedException(
-					RefusedMessage.WRONG_APPLICATION_VERSION);
+		if (!parameters.getApplicationVersion().equals(getApplication().getVersion())) {
+			throw new ConnectionRefusedException(RefusedMessage.WRONG_APPLICATION_VERSION);
 		}
 
 		// Call check on LoginParameters
@@ -187,6 +174,7 @@ public final class Server implements TaskSender {
 	public void shutdown() {
 		try {
 			getServerSocket().close();
+			getTaskQueue().deactivate();
 			setState(RuntimeEnvironmentState.OFFLINE);
 		} catch (IOException e) {
 			getLogger().error(e);
@@ -198,8 +186,7 @@ public final class Server implements TaskSender {
 		return PROJECT_NAME + "-server";
 	}
 
-	public synchronized void disconnectClient(SocketConnection con)
-			throws ServerException {
+	public synchronized void disconnectClient(SocketConnection con) throws ServerException {
 		// Remove from Application
 		try {
 			getApplication().removeUser(con);
@@ -213,15 +200,13 @@ public final class Server implements TaskSender {
 		}
 
 		getLogger().info(
-				"Client disconnected (" + con + "), "
-						+ (getConnectedClients().size())
+				"Client disconnected (" + con + "), " + (getConnectedClients().size())
 						+ " connection(s) overall");
 
 	}
 
 	@Override
-	public synchronized SocketConnection getTaskReceiver(
-			ConnectionInfo connectionInfo)
+	public synchronized SocketConnection getTaskReceiver(ConnectionInfo connectionInfo)
 			throws TaskReceiverNotFoundException, IllegalArgumentException {
 		if (connectionInfo == null) {
 			throw new NullPointerException("Server has multiple receivers");
@@ -231,14 +216,13 @@ public final class Server implements TaskSender {
 				return c;
 			}
 		}
-		throw new TaskReceiverNotFoundException("Could not find client "
-				+ connectionInfo + " on server");
+		throw new TaskReceiverNotFoundException("Could not find client " + connectionInfo
+				+ " on server");
 	}
 
 	@Override
 	public ConnectionInfo getLocalConnectionInfo() {
-		return new ConnectionInfo(
-				getServerSocket().getInetAddress().toString(),
+		return new ConnectionInfo(getServerSocket().getInetAddress().toString(),
 				getServerConfiguration().getPort());
 	}
 
