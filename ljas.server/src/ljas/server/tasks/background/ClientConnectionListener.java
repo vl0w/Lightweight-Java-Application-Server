@@ -48,9 +48,9 @@ public class ClientConnectionListener extends Task {
 
 				// Create welcome-message
 				WelcomeMessage welcome = new WelcomeMessage(
-						((Server) getLocal()).getServerConfiguration()
+						((Server) getLocal()).getConfiguration()
 								.getHostName(), ((Server) getLocal())
-								.getServerConfiguration().getMessasgeOfTheDay());
+								.getConfiguration().getMessasgeOfTheDay());
 				String remoteIp = clientConnection.getSocket().getInetAddress()
 						.toString();
 				int remotePort = clientConnection.getSocket().getPort();

@@ -1,4 +1,4 @@
-package ljas.testing.commons.tasks;
+package ljas.testing.tasks;
 
 import ljas.commons.exceptions.TaskException;
 import ljas.commons.tasking.task.Task;

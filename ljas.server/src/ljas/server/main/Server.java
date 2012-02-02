@@ -25,14 +25,14 @@ import org.apache.log4j.xml.DOMConfigurator;
 public final class Server implements TaskSender {
 	public static final String						PROJECT_NAME		= "LJAS";
 	public static final String						PROJECT_HOMEPAGE	= "http://github.com/Ganymed/Lightweight-Java-Application-Server";
-	public static final String						SERVER_VERSION		= "1.0.2";
+	public static final String						SERVER_VERSION		= "1.0.3";
 
 	private CopyOnWriteArrayList<SocketConnection>	_clientConnections;
 	private RuntimeEnvironmentState					_serverState;
 	private TaskQueue								_taskQueue;
 	private ServerSocket							_serverSocket;
-	private final ServerApplication					_application;
-	private final ServerConfiguration				_serverConfiguration;
+	private ServerApplication						_application;
+	private ServerConfiguration						_configuration;
 
 	public synchronized CopyOnWriteArrayList<SocketConnection> getConnectedClients() {
 		return _clientConnections;
@@ -45,6 +45,10 @@ public final class Server implements TaskSender {
 	@Override
 	public ServerApplication getApplication() {
 		return _application;
+	}
+
+	private void setApplication(ServerApplication application) {
+		_application = application;
 	}
 
 	@Override
@@ -82,24 +86,33 @@ public final class Server implements TaskSender {
 		return Logger.getLogger(getClass());
 	}
 
-	public ServerConfiguration getServerConfiguration() {
-		return _serverConfiguration;
+	public ServerConfiguration getConfiguration() {
+		return _configuration;
+	}
+
+	private void setConfiguration(ServerConfiguration configuration) {
+		_configuration = configuration;
 	}
 
 	// CONSTRUCTORS
 	public Server(ServerApplication application, String serverConfigurationFilePath)
 			throws IOException {
-		_serverConfiguration = new ServerConfiguration(serverConfigurationFilePath);
+		// Set the configuration
+		setConfiguration(new ServerConfiguration(serverConfigurationFilePath));
 
-		setTaskQueue(new TaskQueue(new TaskQueueConfiguration(this, getServerConfiguration()
-				.getTaskWorkerCount(), getServerConfiguration().getMaximumClients(),
-				getServerConfiguration().getMaximumTaskCount())));
+		// Application
+		setApplication(application);
+		getApplication().setLocal(this);
+
+		// Other
+		setTaskQueue(new TaskQueue(new TaskQueueConfiguration(this, getConfiguration()
+				.getTaskWorkerCount(), getConfiguration().getMaximumClients(), getConfiguration()
+				.getMaximumTaskCount())));
 		setState(RuntimeEnvironmentState.OFFLINE);
 		setConnectedClients(new CopyOnWriteArrayList<SocketConnection>());
-		_application = application;
-		_application.setLocal(this);
 
-		DOMConfigurator.configure(getServerConfiguration().getLog4JFilePath());
+		// Logging
+		DOMConfigurator.configure(getConfiguration().getLog4JFilePath());
 	}
 
 	public void startup() throws Exception {
@@ -112,16 +125,16 @@ public final class Server implements TaskSender {
 
 		getLogger().info("See \"" + PROJECT_HOMEPAGE + "\" for more information");
 		getLogger().info(
-				"This server is hosted by " + getServerConfiguration().getHostName() + " ("
-						+ getServerConfiguration().getHostContact() + ")");
+				"This server is hosted by " + getConfiguration().getHostName() + " ("
+						+ getConfiguration().getHostContact() + ")");
 
-		getLogger().debug("Configuration: " + getServerConfiguration().toString());
+		getLogger().debug("Configuration: " + getConfiguration().toString());
 
 		// Internet connection
 		getLogger().info("Getting internet connection, starting socket");
 
 		// Serversocket
-		setServerSocket(new ServerSocket(getServerConfiguration().getPort()));
+		setServerSocket(new ServerSocket(getConfiguration().getPort()));
 
 		// Initialize TaskQueue
 		getLogger().info("Activating TaskQueue");
@@ -153,7 +166,7 @@ public final class Server implements TaskSender {
 		}
 
 		// Check server full
-		if (getConnectedClients().size() >= getServerConfiguration().getMaximumClients()) {
+		if (getConnectedClients().size() >= getConfiguration().getMaximumClients()) {
 			throw new ConnectionRefusedException(RefusedMessage.SERVER_FULL);
 		}
 
@@ -222,8 +235,8 @@ public final class Server implements TaskSender {
 
 	@Override
 	public ConnectionInfo getLocalConnectionInfo() {
-		return new ConnectionInfo(getServerSocket().getInetAddress().toString(),
-				getServerConfiguration().getPort());
+		return new ConnectionInfo(getServerSocket().getInetAddress().toString(), getConfiguration()
+				.getPort());
 	}
 
 	@Override
