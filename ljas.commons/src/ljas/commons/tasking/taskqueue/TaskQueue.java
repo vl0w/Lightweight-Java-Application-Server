@@ -7,13 +7,12 @@ import ljas.commons.network.TaskSender;
 import ljas.commons.tasking.task.Task;
 import ljas.commons.tasking.task.TaskResult;
 import ljas.commons.tasking.task.TaskState;
-import ljas.commons.worker.Worker;
 import org.apache.log4j.Logger;
 
 
 public class TaskQueue {
 	private WorkerController		_controller;
-	public final int				WORKER_DELAY	= 10;
+	public final int				WORKER_DELAY	= 5;
 	private Queue<Task>				_taskQueue;
 	private static long				TASKIDCOUNTER	= 0;
 	private TaskQueueConfiguration	_configuration;
@@ -97,9 +96,6 @@ public class TaskQueue {
 
 		// Start Workers
 		_controller.start();
-
-		// Print some info
-		getLogger().debug("Taskqueue is running");
 	}
 
 	/**
@@ -141,9 +137,7 @@ public class TaskQueue {
 	 * Deactivates the {@link TaskQueue}
 	 */
 	public void deactivate() {
-		for (Worker w : getController().getWorkers()) {
-			w.kill();
-		}
+		getController().killAll();
 		setInitialized(false);
 	}
 

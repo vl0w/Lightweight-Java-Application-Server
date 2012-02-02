@@ -40,9 +40,21 @@ public class ConnectionTest extends ServerTestCase {
 		}
 	}
 
-	public void testServerFull() throws IOException{
+	public void testServerFull() throws IOException, ConnectionRefusedException{
 		int maximumClients = ServerManager.getServer().getConfiguration().getMaximumClients();
 
+		// Connect maximum amount of clients
+		for(int i=0;i<maximumClients;i++){
+			createClient();
+		}
+
+		try{
+			createClient();
+			fail("Should throw an exception");
+		}catch(ConnectionRefusedException e){
+			// Success!
+			assertEquals(RefusedMessage.SERVER_FULL, e.getRefusedMessage());
+		}
 
 	}
 }

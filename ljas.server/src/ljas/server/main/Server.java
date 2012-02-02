@@ -131,17 +131,17 @@ public final class Server implements TaskSender {
 		getLogger().debug("Configuration: " + getConfiguration().toString());
 
 		// Internet connection
-		getLogger().info("Getting internet connection, starting socket");
+		getLogger().debug("Getting internet connection, starting socket");
 
 		// Serversocket
 		setServerSocket(new ServerSocket(getConfiguration().getPort()));
 
 		// Initialize TaskQueue
-		getLogger().info("Activating TaskQueue");
+		getLogger().debug("Activating TaskQueue");
 		getTaskQueue().activate(new ClientConnectionListener(this));
 
 		// Start application
-		getLogger().info("Starting application");
+		getLogger().debug("Starting application");
 		getApplication().start();
 
 		// Finish Process
@@ -186,8 +186,11 @@ public final class Server implements TaskSender {
 
 	public void shutdown() {
 		try {
+			getLogger().debug("Closing socket");
 			getServerSocket().close();
+			getLogger().debug("Deactivating TaskQueue");
 			getTaskQueue().deactivate();
+			getLogger().info(this+" is offline");
 			setState(RuntimeEnvironmentState.OFFLINE);
 		} catch (IOException e) {
 			getLogger().error(e);

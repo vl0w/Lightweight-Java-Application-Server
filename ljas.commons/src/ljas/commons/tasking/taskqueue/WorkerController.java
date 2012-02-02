@@ -1,6 +1,8 @@
 package ljas.commons.tasking.taskqueue;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import ljas.commons.network.SocketConnection;
 import ljas.commons.tasking.task.Task;
 import ljas.commons.worker.BackgroundWorker;
@@ -8,34 +10,56 @@ import ljas.commons.worker.SocketWorker;
 import ljas.commons.worker.TaskWorker;
 import ljas.commons.worker.Worker;
 
+
 public class WorkerController {
-	private final ArrayList<TaskWorker> _taskWorkers;
-	private final ArrayList<BackgroundWorker> _backgroundWorker;
-	private final ArrayList<SocketWorker> _socketWorkers;
-	private final TaskQueue _taskQueue;
+	private List<Worker>	_workerList;
+	private final TaskQueue	_taskQueue;
 
 	public void addTaskWorkers(int n) {
 		for (int i = 0; i < n; i++) {
-			_taskWorkers.add(new TaskWorker(this, "TaskWorker " + i));
+			_workerList.add(new TaskWorker(this, "TaskWorker " + i));
 		}
 	}
 
 	public void addSocketWorkers(int n) {
 		for (int i = 0; i < n; i++) {
-			_socketWorkers.add(new SocketWorker(this));
+			_workerList.add(new SocketWorker(this));
 		}
 	}
 
 	public void addBackgroundWorker(Task task) {
-		_backgroundWorker.add(new BackgroundWorker(this, task));
+		_workerList.add(new BackgroundWorker(this, task));
 	}
 
-	public ArrayList<Worker> getWorkers() {
-		ArrayList<Worker> workers = new ArrayList<Worker>();
-		workers.addAll(_taskWorkers);
-		workers.addAll(_backgroundWorker);
-		workers.addAll(_socketWorkers);
-		return workers;
+	private List<Worker> getWorkerList() {
+		return _workerList;
+	}
+
+	private List<Worker> getWorkerList(Class<? extends Worker>... types) {
+		List<Worker> typeWorkerList = new ArrayList<Worker>();
+		List<Worker> workerList = getWorkerList();
+
+		for (Worker worker : workerList) {
+			for (Class<? extends Worker> workerClass : types) {
+				if (worker.getClass().equals(workerClass)) {
+					typeWorkerList.add(worker);
+				}
+			}
+		}
+		return typeWorkerList;
+	}
+
+	@SuppressWarnings("unchecked")
+	private <V extends Worker> List<V> getWorkerList(Class<V> type) {
+		List<V> typeWorkerList = new ArrayList<V>();
+		List<Worker> workerList = getWorkerList();
+
+		for (Worker worker : workerList) {
+			if (worker.getClass().equals(type)) {
+				typeWorkerList.add((V) worker);
+			}
+		}
+		return typeWorkerList;
 	}
 
 	public TaskQueue getTaskQueue() {
@@ -44,34 +68,31 @@ public class WorkerController {
 
 	public WorkerController(TaskQueue taskQueue) {
 		_taskQueue = taskQueue;
-		_taskWorkers = new ArrayList<TaskWorker>();
-		_backgroundWorker = new ArrayList<BackgroundWorker>();
-		_socketWorkers = new ArrayList<SocketWorker>();
+		_workerList = new CopyOnWriteArrayList<Worker>();
 
 		addTaskWorkers(getTaskQueue().getConfiguration().getTaskWorkerCount());
 		addSocketWorkers(getTaskQueue().getConfiguration().getSocketWorkerCount());
 	}
 
+	@SuppressWarnings("unchecked")
 	public void start() {
 		// Start workers
-		for (Worker w : getWorkers()) {
-			if (!(w instanceof SocketWorker)) {
-				w.start();
-			}
+		for (Worker w : getWorkerList(TaskWorker.class, BackgroundWorker.class)) {
+			w.start();
 		}
 	}
 
 	public SocketWorker getSocketWorker() throws Exception {
-		for (SocketWorker w : _socketWorkers) {
-			if (w.getConnection() == null) {
-				return w;
+		for (SocketWorker worker : getWorkerList(SocketWorker.class)) {
+			if (worker.getConnection() == null) {
+				return worker;
 			}
 		}
 		throw new Exception();
 	}
 
 	public SocketWorker getSocketWorker(SocketConnection clientConnection) {
-		for (SocketWorker w : _socketWorkers) {
+		for (SocketWorker w : getWorkerList(SocketWorker.class)) {
 			if (w.getConnection().equals(clientConnection)) {
 				return w;
 			}
@@ -79,28 +100,33 @@ public class WorkerController {
 		return null;
 	}
 
-	public void setSocketWorker(SocketConnection clientConnection,
-			SocketWorker value) {
-		for (SocketWorker w : _socketWorkers) {
-			if (w.getConnection() == clientConnection) {
-				w = value;
+	public void setSocketWorker(SocketConnection clientConnection, SocketWorker value) {
+		for (SocketWorker worker : getWorkerList(SocketWorker.class)) {
+			if (worker.getConnection() == clientConnection) {
+				worker = value;
 			}
 		}
 	}
 
-	public void clearSuspendedSocketWorker(SocketWorker wrk) {
-		_socketWorkers.remove(wrk);
-		_socketWorkers.add(new SocketWorker(this));
+	public void clearSuspendedSocketWorker(SocketWorker worker) {
+		getWorkerList(SocketWorker.class).remove(worker);
+		getWorkerList().add(new SocketWorker(this));
 	}
 
-	public void waitAll() {
-		for (Worker w : getWorkers()) {
-			w.pause();
+	public void pauseAll() {
+		for (Worker worker : getWorkerList()) {
+			worker.pause();
+		}
+	}
+
+	public void killAll() {
+		for (Worker worker : _workerList) {
+			worker.kill();
 		}
 	}
 
 	public void goAll() {
-		for (Worker w : getWorkers()) {
+		for (Worker w : getWorkerList()) {
 			w.go();
 		}
 	}
