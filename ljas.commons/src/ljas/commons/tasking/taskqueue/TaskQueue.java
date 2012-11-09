@@ -166,8 +166,8 @@ public class TaskQueue {
 		/*
 		 * System is overloaded
 		 */
-		if (getConfiguration().getMaximumTaskCount() > 0
-				&& getQueue().size() >= getConfiguration().getMaximumTaskCount()) {
+		if (getConfiguration().getMaximumTasks() > 0
+				&& getQueue().size() >= getConfiguration().getMaximumTasks()) {
 			// TODO: Print an error
 
 			task.setResult(TaskResult.ERROR);

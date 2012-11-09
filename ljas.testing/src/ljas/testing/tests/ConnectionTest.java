@@ -2,6 +2,7 @@ package ljas.testing.tests;
 
 import java.io.IOException;
 import java.net.ConnectException;
+
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.state.RefusedMessage;
 import ljas.testing.ServerManager;
@@ -30,7 +31,7 @@ public class ConnectionTest extends ServerTestCase {
 
 	public void testWrongVersion() {
 		try {
-			createClient(ServerTestCase.APPLICATION_ID, "0.5");
+			createClient(ServerTestCase.APPLICATION_IDENTIFIER, "0.5");
 			fail("Should throw exception.");
 		} catch (ConnectException e) {
 			fail("Can not connect to server");

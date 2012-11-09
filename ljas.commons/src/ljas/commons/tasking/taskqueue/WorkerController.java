@@ -70,8 +70,8 @@ public class WorkerController {
 		_taskQueue = taskQueue;
 		_workerList = new CopyOnWriteArrayList<Worker>();
 
-		addTaskWorkers(getTaskQueue().getConfiguration().getTaskWorkerCount());
-		addSocketWorkers(getTaskQueue().getConfiguration().getSocketWorkerCount());
+		addTaskWorkers(getTaskQueue().getConfiguration().getTaskWorkers());
+		addSocketWorkers(getTaskQueue().getConfiguration().getSocketWorkers());
 	}
 
 	@SuppressWarnings("unchecked")
