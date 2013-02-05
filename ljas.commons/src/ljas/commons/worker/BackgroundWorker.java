@@ -1,7 +1,6 @@
 package ljas.commons.worker;
 
 import ljas.commons.tasking.task.Task;
-import ljas.commons.tasking.taskqueue.WorkerController;
 
 public class BackgroundWorker extends Worker {
 	private Task _task;

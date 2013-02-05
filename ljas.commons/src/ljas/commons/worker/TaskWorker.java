@@ -1,28 +1,41 @@
 package ljas.commons.worker;
 
 import java.util.NoSuchElementException;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import ljas.commons.network.ConnectionInfo;
 import ljas.commons.tasking.task.Task;
 import ljas.commons.tasking.task.TaskResult;
 import ljas.commons.tasking.task.TaskState;
-import ljas.commons.tasking.taskqueue.WorkerController;
 
 public class TaskWorker extends Worker {
+	private final static int IDLE_TIME_TO_SELF_DESTRUCTION = 10000;
+	private Queue<Task> _taskQueue;
+	private int _queueEmptyCounter;
 
 	public TaskWorker(WorkerController controller) {
-		this(controller, "TaskWorker ?");
+		this(controller, 0);
 	}
 
-	public TaskWorker(WorkerController controller, String threadName) {
+	public TaskWorker(WorkerController controller, int id) {
 		super(controller, Thread.NORM_PRIORITY, false);
-		setName(threadName);
+		_taskQueue = new ConcurrentLinkedQueue<Task>();
+		int port = controller.getTaskController().getLocal()
+				.getLocalConnectionInfo().getPort();
+		setName("TaskWorker " + id + " (:" + port + ")");
+		_queueEmptyCounter = 0;
+	}
+
+	public synchronized Queue<Task> getTaskQueue() {
+		return _taskQueue;
 	}
 
 	@Override
 	public void runItOnce() throws Exception {
 		try {
-			Task task = getController().getTaskQueue().removeTask();
-			task.setLocal(getController().getTaskQueue().getLocal());
+			Task task = getTaskQueue().remove();
+			task.setLocal(getWorkerController().getTaskController().getLocal());
 
 			if (task.getState() == TaskState.DO_PERFORM) {
 				performTask(task);
@@ -33,12 +46,35 @@ public class TaskWorker extends Worker {
 			}
 
 		} catch (NoSuchElementException e) {
-			// nothing
-		} catch (NullPointerException e) {
-			Thread.sleep(getController().getTaskQueue().WORKER_DELAY);
+			final int workerDelay = getWorkerController().getTaskController().WORKER_DELAY;
+			sleep(workerDelay);
+			_queueEmptyCounter++;
+			// Must destroy itself?
+			if (_queueEmptyCounter * workerDelay >= IDLE_TIME_TO_SELF_DESTRUCTION) {
+				getLogger().info(
+						"TaskWorker has not been used since "
+								+ IDLE_TIME_TO_SELF_DESTRUCTION
+								+ "ms. Shuting it down.");
+				kill();
+			}
 		} catch (Exception e) {
-			getLogger().error(e.getMessage(), e);
+			getLogger().error(e);
 		}
+	}
+
+	/**
+	 * Schedules the task
+	 * 
+	 * @param task
+	 *            The task to schedule and execute
+	 * @return True when the task has succesfully been scheduled for execution.
+	 */
+	public boolean scheduleTask(Task task) {
+		if (!isKilled()) {
+			getTaskQueue().add(task);
+			return true;
+		}
+		return false;
 	}
 
 	private void checkTask(Task task) throws Exception {
@@ -50,18 +86,21 @@ public class TaskWorker extends Worker {
 		task.notifyAllExecuted();
 
 		// Log
-		getController().getTaskQueue().getLogger()
+		getWorkerController().getTaskController().getLogger()
 				.debug("Task '" + task + "' checked");
 	}
 
 	private void performTask(Task task) throws Exception {
+		// Get time
+		long startTime = System.currentTimeMillis();
+
 		// Only perform task when the result has not been set previously
 		if (task.getResult() == TaskResult.NONE) {
 			// Perform the task
 			task.perform();
 
 			// Log
-			getController().getTaskQueue().getLogger()
+			getWorkerController().getTaskController().getLogger()
 					.debug("Executed task '" + task + "'");
 		}
 
@@ -75,22 +114,24 @@ public class TaskWorker extends Worker {
 
 		// Send the task back to its sender, else check
 		try {
-			ConnectionInfo remote = getController().getTaskQueue().getLocal()
-					.getTaskReceiver(task.getSenderInfo())
+			ConnectionInfo remote = getWorkerController().getTaskController()
+					.getLocal().getTaskReceiver(task.getSenderInfo())
 					.getConnectionInfo();
-			ConnectionInfo local = getController().getTaskQueue().getLocal().getLocalConnectionInfo();
+			ConnectionInfo local = getWorkerController().getTaskController()
+					.getLocal().getLocalConnectionInfo();
 
-			if(remote.equals(local)){
+			if (remote.equals(local)) {
 				// Local task
-				getController().getTaskQueue().executeTaskLocal(task);
-			}else{
+				getWorkerController().getTaskController()
+						.executeTaskLocal(task);
+			} else {
 				// Remote task
-				getController().getTaskQueue().executeTaskRemote(task, remote);
+				getWorkerController().getTaskController().executeTaskRemote(
+						task, remote);
 			}
 
-
 			// Log
-			getController().getTaskQueue().getLogger()
+			getWorkerController().getTaskController().getLogger()
 					.debug("Task '" + task + "' sent back to sender");
 		} catch (Exception e) {
 			// Task receiver not found, probably disconnected
@@ -98,5 +139,17 @@ public class TaskWorker extends Worker {
 
 			// do not log
 		}
+
+		// Get time, notify the TaskController about it
+		long endTime = System.currentTimeMillis();
+		long duration = endTime - startTime;
+		getWorkerController().getTaskController().storeExecutionTime(task,
+				duration);
+	}
+
+	@Override
+	public void kill() {
+		getWorkerController().getWorkers().remove(this);
+		super.kill();
 	}
 }

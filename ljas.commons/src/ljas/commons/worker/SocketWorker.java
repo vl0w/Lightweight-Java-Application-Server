@@ -2,7 +2,6 @@ package ljas.commons.worker;
 
 import ljas.commons.network.SocketConnection;
 import ljas.commons.tasking.task.Task;
-import ljas.commons.tasking.taskqueue.WorkerController;
 
 public class SocketWorker extends Worker {
 
@@ -17,6 +16,10 @@ public class SocketWorker extends Worker {
 		_connection = value;
 		if (_connection != null) {
 			if (!isAlive()) {
+				int port = getWorkerController().getTaskController().getLocal()
+						.getLocalConnectionInfo().getPort();
+				setName("SocketWorker " + SOCKET_WORKER_COUNT + " (:" + port
+						+ ")");
 				start();
 			}
 		}
@@ -25,7 +28,8 @@ public class SocketWorker extends Worker {
 	public SocketWorker(WorkerController controller) {
 		super(controller, Thread.NORM_PRIORITY, false);
 		setConnection(null);
-		setName("SocketWorker" + (++SOCKET_WORKER_COUNT));
+		setName("SocketWorker (suspended)");
+		SOCKET_WORKER_COUNT++;
 	}
 
 	@Override
@@ -34,8 +38,10 @@ public class SocketWorker extends Worker {
 			Object o = _connection.readObject();
 			if (o != null) {
 				if (o instanceof Task) {
-					if (getController().getTaskQueue().checkTask((Task) o)) {
-						getController().getTaskQueue().addTask((Task) o);
+					if (getWorkerController().getTaskController().checkTask(
+							(Task) o)) {
+						getWorkerController().getTaskController().scheduleTask(
+								(Task) o);
 					}
 				} else {
 					throw new Exception("Client sended unknown object!");
@@ -46,8 +52,8 @@ public class SocketWorker extends Worker {
 			_connection.close();
 
 			// Notify thread owner
-			getController()
-					.getTaskQueue()
+			getWorkerController()
+					.getTaskController()
 					.getLocal()
 					.notifyDisconnectedTaskReceiver(
 							_connection.getConnectionInfo());
@@ -59,7 +65,7 @@ public class SocketWorker extends Worker {
 
 	@Override
 	public void kill() {
-		getController().clearSuspendedSocketWorker(this);
+		getWorkerController().clearSuspendedSocketWorker(this);
 		super.kill();
 	}
 }

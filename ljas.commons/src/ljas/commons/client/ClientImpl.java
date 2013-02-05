@@ -13,8 +13,10 @@ import ljas.commons.state.RuntimeEnvironmentState;
 import ljas.commons.state.WelcomeMessage;
 import ljas.commons.tasking.task.Task;
 import ljas.commons.tasking.task.TaskObserverAdapter;
-import ljas.commons.tasking.taskqueue.TaskQueue;
+import ljas.commons.tasking.taskqueue.TaskController;
 import ljas.commons.tasking.taskqueue.TaskQueueConfiguration;
+import ljas.commons.worker.WorkerController;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
@@ -22,7 +24,8 @@ public class ClientImpl implements Client {
 	private RuntimeEnvironmentState _clientState;
 	private SocketConnection _serverSocket;
 	private final ClientApplication _application;
-	private TaskQueue _taskQueue;
+	private TaskController _taskController;
+	private WorkerController _workerController;
 	private final ClientUI _ui;
 	private ConnectionInfo _myConnectionInfo;
 
@@ -44,8 +47,13 @@ public class ClientImpl implements Client {
 	}
 
 	@Override
-	public TaskQueue getTaskQueue() {
-		return _taskQueue;
+	public TaskController getTaskController() {
+		return _taskController;
+	}
+
+	@Override
+	public WorkerController getWorkerController() {
+		return _workerController;
 	}
 
 	@Override
@@ -56,7 +64,8 @@ public class ClientImpl implements Client {
 	public ClientImpl(ClientUI ui, ClientApplication application) {
 		setServerSocket(null);
 		setState(RuntimeEnvironmentState.OFFLINE);
-		_taskQueue = new TaskQueue(new TaskQueueConfiguration(this,1,2));
+		_taskController = new TaskController(new TaskQueueConfiguration(this,1,2));
+		_workerController = new WorkerController(this);
 		_application = application;
 		_application.setClient(this);
 		_ui = ui;
@@ -74,7 +83,8 @@ public class ClientImpl implements Client {
 		}
 
 		setState(RuntimeEnvironmentState.STARTUP);
-		_taskQueue.activate();
+		getTaskController().activate();
+		getWorkerController().start();
 		try {
 			// Connecting to server
 			setServerSocket(new SocketConnection(new Socket(ip, port), this));
@@ -88,7 +98,7 @@ public class ClientImpl implements Client {
 				setState(RuntimeEnvironmentState.ONLINE);
 				WelcomeMessage message = (WelcomeMessage) o;
 				_myConnectionInfo = message.getConnectionInfo();
-				_taskQueue.getController().getSocketWorker()
+				getWorkerController().getSocketWorker()
 						.setConnection(getServerSocket());
 				_ui.handleConnected(message);
 			} else if (o instanceof RefusedMessage) {
@@ -99,7 +109,7 @@ public class ClientImpl implements Client {
 				throw new Exception("Unknown server response");
 			}
 		} catch (Exception e) {
-			_taskQueue.deactivate();
+			_taskController.deactivate();
 			setState(RuntimeEnvironmentState.OFFLINE);
 			if (ConnectionRefusedException.class.getName().equals(
 					e.getClass().getName())) {
@@ -116,7 +126,7 @@ public class ClientImpl implements Client {
 		}
 
 		try {
-			getTaskQueue().executeTaskRemote(task, getLocalConnectionInfo());
+			getTaskController().executeTaskRemote(task, getLocalConnectionInfo());
 		} catch (Exception e) {
 			getLogger().error("Error while sending task", e);
 		}
@@ -133,7 +143,7 @@ public class ClientImpl implements Client {
 	@Override
 	public void disconnect() {
 		if (isOnline()) {
-			_taskQueue.deactivate();
+			_taskController.deactivate();
 			_ui.handleDisconnected();
 			getServerSocket().close();
 			setState(RuntimeEnvironmentState.OFFLINE);

@@ -6,7 +6,7 @@ import java.util.List;
 import ljas.commons.exceptions.TaskException;
 import ljas.commons.network.ConnectionInfo;
 import ljas.commons.network.TaskSender;
-import ljas.commons.tasking.taskqueue.TaskQueue;
+import ljas.commons.tasking.taskqueue.TaskController;
 
 /**
  * 
@@ -16,7 +16,6 @@ import ljas.commons.tasking.taskqueue.TaskQueue;
 public abstract class Task implements Serializable {
 	private static final long serialVersionUID = -8887389539021809582L;
 
-	public static String MSG_SYSTEM_OVERLOAD = "System overloaded. Try again later";
 	public static String MSG_SAFETY_CONCERN = "Task not executed due to safety concerns (Wrong Application ID)";
 
 	private long _id;
@@ -142,7 +141,7 @@ public abstract class Task implements Serializable {
 	}
 
 	public Task(int maximumLifetimeSeconds, int minimumLifeTimeSeconds) {
-		setId(TaskQueue.createTaskId());
+		setId(TaskController.createTaskId());
 		setApplicationId(0);
 		setSenderInfo(null);
 		_state = TaskState.NEW;

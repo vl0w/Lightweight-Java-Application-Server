@@ -1,7 +1,7 @@
 package ljas.commons.worker;
 
 import ljas.commons.state.RuntimeEnvironmentState;
-import ljas.commons.tasking.taskqueue.WorkerController;
+
 import org.apache.log4j.Logger;
 
 public abstract class Worker extends Thread {
@@ -11,11 +11,11 @@ public abstract class Worker extends Thread {
 	private Logger _log;
 	private boolean _delete;
 
-	protected void setController(WorkerController value) {
+	protected void setWorkerController(WorkerController value) {
 		_controller = value;
 	}
 
-	protected WorkerController getController() {
+	protected WorkerController getWorkerController() {
 		return _controller;
 	}
 
@@ -24,7 +24,7 @@ public abstract class Worker extends Thread {
 	}
 
 	public boolean isKilled() {
-		if (getController().getTaskQueue().getLocal().getState() == RuntimeEnvironmentState.OFFLINE) {
+		if (getWorkerController().getTaskController().getLocal().getState() == RuntimeEnvironmentState.OFFLINE) {
 			return true;
 		}
 		if (_delete) {
@@ -34,8 +34,8 @@ public abstract class Worker extends Thread {
 	}
 
 	public Worker(WorkerController controller, int priority, boolean daemon) {
-		setController(controller);
-		_log = getController().getTaskQueue().getLocal().getLogger();
+		setWorkerController(controller);
+		_log = getWorkerController().getTaskController().getLocal().getLogger();
 		setPriority(priority);
 		setDaemon(daemon);
 		_delete = false;
@@ -47,7 +47,7 @@ public abstract class Worker extends Thread {
 			while (_blinker == thisThread) {
 				try {
 					((Worker) thisThread).runItOnce();
-					sleep(getController().getTaskQueue().WORKER_DELAY);
+					sleep(getWorkerController().getTaskController().WORKER_DELAY);
 				} catch (Exception e) {
 					getLogger().error(e);
 				}

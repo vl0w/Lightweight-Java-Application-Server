@@ -4,22 +4,15 @@ import ljas.commons.network.TaskSender;
 
 public class TaskQueueConfiguration {
 	private TaskSender _local;
-	private int _maximumTasks;
-	private int _taskWorkers;
+	private int _maxTaskWorkers;
 	private int _socketWorkers;
 	
 	public TaskQueueConfiguration(TaskSender local, int taskWorkers,
 			int socketWorkers) {
-		this(local,taskWorkers,socketWorkers,1000);
-	}
-	
-	public TaskQueueConfiguration(TaskSender local, int taskWorkers,
-			int socketWorkers, int maximumTasks) {
 		super();
 		setLocal(local);
-		setTaskWorkers(taskWorkers);
+		setMaxTaskWorkers(taskWorkers);
 		setSocketWorkers(socketWorkers);
-		setMaximumTasks(maximumTasks);
 	}
 
 	public TaskSender getLocal() {
@@ -30,20 +23,12 @@ public class TaskQueueConfiguration {
 		_local = local;
 	}
 
-	public int getMaximumTasks() {
-		return _maximumTasks;
+	public int getMaxTaskWorkers() {
+		return _maxTaskWorkers;
 	}
 
-	private void setMaximumTasks(int maximumTasks) {
-		_maximumTasks = maximumTasks;
-	}
-
-	public int getTaskWorkers() {
-		return _taskWorkers;
-	}
-
-	private void setTaskWorkers(int taskWorkers) {
-		_taskWorkers = taskWorkers;
+	private void setMaxTaskWorkers(int taskWorkers) {
+		_maxTaskWorkers = taskWorkers;
 	}
 
 	public int getSocketWorkers() {
