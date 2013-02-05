@@ -11,7 +11,7 @@ import ljas.testing.tasks.HaxxorTask;
 public class SyncTaskTest extends ServerTestCase {
 	public void testSyncTask() {
 		try {
-			Client client = createClient();
+			Client client = createAndConnectClient();
 
 			double v1 = Math.random(), v2 = Math.random(), expectedValue = v1 + v2;
 			double result = ((AdditionTask) client.runTaskSync(new AdditionTask(v1, v2))).result;
@@ -24,7 +24,7 @@ public class SyncTaskTest extends ServerTestCase {
 
 	public void testFakedTask() {
 		try {
-			Client client = createClient();
+			Client client = createAndConnectClient();
 
 			client.runTaskSync(new HaxxorTask(client.getLocalConnectionInfo()));
 

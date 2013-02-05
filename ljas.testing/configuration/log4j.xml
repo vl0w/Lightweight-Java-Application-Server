@@ -15,7 +15,7 @@
   </logger>
   
     <logger name="ljas.commons" additivity="true">
-    <level value="WARN" />
+    <level value="INFO" />
     <appender-ref ref="console" />
   </logger>
 

@@ -2,7 +2,7 @@ package ljas.testing;
 
 import java.io.IOException;
 import ljas.commons.application.server.ServerApplicationAdapter;
-import ljas.server.main.Server;
+import ljas.server.Server;
 
 public abstract class ServerManager {
 	private static Server _server;

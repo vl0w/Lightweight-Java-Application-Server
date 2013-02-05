@@ -1,4 +1,4 @@
-package ljas.server.main;
+package ljas.server;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -29,12 +29,8 @@ public class ServerConfiguration {
 		return _properties.getProperty("MessageOfTheDay");
 	}
 
-	public int getTaskWorkerCount() {
-		return Integer.valueOf(_properties.getProperty("TaskWorkers"));
-	}
-
-	public int getMaximumTaskCount() {
-		return Integer.valueOf(_properties.getProperty("MaximumTasks"));
+	public int getMaxTaskWorkerCount() {
+		return Integer.valueOf(_properties.getProperty("MaxTaskWorkers"));
 	}
 
 	public String getLog4JFilePath() {

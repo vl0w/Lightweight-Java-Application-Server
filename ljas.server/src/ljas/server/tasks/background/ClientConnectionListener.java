@@ -10,7 +10,7 @@ import ljas.commons.network.TaskSender;
 import ljas.commons.state.RefusedMessage;
 import ljas.commons.state.WelcomeMessage;
 import ljas.commons.tasking.task.Task;
-import ljas.server.main.Server;
+import ljas.server.Server;
 
 public class ClientConnectionListener extends Task {
 	private static final long serialVersionUID = -3839564995881410292L;
@@ -48,9 +48,9 @@ public class ClientConnectionListener extends Task {
 
 				// Create welcome-message
 				WelcomeMessage welcome = new WelcomeMessage(
+						((Server) getLocal()).getConfiguration().getHostName(),
 						((Server) getLocal()).getConfiguration()
-								.getHostName(), ((Server) getLocal())
-								.getConfiguration().getMessasgeOfTheDay());
+								.getMessasgeOfTheDay());
 				String remoteIp = clientConnection.getSocket().getInetAddress()
 						.toString();
 				int remotePort = clientConnection.getSocket().getPort();
@@ -77,7 +77,6 @@ public class ClientConnectionListener extends Task {
 			// Log nothing, let it be
 		} catch (IOException e) {
 			// Log nothing, let it be
-//			getLocal().getLogger().error(e);
 		} catch (Exception e) {
 			getLocal().getLogger().error(e);
 		}

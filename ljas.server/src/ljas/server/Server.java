@@ -1,8 +1,9 @@
-package ljas.server.main;
+package ljas.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.CopyOnWriteArrayList;
+
 import ljas.commons.application.LoginParameters;
 import ljas.commons.application.server.ServerApplication;
 import ljas.commons.application.server.ServerApplicationException;
@@ -13,32 +14,35 @@ import ljas.commons.network.SocketConnection;
 import ljas.commons.network.TaskSender;
 import ljas.commons.state.RefusedMessage;
 import ljas.commons.state.RuntimeEnvironmentState;
-import ljas.commons.tasking.taskqueue.TaskQueue;
+import ljas.commons.tasking.taskqueue.TaskController;
 import ljas.commons.tasking.taskqueue.TaskQueueConfiguration;
 import ljas.commons.worker.SocketWorker;
+import ljas.commons.worker.WorkerController;
 import ljas.server.exceptions.ServerException;
 import ljas.server.tasks.background.ClientConnectionListener;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
-
 public final class Server implements TaskSender {
-	public static final String						PROJECT_NAME		= "LJAS";
-	public static final String						PROJECT_HOMEPAGE	= "http://github.com/Ganymed/Lightweight-Java-Application-Server";
-	public static final String						SERVER_VERSION		= "1.0.3";
+	public static final String PROJECT_NAME = "LJAS";
+	public static final String PROJECT_HOMEPAGE = "http://github.com/Ganymed/Lightweight-Java-Application-Server";
+	public static final String SERVER_VERSION = "1.0.3";
 
-	private CopyOnWriteArrayList<SocketConnection>	_clientConnections;
-	private RuntimeEnvironmentState					_serverState;
-	private TaskQueue								_taskQueue;
-	private ServerSocket							_serverSocket;
-	private ServerApplication						_application;
-	private ServerConfiguration						_configuration;
+	private CopyOnWriteArrayList<SocketConnection> _clientConnections;
+	private RuntimeEnvironmentState _serverState;
+	private TaskController _taskController;
+	private WorkerController _workerController;
+	private ServerSocket _serverSocket;
+	private ServerApplication _application;
+	private ServerConfiguration _configuration;
 
 	public synchronized CopyOnWriteArrayList<SocketConnection> getConnectedClients() {
 		return _clientConnections;
 	}
 
-	private void setConnectedClients(CopyOnWriteArrayList<SocketConnection> _connectedClients) {
+	private void setConnectedClients(
+			CopyOnWriteArrayList<SocketConnection> _connectedClients) {
 		_clientConnections = _connectedClients;
 	}
 
@@ -72,13 +76,22 @@ public final class Server implements TaskSender {
 		return getState() == RuntimeEnvironmentState.ONLINE;
 	}
 
-	private void setTaskQueue(TaskQueue value) {
-		_taskQueue = value;
+	private void setTaskController(TaskController value) {
+		_taskController = value;
 	}
 
 	@Override
-	public TaskQueue getTaskQueue() {
-		return _taskQueue;
+	public TaskController getTaskController() {
+		return _taskController;
+	}
+
+	public void setWorkerController(WorkerController workerController) {
+		_workerController = workerController;
+	}
+
+	@Override
+	public WorkerController getWorkerController() {
+		return _workerController;
 	}
 
 	@Override
@@ -95,8 +108,8 @@ public final class Server implements TaskSender {
 	}
 
 	// CONSTRUCTORS
-	public Server(ServerApplication application, String serverConfigurationFilePath)
-			throws IOException {
+	public Server(ServerApplication application,
+			String serverConfigurationFilePath) throws IOException {
 		// Set the configuration
 		setConfiguration(new ServerConfiguration(serverConfigurationFilePath));
 
@@ -105,9 +118,10 @@ public final class Server implements TaskSender {
 		getApplication().setLocal(this);
 
 		// Other
-		setTaskQueue(new TaskQueue(new TaskQueueConfiguration(this, getConfiguration()
-				.getTaskWorkerCount(), getConfiguration().getMaximumClients(), getConfiguration()
-				.getMaximumTaskCount())));
+		setTaskController(new TaskController(new TaskQueueConfiguration(this,
+				getConfiguration().getMaxTaskWorkerCount(), getConfiguration()
+						.getMaximumClients())));
+		setWorkerController(new WorkerController(this));
 		setState(RuntimeEnvironmentState.OFFLINE);
 		setConnectedClients(new CopyOnWriteArrayList<SocketConnection>());
 
@@ -116,17 +130,23 @@ public final class Server implements TaskSender {
 	}
 
 	public void startup() throws Exception {
+		if (isOnline()) {
+			shutdown();
+		}
+
 		setState(RuntimeEnvironmentState.STARTUP);
 
 		// Print some information
 		getLogger().info(
-				"Starting " + this + " (v" + SERVER_VERSION + ") with application "
-						+ getApplication().getName() + " (" + getApplication().getVersion() + ")");
+				"Starting " + this + " (v" + SERVER_VERSION
+						+ ") with application " + getApplication().getName()
+						+ " (" + getApplication().getVersion() + ")");
 
-		getLogger().info("See \"" + PROJECT_HOMEPAGE + "\" for more information");
 		getLogger().info(
-				"This server is hosted by " + getConfiguration().getHostName() + " ("
-						+ getConfiguration().getHostContact() + ")");
+				"See \"" + PROJECT_HOMEPAGE + "\" for more information");
+		getLogger().info(
+				"This server is hosted by " + getConfiguration().getHostName()
+						+ " (" + getConfiguration().getHostContact() + ")");
 
 		getLogger().debug("Configuration: " + getConfiguration().toString());
 
@@ -136,9 +156,13 @@ public final class Server implements TaskSender {
 		// Serversocket
 		setServerSocket(new ServerSocket(getConfiguration().getPort()));
 
-		// Initialize TaskQueue
-		getLogger().debug("Activating TaskQueue");
-		getTaskQueue().activate(new ClientConnectionListener(this));
+		// Initialize TaskController
+		getLogger().debug("Activating " + TaskController.class.getSimpleName());
+		getTaskController().activate(new ClientConnectionListener(this));
+
+		// Initialize WorkerController
+		getLogger().debug("Activating " + WorkerController.class.getSimpleName());
+		getWorkerController().start();
 
 		// Start application
 		getLogger().debug("Starting application");
@@ -149,16 +173,17 @@ public final class Server implements TaskSender {
 		getLogger().info(this + " has been started");
 	}
 
-	public void registerClient(SocketConnection clientConnection, LoginParameters parameters)
-			throws Exception {
+	public void registerClient(SocketConnection clientConnection,
+			LoginParameters parameters) throws Exception {
 
 		getConnectedClients().add(clientConnection);
-		SocketWorker wrk = getTaskQueue().getController().getSocketWorker();
+		SocketWorker wrk = getWorkerController().getSocketWorker();
 		wrk.setConnection(clientConnection);
 		getApplication().registerUser(clientConnection, parameters);
 	}
 
-	public void checkClient(LoginParameters parameters) throws ConnectionRefusedException {
+	public void checkClient(LoginParameters parameters)
+			throws ConnectionRefusedException {
 
 		// Check server state
 		if (!isOnline()) {
@@ -166,18 +191,23 @@ public final class Server implements TaskSender {
 		}
 
 		// Check server full
-		if (getConnectedClients().size() >= getConfiguration().getMaximumClients()) {
+		if (getConnectedClients().size() >= getConfiguration()
+				.getMaximumClients()) {
 			throw new ConnectionRefusedException(RefusedMessage.SERVER_FULL);
 		}
 
 		// Check application id
-		if (parameters.getApplicationId() != getApplication().getApplicationId()) {
-			throw new ConnectionRefusedException(RefusedMessage.WRONG_APPLICATION_ID);
+		if (parameters.getApplicationId() != getApplication()
+				.getApplicationId()) {
+			throw new ConnectionRefusedException(
+					RefusedMessage.WRONG_APPLICATION_ID);
 		}
 
 		// Check application version
-		if (!parameters.getApplicationVersion().equals(getApplication().getVersion())) {
-			throw new ConnectionRefusedException(RefusedMessage.WRONG_APPLICATION_VERSION);
+		if (!parameters.getApplicationVersion().equals(
+				getApplication().getVersion())) {
+			throw new ConnectionRefusedException(
+					RefusedMessage.WRONG_APPLICATION_VERSION);
 		}
 
 		// Call check on LoginParameters
@@ -188,9 +218,14 @@ public final class Server implements TaskSender {
 		try {
 			getLogger().debug("Closing socket");
 			getServerSocket().close();
-			getLogger().debug("Deactivating TaskQueue");
-			getTaskQueue().deactivate();
-			getLogger().info(this+" is offline");
+
+			getLogger().debug("Deactivating " + TaskController.class.getSimpleName());
+			getTaskController().deactivate();
+
+			getLogger().debug("Deactivating " + WorkerController.class.getSimpleName());
+			getWorkerController().killAll();
+
+			getLogger().info(this + " is offline");
 			setState(RuntimeEnvironmentState.OFFLINE);
 		} catch (IOException e) {
 			getLogger().error(e);
@@ -202,7 +237,8 @@ public final class Server implements TaskSender {
 		return PROJECT_NAME + "-server";
 	}
 
-	public synchronized void disconnectClient(SocketConnection con) throws ServerException {
+	public synchronized void disconnectClient(SocketConnection con)
+			throws ServerException {
 		// Remove from Application
 		try {
 			getApplication().removeUser(con);
@@ -216,13 +252,15 @@ public final class Server implements TaskSender {
 		}
 
 		getLogger().info(
-				"Client disconnected (" + con + "), " + (getConnectedClients().size())
+				"Client disconnected (" + con + "), "
+						+ (getConnectedClients().size())
 						+ " connection(s) overall");
 
 	}
 
 	@Override
-	public synchronized SocketConnection getTaskReceiver(ConnectionInfo connectionInfo)
+	public synchronized SocketConnection getTaskReceiver(
+			ConnectionInfo connectionInfo)
 			throws TaskReceiverNotFoundException, IllegalArgumentException {
 		if (connectionInfo == null) {
 			throw new NullPointerException("Server has multiple receivers");
@@ -232,14 +270,15 @@ public final class Server implements TaskSender {
 				return c;
 			}
 		}
-		throw new TaskReceiverNotFoundException("Could not find client " + connectionInfo
-				+ " on server");
+		throw new TaskReceiverNotFoundException("Could not find client "
+				+ connectionInfo + " on server");
 	}
 
 	@Override
 	public ConnectionInfo getLocalConnectionInfo() {
-		return new ConnectionInfo(getServerSocket().getInetAddress().toString(), getConfiguration()
-				.getPort());
+		String inetAdress = getServerSocket().getInetAddress().toString();
+		int port = getConfiguration().getPort();
+		return new ConnectionInfo(inetAdress, port);
 	}
 
 	@Override

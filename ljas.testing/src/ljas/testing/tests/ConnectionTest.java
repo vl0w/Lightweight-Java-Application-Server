@@ -5,13 +5,12 @@ import java.net.ConnectException;
 
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.state.RefusedMessage;
-import ljas.testing.ServerManager;
 import ljas.testing.ServerTestCase;
 
 public class ConnectionTest extends ServerTestCase {
 	public void testConnectionOk() {
 		try {
-			createClient();
+			createAndConnectClient();
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
@@ -19,7 +18,7 @@ public class ConnectionTest extends ServerTestCase {
 
 	public void testWrongApplicationId() {
 		try {
-			createClient("com.maps.haxxor",ServerTestCase.APPLICATION_VERSION);
+			createAndConnectClient("com.maps.haxxor",ServerTestCase.APPLICATION_VERSION);
 			fail("Should throw exception.");
 		} catch (ConnectException e) {
 			fail("Can not connect to server");
@@ -31,7 +30,7 @@ public class ConnectionTest extends ServerTestCase {
 
 	public void testWrongVersion() {
 		try {
-			createClient(ServerTestCase.APPLICATION_IDENTIFIER, "0.5");
+			createAndConnectClient(ServerTestCase.APPLICATION_IDENTIFIER, "0.5");
 			fail("Should throw exception.");
 		} catch (ConnectException e) {
 			fail("Can not connect to server");
@@ -42,15 +41,10 @@ public class ConnectionTest extends ServerTestCase {
 	}
 
 	public void testServerFull() throws IOException, ConnectionRefusedException{
-		int maximumClients = ServerManager.getServer().getConfiguration().getMaximumClients();
-
-		// Connect maximum amount of clients
-		for(int i=0;i<maximumClients;i++){
-			createClient();
-		}
+		createClients();
 
 		try{
-			createClient();
+			createAndConnectClient();
 			fail("Should throw an exception");
 		}catch(ConnectionRefusedException e){
 			// Success!

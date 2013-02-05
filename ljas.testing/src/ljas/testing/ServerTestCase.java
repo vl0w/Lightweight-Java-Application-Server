@@ -14,7 +14,7 @@ import ljas.commons.client.ClientImpl;
 import ljas.commons.client.ClientUI;
 import ljas.commons.client.EmptyUI;
 import ljas.commons.exceptions.ConnectionRefusedException;
-import ljas.server.main.Server;
+import ljas.server.Server;
 
 public class ServerTestCase extends TestCase {
 	public static final String APPLICATION_IDENTIFIER = "ljas.testing";
@@ -55,23 +55,60 @@ public class ServerTestCase extends TestCase {
 				"./configuration/ServerConfiguration.properties");
 	}
 
-	protected Client createClient() throws ConnectException, ConnectionRefusedException {
+	public static Client createClient() throws ConnectException,
+			ConnectionRefusedException {
 		return createClient(APPLICATION_IDENTIFIER, APPLICATION_VERSION);
 	}
 
-	protected Client createClient(String applicationIdentifier,
-			String applicationVersion) throws ConnectException, ConnectionRefusedException {
+	protected static Client createClient(String applicationIdentifier,
+			String applicationVersion) throws ConnectException,
+			ConnectionRefusedException {
 		ClientApplication application = new ClientApplicationAdapter(
 				applicationIdentifier, applicationVersion);
 		ClientUI ui = new EmptyUI();
 
 		Client client = new ClientImpl(ui, application);
+		return client;
+	}
+
+	protected static Client createAndConnectClient(
+			String applicationIdentifier, String applicationVersion)
+			throws ConnectException, ConnectionRefusedException {
+		Client client = createClient();
 		connectClient(client);
 		return client;
 	}
-	
-	protected void connectClient(Client client) throws ConnectException, ConnectionRefusedException {
-		LoginParameters parameters = new LoginParametersImpl(client.getApplication());
+
+	public static Client createAndConnectClient() throws ConnectException,
+			ConnectionRefusedException {
+		return createAndConnectClient(APPLICATION_IDENTIFIER,
+				APPLICATION_VERSION);
+	}
+
+	public static void connectClient(Client client) throws ConnectException,
+			ConnectionRefusedException {
+		LoginParameters parameters = new LoginParametersImpl(
+				client.getApplication());
 		client.connect("localhost", 1666, parameters);
 	}
+
+	protected Client[] createClients() throws ConnectionRefusedException,
+			IOException {
+		int maximumClients = ServerManager.getServer().getConfiguration()
+				.getMaximumClients();
+		return createClients(maximumClients);
+	}
+
+	protected Client[] createClients(int amount)
+			throws ConnectionRefusedException, IOException {
+		Client[] clients = new Client[amount];
+
+		// Connect maximum amount of clients
+		for (int i = 0; i < amount; i++) {
+			clients[i] = createAndConnectClient();
+		}
+
+		return clients;
+	}
+
 }
