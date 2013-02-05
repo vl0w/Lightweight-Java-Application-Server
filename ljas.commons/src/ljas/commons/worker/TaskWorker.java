@@ -5,9 +5,9 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ljas.commons.network.ConnectionInfo;
-import ljas.commons.tasking.task.Task;
-import ljas.commons.tasking.task.TaskResult;
-import ljas.commons.tasking.task.TaskState;
+import ljas.commons.tasking.Task;
+import ljas.commons.tasking.TaskResult;
+import ljas.commons.tasking.TaskState;
 
 public class TaskWorker extends Worker {
 	private final static int IDLE_TIME_TO_SELF_DESTRUCTION = 10000;
@@ -32,7 +32,7 @@ public class TaskWorker extends Worker {
 	}
 
 	@Override
-	public void runItOnce() throws Exception {
+	public void runCycle() throws Exception {
 		try {
 			Task task = getTaskQueue().remove();
 			task.setLocal(getWorkerController().getTaskController().getLocal());

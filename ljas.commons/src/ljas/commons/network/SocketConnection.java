@@ -5,7 +5,8 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import ljas.commons.tasking.task.Task;
+
+import ljas.commons.tasking.Task;
 import ljas.commons.tasking.taskqueue.HasTaskQueue;
 
 public class SocketConnection {

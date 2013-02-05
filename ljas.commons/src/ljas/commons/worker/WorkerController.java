@@ -8,7 +8,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import ljas.commons.network.SocketConnection;
 import ljas.commons.network.TaskSender;
-import ljas.commons.tasking.task.Task;
+import ljas.commons.tasking.Task;
 import ljas.commons.tasking.taskqueue.TaskController;
 import ljas.commons.tools.MapUtil;
 import ljas.commons.tools.QueueUtils;

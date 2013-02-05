@@ -1,4 +1,4 @@
-package ljas.commons.tasking.task;
+package ljas.commons.tasking;
 
 import java.io.Serializable;
 import java.util.List;
@@ -6,6 +6,8 @@ import java.util.List;
 import ljas.commons.exceptions.TaskException;
 import ljas.commons.network.ConnectionInfo;
 import ljas.commons.network.TaskSender;
+import ljas.commons.tasking.observation.TaskObserver;
+import ljas.commons.tasking.observation.TaskObserverFactory;
 import ljas.commons.tasking.taskqueue.TaskController;
 
 /**

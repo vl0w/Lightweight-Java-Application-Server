@@ -1,7 +1,7 @@
 package ljas.testing.tasks;
 
 import ljas.commons.exceptions.TaskException;
-import ljas.commons.tasking.task.Task;
+import ljas.commons.tasking.Task;
 
 public class SleepTask extends Task {
 	private static final long serialVersionUID = -7775085616940551405L;

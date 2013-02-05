@@ -9,7 +9,7 @@ import ljas.commons.network.SocketConnection;
 import ljas.commons.network.TaskSender;
 import ljas.commons.state.RefusedMessage;
 import ljas.commons.state.WelcomeMessage;
-import ljas.commons.tasking.task.Task;
+import ljas.commons.tasking.Task;
 import ljas.server.Server;
 
 public class ClientConnectionListener extends Task {

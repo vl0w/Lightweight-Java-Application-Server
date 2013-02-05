@@ -2,7 +2,7 @@ package ljas.testing.tests;
 
 import ljas.commons.application.client.ClientApplicationException;
 import ljas.commons.client.Client;
-import ljas.commons.tasking.task.Task;
+import ljas.commons.tasking.Task;
 import ljas.testing.ServerTestCase;
 import ljas.testing.tasks.AdditionTask;
 import ljas.testing.tasks.HaxxorTask;

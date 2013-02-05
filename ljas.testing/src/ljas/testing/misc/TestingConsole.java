@@ -10,8 +10,8 @@ import java.util.Scanner;
 
 import ljas.commons.client.Client;
 import ljas.commons.exceptions.ConnectionRefusedException;
-import ljas.commons.tasking.task.Task;
-import ljas.commons.tasking.task.TaskObserverAdapter;
+import ljas.commons.tasking.Task;
+import ljas.commons.tasking.observation.TaskObserverAdapter;
 import ljas.commons.tasking.taskqueue.TaskController;
 import ljas.commons.tools.QueueUtils;
 import ljas.commons.worker.TaskWorker;

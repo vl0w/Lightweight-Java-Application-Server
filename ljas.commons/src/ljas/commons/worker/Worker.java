@@ -46,7 +46,7 @@ public abstract class Worker extends Thread {
 		while (!isKilled()) {
 			while (_blinker == thisThread) {
 				try {
-					((Worker) thisThread).runItOnce();
+					((Worker) thisThread).runCycle();
 					sleep(getWorkerController().getTaskController().WORKER_DELAY);
 				} catch (Exception e) {
 					getLogger().error(e);
@@ -68,7 +68,7 @@ public abstract class Worker extends Thread {
 		_delete = true;
 	}
 
-	public abstract void runItOnce() throws Exception;
+	public abstract void runCycle() throws Exception;
 
 	@Override
 	public void start() {

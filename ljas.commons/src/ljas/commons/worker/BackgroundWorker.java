@@ -1,6 +1,6 @@
 package ljas.commons.worker;
 
-import ljas.commons.tasking.task.Task;
+import ljas.commons.tasking.Task;
 
 public class BackgroundWorker extends Worker {
 	private Task _task;
@@ -12,7 +12,7 @@ public class BackgroundWorker extends Worker {
 	}
 
 	@Override
-	public void runItOnce() throws Exception {
+	public void runCycle() throws Exception {
 		_task.perform();
 	}
 }

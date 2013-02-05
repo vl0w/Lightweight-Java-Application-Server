@@ -1,7 +1,7 @@
 package ljas.commons.worker;
 
 import ljas.commons.network.SocketConnection;
-import ljas.commons.tasking.task.Task;
+import ljas.commons.tasking.Task;
 
 public class SocketWorker extends Worker {
 
@@ -33,7 +33,7 @@ public class SocketWorker extends Worker {
 	}
 
 	@Override
-	public void runItOnce() {
+	public void runCycle() {
 		try {
 			Object o = _connection.readObject();
 			if (o != null) {

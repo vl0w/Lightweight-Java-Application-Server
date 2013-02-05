@@ -6,9 +6,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import ljas.commons.network.ConnectionInfo;
 import ljas.commons.network.TaskSender;
-import ljas.commons.tasking.task.Task;
-import ljas.commons.tasking.task.TaskResult;
-import ljas.commons.tasking.task.TaskState;
+import ljas.commons.tasking.Task;
+import ljas.commons.tasking.TaskResult;
+import ljas.commons.tasking.TaskState;
 import ljas.commons.tools.Average;
 import ljas.commons.worker.WorkerController;
 

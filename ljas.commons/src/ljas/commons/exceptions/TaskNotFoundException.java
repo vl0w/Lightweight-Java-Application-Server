@@ -1,6 +1,6 @@
 package ljas.commons.exceptions;
 
-import ljas.commons.tasking.task.Task;
+import ljas.commons.tasking.Task;
 
 public class TaskNotFoundException extends Exception {
 	private static final long serialVersionUID = -1536946207070983944L;

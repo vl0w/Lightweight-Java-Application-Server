@@ -1,4 +1,6 @@
-package ljas.commons.tasking.task;
+package ljas.commons.tasking.observation;
+
+import ljas.commons.tasking.Task;
 
 public interface TaskObserver {
 	public void notifyExecuted(Task task);

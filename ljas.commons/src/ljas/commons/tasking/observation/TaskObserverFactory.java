@@ -1,9 +1,11 @@
-package ljas.commons.tasking.task;
+package ljas.commons.tasking.observation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import ljas.commons.tasking.Task;
 
 public class TaskObserverFactory {
 	private static TaskObserverFactory _instance;

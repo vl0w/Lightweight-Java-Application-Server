@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ljas.commons.client.Client;
-import ljas.commons.tasking.task.Task;
-import ljas.commons.tasking.task.TaskObserverAdapter;
+import ljas.commons.tasking.Task;
+import ljas.commons.tasking.observation.TaskObserverAdapter;
 import ljas.testing.ServerTestCase;
 import ljas.testing.tasks.AdditionTask;
 import ljas.testing.tasks.SleepTask;

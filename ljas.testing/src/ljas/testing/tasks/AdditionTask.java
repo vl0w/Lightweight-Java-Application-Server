@@ -1,7 +1,7 @@
 package ljas.testing.tasks;
 
 import ljas.commons.exceptions.TaskException;
-import ljas.commons.tasking.task.Task;
+import ljas.commons.tasking.Task;
 
 public class AdditionTask extends Task {
 	private static final long serialVersionUID = -1235036848424689310L;
