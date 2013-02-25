@@ -1,18 +1,18 @@
 package ljas.commons.exceptions;
 
-import ljas.commons.state.RefusedMessage;
+import ljas.commons.state.login.LoginRefusedMessage;
 
 public class ConnectionRefusedException extends Exception {
 	private static final long serialVersionUID = 532763272097528071L;
 
-	private RefusedMessage _refusedMessage;
+	private LoginRefusedMessage refusedMessage;
 
-	public RefusedMessage getRefusedMessage() {
-		return _refusedMessage;
+	public ConnectionRefusedException(LoginRefusedMessage refusedMessage) {
+		super(refusedMessage.getReason());
+		this.refusedMessage = refusedMessage;
 	}
 
-	public ConnectionRefusedException(RefusedMessage message) {
-		super(message.getReason());
-		_refusedMessage = message;
+	public LoginRefusedMessage getRefusedMessage() {
+		return refusedMessage;
 	}
 }

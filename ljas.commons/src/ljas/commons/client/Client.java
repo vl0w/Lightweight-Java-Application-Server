@@ -1,16 +1,25 @@
 package ljas.commons.client;
 
+import java.io.IOException;
 import java.net.ConnectException;
 
+import ljas.commons.application.ApplicationEnvironment;
 import ljas.commons.application.LoginParameters;
 import ljas.commons.application.client.ClientApplicationException;
 import ljas.commons.exceptions.ConnectionRefusedException;
-import ljas.commons.network.TaskSender;
+import ljas.commons.exceptions.SessionException;
+import ljas.commons.session.Session;
+import ljas.commons.state.HasState;
 import ljas.commons.tasking.Task;
+import ljas.commons.tasking.environment.HasTaskSystem;
 import ljas.commons.tasking.observation.TaskObserver;
 
+public interface Client extends HasTaskSystem, HasState, ApplicationEnvironment {
+	/**
+	 * The default time after a server request timeout occurs
+	 */
+	static long REQUEST_TIMEOUT_MS = 10000;
 
-public interface Client extends TaskSender {
 	/**
 	 * Connects to a server
 	 * 
@@ -24,21 +33,26 @@ public interface Client extends TaskSender {
 	 *             Occurs when the server refused the connection attempt
 	 * @throws ConnectException
 	 *             Occurs when the server could not be reached
+	 * @throws IOException
 	 */
-	public void connect(String ip, int port, LoginParameters parameters)
-			throws ConnectionRefusedException, ConnectException;
+	void connect(String ip, int port, LoginParameters parameters)
+			throws ConnectionRefusedException, SessionException;
 
-	public void disconnect();
+	void disconnect() throws SessionException;
 
-	public boolean isOnline();
+	boolean isOnline();
 
 	/**
-	 * Runs a task synchronized on the client. This means that the client has to wait until the task is finished. 
-	 * @param task The task to execute
+	 * Runs a task synchronized on the client. This means that the client has to
+	 * wait until the task is finished.
+	 * 
+	 * @param task
+	 *            The task to execute
 	 * @return The executed task
-	 * @throws ClientApplicationException When something went wrong
+	 * @throws ClientApplicationException
+	 *             When something went wrong
 	 */
-	public Task runTaskSync(Task task) throws ClientApplicationException;
+	Task runTaskSync(Task task) throws ClientApplicationException;
 
 	/**
 	 * Runs a task asynchroniously on the server. Does not throw an exception in
@@ -48,7 +62,7 @@ public interface Client extends TaskSender {
 	 *            The task to send
 	 * @return True when the task could be sended, false otherwise
 	 */
-	public boolean runTaskAsync(Task task);
+	void runTaskAsync(Task task);
 
-	public ClientUI getUI();
+	Session getServerSession();
 }

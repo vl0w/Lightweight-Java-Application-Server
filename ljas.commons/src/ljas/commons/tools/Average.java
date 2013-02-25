@@ -2,17 +2,17 @@ package ljas.commons.tools;
 
 
 public class Average {
-	private int _counter;
-	private double _summedValue;
+	private int counter;
+	private double summedValue;
 	
 	public Average() {
-		_counter = 0;
-		_summedValue = 0;
+		counter = 0;
+		summedValue = 0;
 	}
 	
 	public void add(double value) {
-		_summedValue+=value;
-		_counter++;
+		summedValue+=value;
+		counter++;
 	}
 	
 	public int asInt() {
@@ -24,6 +24,6 @@ public class Average {
 	}
 	
 	private double getAverage() {
-		return _summedValue / _counter;
+		return summedValue / counter;
 	}
 }

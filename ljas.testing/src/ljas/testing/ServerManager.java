@@ -1,35 +1,48 @@
 package ljas.testing;
 
 import java.io.IOException;
+
 import ljas.commons.application.server.ServerApplicationAdapter;
 import ljas.server.Server;
 
 public abstract class ServerManager {
-	private static Server _server;
+	private static Server server;
+	private static String serverConfigurationFileAsString;
 
-	public static Server getServer() throws IOException{
-		if(_server==null){
-			_server=createServer();
+	static {
+		server = null;
+		serverConfigurationFileAsString = "./configuration/ServerConfiguration.properties";
+	}
+
+	public static Server getServer() throws IOException {
+		if (server == null) {
+			server = createServer();
 		}
-		return _server;
+		return server;
 	}
 
-	public static Server createServer() throws IOException{
+	public static Server createServer() throws IOException {
 		return new Server(new ServerApplicationAdapter("ljas.testing", "1.0"),
-				"./configuration/ServerConfiguration.properties");
+				serverConfigurationFileAsString);
 	}
 
-	public static void startupServer() throws Exception{
+	// TODO exception handling
+	public static void startupServer() throws Exception {
 		Server server = getServer();
-		if(!server.isOnline()){
+		if (!server.isOnline()) {
 			server.startup();
 		}
 	}
 
-	public static void shutdownServer() throws IOException{
+	// TODO exception handling
+	public static void shutdownServer() throws IOException {
 		Server server = getServer();
-		if(server.isOnline()){
+		if (server.isOnline()) {
 			server.shutdown();
 		}
+	}
+
+	public static void setServerConfigurationFile(String filePathAsString) {
+		serverConfigurationFileAsString = filePathAsString;
 	}
 }

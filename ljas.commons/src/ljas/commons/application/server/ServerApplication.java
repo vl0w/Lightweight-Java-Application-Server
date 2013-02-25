@@ -2,20 +2,9 @@ package ljas.commons.application.server;
 
 import ljas.commons.application.Application;
 import ljas.commons.application.LoginParameters;
-import ljas.commons.network.TaskSender;
-import ljas.commons.network.SocketConnection;
+import ljas.commons.session.Session;
 
 public abstract class ServerApplication extends Application {
-	private TaskSender _local;
-
-	public TaskSender getLocal() {
-		return _local;
-	}
-
-	public void setLocal(TaskSender value) {
-		_local = value;
-	}
-
 	public ServerApplication(String name, String version) {
 		super(name, version);
 	}
@@ -29,8 +18,8 @@ public abstract class ServerApplication extends Application {
 	 *            The login parameters
 	 * @throws ServerApplicationException
 	 */
-	public abstract void registerUser(SocketConnection connection,
-			LoginParameters parameter) throws ServerApplicationException;
+	public abstract void registerUser(Session session, LoginParameters parameter)
+			throws ServerApplicationException;
 
 	/**
 	 * Gets called, when a user closed the server connection or the server lost
@@ -40,6 +29,6 @@ public abstract class ServerApplication extends Application {
 	 *            The connection of the user
 	 * @throws ServerApplicationException
 	 */
-	public abstract void removeUser(SocketConnection connection)
+	public abstract void removeUser(Session session)
 			throws ServerApplicationException;
 }

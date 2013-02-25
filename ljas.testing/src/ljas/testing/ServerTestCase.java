@@ -1,111 +1,91 @@
 package ljas.testing;
 
 import java.io.IOException;
-import java.net.ConnectException;
+import java.util.ArrayList;
+import java.util.List;
 
 import junit.framework.TestCase;
 import ljas.commons.application.LoginParameters;
 import ljas.commons.application.LoginParametersImpl;
 import ljas.commons.application.client.ClientApplication;
 import ljas.commons.application.client.ClientApplicationAdapter;
-import ljas.commons.application.server.ServerApplicationAdapter;
 import ljas.commons.client.Client;
 import ljas.commons.client.ClientImpl;
-import ljas.commons.client.ClientUI;
-import ljas.commons.client.EmptyUI;
 import ljas.commons.exceptions.ConnectionRefusedException;
-import ljas.server.Server;
+import ljas.commons.exceptions.SessionException;
 
 public class ServerTestCase extends TestCase {
 	public static final String APPLICATION_IDENTIFIER = "ljas.testing";
 	public static final String APPLICATION_VERSION = "1.0";
 
-	private Server _server;
-
-	private void setServer(Server server) {
-		_server = server;
+	public static Client createAndConnectClient()
+			throws ConnectionRefusedException, SessionException {
+		return createAndConnectClient(APPLICATION_IDENTIFIER,
+				APPLICATION_VERSION);
 	}
 
-	protected Server getServer() {
-		return _server;
+	public static void connectClient(Client client)
+			throws ConnectionRefusedException, SessionException {
+		LoginParameters parameters = new LoginParametersImpl(
+				client.getApplication());
+		client.connect("localhost", 1666, parameters);
+	}
+
+	public static Client createClient() throws SessionException,
+			ConnectionRefusedException {
+		return createClient(APPLICATION_IDENTIFIER, APPLICATION_VERSION);
 	}
 
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		Server server = createServer();
-		server.startup();
-		assertTrue("Server is not online!", server.isOnline());
-		setServer(server);
+		ServerManager.startupServer();
+		assertTrue("Server is not online!", ServerManager.getServer()
+				.isOnline());
 	}
 
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 
-		Server server = getServer();
-		server.shutdown();
-		assertFalse("Server is still online!", server.isOnline());
-	}
-
-	private Server createServer() throws IOException {
-		return new Server(new ServerApplicationAdapter(APPLICATION_IDENTIFIER,
-				APPLICATION_VERSION),
-				"./configuration/ServerConfiguration.properties");
-	}
-
-	public static Client createClient() throws ConnectException,
-			ConnectionRefusedException {
-		return createClient(APPLICATION_IDENTIFIER, APPLICATION_VERSION);
+		ServerManager.shutdownServer();
+		assertFalse("Server is still online!", ServerManager.getServer()
+				.isOnline());
 	}
 
 	protected static Client createClient(String applicationIdentifier,
-			String applicationVersion) throws ConnectException,
+			String applicationVersion) throws SessionException,
 			ConnectionRefusedException {
 		ClientApplication application = new ClientApplicationAdapter(
 				applicationIdentifier, applicationVersion);
-		ClientUI ui = new EmptyUI();
 
-		Client client = new ClientImpl(ui, application);
+		Client client = new ClientImpl(application);
 		return client;
 	}
 
 	protected static Client createAndConnectClient(
 			String applicationIdentifier, String applicationVersion)
-			throws ConnectException, ConnectionRefusedException {
+			throws ConnectionRefusedException, SessionException {
 		Client client = createClient();
 		connectClient(client);
 		return client;
 	}
 
-	public static Client createAndConnectClient() throws ConnectException,
-			ConnectionRefusedException {
-		return createAndConnectClient(APPLICATION_IDENTIFIER,
-				APPLICATION_VERSION);
-	}
-
-	public static void connectClient(Client client) throws ConnectException,
-			ConnectionRefusedException {
-		LoginParameters parameters = new LoginParametersImpl(
-				client.getApplication());
-		client.connect("localhost", 1666, parameters);
-	}
-
-	protected Client[] createClients() throws ConnectionRefusedException,
-			IOException {
+	protected List<Client> createClients() throws ConnectionRefusedException,
+			SessionException, IOException {
 		int maximumClients = ServerManager.getServer().getConfiguration()
 				.getMaximumClients();
 		return createClients(maximumClients);
 	}
 
-	protected Client[] createClients(int amount)
-			throws ConnectionRefusedException, IOException {
-		Client[] clients = new Client[amount];
+	protected List<Client> createClients(int amount)
+			throws ConnectionRefusedException, SessionException {
+		List<Client> clients = new ArrayList<>();
 
 		// Connect maximum amount of clients
 		for (int i = 0; i < amount; i++) {
-			clients[i] = createAndConnectClient();
+			clients.add(createAndConnectClient());
 		}
 
 		return clients;

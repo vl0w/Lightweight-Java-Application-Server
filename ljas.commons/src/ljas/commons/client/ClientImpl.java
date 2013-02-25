@@ -1,121 +1,101 @@
 package ljas.commons.client;
 
-import java.net.ConnectException;
-import java.net.Socket;
+import ljas.commons.application.Application;
 import ljas.commons.application.LoginParameters;
 import ljas.commons.application.client.ClientApplication;
 import ljas.commons.application.client.ClientApplicationException;
 import ljas.commons.exceptions.ConnectionRefusedException;
-import ljas.commons.network.ConnectionInfo;
-import ljas.commons.network.SocketConnection;
-import ljas.commons.state.RefusedMessage;
+import ljas.commons.exceptions.RequestTimedOutException;
+import ljas.commons.exceptions.SessionException;
+import ljas.commons.session.Session;
+import ljas.commons.session.SessionFactory;
 import ljas.commons.state.RuntimeEnvironmentState;
-import ljas.commons.state.WelcomeMessage;
+import ljas.commons.state.login.LoginAcceptedMessage;
+import ljas.commons.state.login.LoginMessage;
+import ljas.commons.state.login.LoginRefusedMessage;
 import ljas.commons.tasking.Task;
-import ljas.commons.tasking.observation.TaskObserverAdapter;
-import ljas.commons.tasking.taskqueue.TaskController;
-import ljas.commons.tasking.taskqueue.TaskQueueConfiguration;
-import ljas.commons.worker.WorkerController;
+import ljas.commons.tasking.environment.TaskSystem;
+import ljas.commons.tasking.environment.TaskSystemImpl;
+import ljas.commons.tasking.environment.TaskSystemSessionObserver;
+import ljas.commons.tasking.monitoring.TaskMonitor;
+import ljas.commons.tasking.observation.NullTaskObserver;
+import ljas.commons.threading.ThreadBlocker;
+import ljas.commons.threading.ThreadSystem;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
 public class ClientImpl implements Client {
-	private RuntimeEnvironmentState _clientState;
-	private SocketConnection _serverSocket;
-	private final ClientApplication _application;
-	private TaskController _taskController;
-	private WorkerController _workerController;
-	private final ClientUI _ui;
-	private ConnectionInfo _myConnectionInfo;
+	private Session session;
+	private TaskSystem taskSystem;
+	private ThreadSystem threadSystem;
 
-	public void setState(RuntimeEnvironmentState value) {
-		_clientState = value;
+	private RuntimeEnvironmentState state;
+	private final ClientApplication application;
+
+	@Override
+	public void setState(RuntimeEnvironmentState state) {
+		this.state = state;
 	}
 
 	@Override
 	public RuntimeEnvironmentState getState() {
-		return _clientState;
-	}
-
-	private void setServerSocket(SocketConnection value) {
-		_serverSocket = value;
-	}
-
-	public SocketConnection getServerSocket() {
-		return _serverSocket;
+		return state;
 	}
 
 	@Override
-	public TaskController getTaskController() {
-		return _taskController;
+	public TaskSystem getTaskSystem() {
+		return taskSystem;
 	}
 
-	@Override
-	public WorkerController getWorkerController() {
-		return _workerController;
-	}
-
-	@Override
-	public ClientUI getUI() {
-		return _ui;
-	}
-
-	public ClientImpl(ClientUI ui, ClientApplication application) {
-		setServerSocket(null);
-		setState(RuntimeEnvironmentState.OFFLINE);
-		_taskController = new TaskController(new TaskQueueConfiguration(this,1,2));
-		_workerController = new WorkerController(this);
-		_application = application;
-		_application.setClient(this);
-		_ui = ui;
-		_ui.setClient(this);
+	public ClientImpl(ClientApplication application) {
 		DOMConfigurator.configure("./configuration/log4j.xml");
+		setState(RuntimeEnvironmentState.OFFLINE);
 
-		_ui.handleStart();
+		this.application = application;
+		application.setClient(this);
+
+		TaskMonitor taskMonitor = new TaskMonitor();
+
+		threadSystem = new ThreadSystem(taskMonitor, 1);
+		taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);
 	}
 
 	@Override
 	public void connect(String ip, int port, LoginParameters parameters)
-			throws ConnectionRefusedException, ConnectException {
+			throws ConnectionRefusedException, SessionException {
 		if (isOnline()) {
 			disconnect();
 		}
-
 		setState(RuntimeEnvironmentState.STARTUP);
-		getTaskController().activate();
-		getWorkerController().start();
+
 		try {
-			// Connecting to server
-			setServerSocket(new SocketConnection(new Socket(ip, port), this));
+			session = SessionFactory.prepareSession(threadSystem);
 
-			getServerSocket().writeObject(parameters);
+			ClientLoginHandler loginHandler = new ClientLoginHandler(ip, port,
+					session, parameters);
 
-			// Awaiting his answer
-			Object o = getServerSocket().readObject();
+			LoginMessage loginMessage = loginHandler.block();
 
-			if (o instanceof WelcomeMessage) {
+			if (loginMessage instanceof LoginAcceptedMessage) {
 				setState(RuntimeEnvironmentState.ONLINE);
-				WelcomeMessage message = (WelcomeMessage) o;
-				_myConnectionInfo = message.getConnectionInfo();
-				getWorkerController().getSocketWorker()
-						.setConnection(getServerSocket());
-				_ui.handleConnected(message);
-			} else if (o instanceof RefusedMessage) {
-				RefusedMessage message = (RefusedMessage) o;
-				_ui.handleConnectionFailed(message);
+				TaskSystemSessionObserver observer = new TaskSystemSessionObserver(
+						this);
+				session.setObserver(observer);
+
+			} else if (loginMessage instanceof LoginRefusedMessage) {
+				setState(RuntimeEnvironmentState.OFFLINE);
+				LoginRefusedMessage message = (LoginRefusedMessage) loginMessage;
 				throw new ConnectionRefusedException(message);
-			} else {
-				throw new Exception("Unknown server response");
 			}
-		} catch (Exception e) {
-			_taskController.deactivate();
+
+		} catch (Throwable t) {
 			setState(RuntimeEnvironmentState.OFFLINE);
 			if (ConnectionRefusedException.class.getName().equals(
-					e.getClass().getName())) {
-				throw (ConnectionRefusedException) e;
+					t.getClass().getName())) {
+				throw (ConnectionRefusedException) t;
 			} else {
-				throw new ConnectException(e.getMessage());
+				throw new SessionException(t);
 			}
 		}
 	}
@@ -125,61 +105,33 @@ public class ClientImpl implements Client {
 			throw new ClientApplicationException("Client is not online");
 		}
 
-		try {
-			getTaskController().executeTaskRemote(task, getLocalConnectionInfo());
-		} catch (Exception e) {
-			getLogger().error("Error while sending task", e);
-		}
+		taskSystem.scheduleTask(task);
 	}
 
 	@Override
 	public boolean isOnline() {
-		if (getState() == RuntimeEnvironmentState.ONLINE) {
-			return true;
-		}
-		return false;
+		return getState() == RuntimeEnvironmentState.ONLINE && session != null
+				&& session.isConnected();
 	}
 
 	@Override
-	public void disconnect() {
+	public void disconnect() throws SessionException {
 		if (isOnline()) {
-			_taskController.deactivate();
-			_ui.handleDisconnected();
-			getServerSocket().close();
+			// _taskController.deactivate();
+			session.disconnect();
+
+			// getServerSocket().close();
 			setState(RuntimeEnvironmentState.OFFLINE);
 		}
 	}
 
-	@Override
 	public Logger getLogger() {
-		return Logger.getLogger(this.getClass());
-	}
-
-	@Override
-	public SocketConnection getTaskReceiver(ConnectionInfo connectionInfo) {
-		return getServerSocket();
-	}
-
-	@Override
-	public ConnectionInfo getLocalConnectionInfo() {
-		return _myConnectionInfo;
-	}
-
-	@Override
-	public ClientApplication getApplication() {
-		return _application;
-	}
-
-	@Override
-	public void notifyDisconnectedTaskReceiver(ConnectionInfo connectionInfo) {
-		if (isOnline()) {
-			disconnect();
-		}
+		return Logger.getLogger(Client.class);
 	}
 
 	/**
 	 * Runs a task, waits for it and throws an exception when it has failed
-	 *
+	 * 
 	 * @param task
 	 *            The task to execute
 	 * @return The executed task
@@ -188,89 +140,52 @@ public class ClientImpl implements Client {
 	 */
 	@Override
 	public Task runTaskSync(Task task) throws ClientApplicationException {
-		// Private class to provide the runTaskSync function!
-		class TaskWaiter {
-			private Task _finishedTask;
-			private final Task _waitingTask;
-			private ClientApplicationException _exception;
-			private boolean _interrupted;
-			private final int _expiration;
+		final ThreadBlocker<Task> threadBlocker = new ThreadBlocker<>(
+				Client.REQUEST_TIMEOUT_MS);
 
-			public Task getFinishedTask() {
-				return _finishedTask;
+		task.addObserver(new NullTaskObserver() {
+
+			@Override
+			public void notifyExecuted(Task task) {
+				threadBlocker.release(task);
 			}
 
-			/**
-			 *
-			 * @param task
-			 *            The task which the TaskWaiter should wait for
-			 * @param autoExpiration
-			 *            Defines after how many seconds the task expires. 0
-			 *            indicates, that the TaskWaiter will wait forever
-			 */
-			public TaskWaiter(Task task, int autoExpiration) {
-				_waitingTask = task;
-				_exception = null;
-				_expiration = autoExpiration;
+			@Override
+			public void notifyFail(Task task) {
+				ClientApplicationException exception = new ClientApplicationException(
+						task.getResultMessage());
+				threadBlocker.release(exception);
 			}
+		});
 
-			public TaskWaiter(Task task) {
-				this(task, 0);
-			}
+		sendTask(task);
 
-			public void doWait() throws ClientApplicationException {
-				_waitingTask.addObserver(new TaskObserverAdapter() {
-					@Override
-					public void notifyExecuted(Task task) {
-						_finishedTask = task;
-						_interrupted = true;
-					}
-
-					@Override
-					public void notifyFail(Task task) {
-						_exception = new ClientApplicationException(task
-								.getResultMessage());
-					}
-				});
-
-				sendTask(_waitingTask);
-
-				int timeCounter = 0;
-				while (!_interrupted) {
-					try {
-						Thread.currentThread();
-						Thread.sleep(50);
-						timeCounter += 50;
-
-						if (_expiration > 0 && timeCounter >= _expiration) {
-							_exception = new ClientApplicationException("Task "
-									+ _waitingTask + " expired");
-							break;
-						}
-					} catch (InterruptedException e) {
-						// nothing
-					}
-				}
-
-				if (_exception != null) {
-					throw _exception;
-				}
-			}
+		try {
+			return threadBlocker.block();
+		} catch (RequestTimedOutException e) {
+			throw new ClientApplicationException("Request timed out");
+		} catch (Throwable e) {
+			throw new ClientApplicationException(
+					"Unknown exception while executing request");
 		}
-
-		// Use the waiter
-		TaskWaiter waiter = new TaskWaiter(task);
-		waiter.doWait();
-		return waiter.getFinishedTask();
 	}
 
 	@Override
-	public boolean runTaskAsync(Task task) {
+	public void runTaskAsync(Task task) {
 		try {
 			sendTask(task);
-			return true;
 		} catch (ClientApplicationException e) {
-			return false;
+			getLogger().error(e);
 		}
+	}
+
+	@Override
+	public Session getServerSession() {
+		return session;
+	}
+
+	@Override
+	public Application getApplication() {
+		return application;
 	}
 }

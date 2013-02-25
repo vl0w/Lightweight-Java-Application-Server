@@ -4,14 +4,14 @@ import ljas.commons.application.Application;
 import ljas.commons.client.Client;
 
 public abstract class ClientApplication extends Application {
-	private Client _client;
+	private Client client;
 
 	public Client getClient() {
-		return _client;
+		return client;
 	}
 
 	public void setClient(Client value) {
-		_client = value;
+		client = value;
 	}
 
 	public ClientApplication(String name, String version) {

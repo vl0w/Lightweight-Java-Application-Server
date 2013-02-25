@@ -6,8 +6,11 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
+
 public class MapUtilTest extends TestCase {
 
+	@Test
 	public void testSortByValue() throws Exception {
 		Map<String, Integer> randomMap = new HashMap<>();
 		randomMap.put("index2", 2);

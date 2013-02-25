@@ -1,36 +1,34 @@
 package ljas.commons.application;
 
-import ljas.commons.application.LoginParameters;
 import ljas.commons.exceptions.ConnectionRefusedException;
-import ljas.commons.network.TaskSender;
 
 public class LoginParametersImpl implements LoginParameters {
 	private static final long serialVersionUID = -6656736060800905192L;
-	private String _applicationVersion;
-	private long _applicationId;
+	private String applicationVersion;
+	private long applicationId;
 
 	public LoginParametersImpl(String applicationVersion, long applicationId) {
-		_applicationVersion = applicationVersion;
-		_applicationId = applicationId;
+		this.applicationVersion = applicationVersion;
+		this.applicationId = applicationId;
 	}
 
 	public LoginParametersImpl(Application application) {
-		_applicationVersion = application.getVersion();
-		_applicationId = application.getApplicationId();
+		applicationVersion = application.getVersion();
+		applicationId = application.getApplicationId();
 	}
 
 	@Override
 	public String getApplicationVersion() {
-		return _applicationVersion;
+		return applicationVersion;
 	}
 
 	@Override
 	public long getApplicationId() {
-		return _applicationId;
+		return applicationId;
 	}
 
 	@Override
-	public void check(TaskSender server) throws ConnectionRefusedException {
+	public void check() throws ConnectionRefusedException {
 		// nothing
 	}
 

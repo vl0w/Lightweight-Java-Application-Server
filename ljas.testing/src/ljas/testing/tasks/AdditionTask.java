@@ -1,23 +1,24 @@
 package ljas.testing.tasks;
 
-import ljas.commons.exceptions.TaskException;
-import ljas.commons.tasking.Task;
+import ljas.commons.client.Client;
+import ljas.commons.tasking.facades.SimpleClientToServerTask;
 
-public class AdditionTask extends Task {
-	private static final long serialVersionUID = -1235036848424689310L;
+public class AdditionTask extends SimpleClientToServerTask {
 
 	private double numOne;
 	private double numTwo;
-	public double result;
+	public double sum;
 
-	public AdditionTask(double numOne, double numTwo) {
+	public AdditionTask(Client client, double numOne, double numTwo) {
+		super(client);
 		this.numOne = numOne;
 		this.numTwo = numTwo;
 	}
 
 	@Override
-	public void performTask() throws TaskException {
-		result = numOne + numTwo;
+	public void perform() {
+		sum = numOne + numTwo;
+
 	}
 
 }

@@ -1,9 +1,7 @@
 package ljas.commons.application.server;
 
 import ljas.commons.application.LoginParameters;
-import ljas.commons.application.server.ServerApplication;
-import ljas.commons.application.server.ServerApplicationException;
-import ljas.commons.network.SocketConnection;
+import ljas.commons.session.Session;
 
 /**
  * Provides a minimalistic standard-implementation
@@ -18,20 +16,21 @@ public class ServerApplicationAdapter extends ServerApplication {
 	}
 
 	@Override
-	public void registerUser(SocketConnection connection,
-			LoginParameters parameter) throws ServerApplicationException {
-		// nothing
-	}
-
-	@Override
-	public void removeUser(SocketConnection connectino)
-			throws ServerApplicationException {
-		// nothing
-	}
-
-	@Override
 	public void start() {
 		// nothing
+	}
+
+	@Override
+	public void registerUser(Session session, LoginParameters parameter)
+			throws ServerApplicationException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void removeUser(Session session) throws ServerApplicationException {
+		// TODO Auto-generated method stub
+
 	}
 
 }

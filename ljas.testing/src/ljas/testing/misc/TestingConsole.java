@@ -11,10 +11,10 @@ import java.util.Scanner;
 import ljas.commons.client.Client;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.tasking.Task;
-import ljas.commons.tasking.observation.TaskObserverAdapter;
-import ljas.commons.tasking.taskqueue.TaskController;
+import ljas.commons.tasking.monitoring.TaskMonitor;
+import ljas.commons.tasking.observation.NullTaskObserver;
+import ljas.commons.threading.TaskExecutorThread;
 import ljas.commons.tools.QueueUtils;
-import ljas.commons.worker.TaskWorker;
 import ljas.testing.ServerManager;
 import ljas.testing.ServerTestCase;
 import ljas.testing.tasks.SleepTask;
@@ -135,7 +135,7 @@ public class TestingConsole {
 		}
 	}
 
-	private static void disconnectClient() {
+	private static void disconnectClient() throws Exception {
 		String clientIdentifier = askUserFor("Client instance name",
 				DEFAULT_CLIENT_INSTANCE, _clientMap.keySet());
 		if (_clientMap.containsKey(clientIdentifier)) {
@@ -147,16 +147,17 @@ public class TestingConsole {
 	}
 
 	private static void printWorkload() throws IOException {
-		TaskController taskController = ServerManager.getServer()
-				.getTaskController();
-		List<TaskWorker> workerList = ServerManager.getServer()
-				.getWorkerController().getWorkers(TaskWorker.class);
-		for (TaskWorker taskWorker : workerList) {
-			List<Task> taskList = QueueUtils.toList(taskWorker.getTaskQueue());
-			long estimatedExecutionTime = taskController
+		TaskMonitor taskMonitor = ServerManager.getServer().getTaskSystem()
+				.getTaskMonitor();
+
+		List<TaskExecutorThread> workerList = ServerManager.getServer()
+				.getThreadSystem().getThreads(TaskExecutorThread.class);
+		for (TaskExecutorThread threads : workerList) {
+			List<Task> taskList = QueueUtils.toList(threads.getTaskQueue());
+			long estimatedExecutionTime = taskMonitor
 					.getEstimatedExecutionTime(taskList);
 			int taskCount = taskList.size();
-			System.out.println(taskWorker + ": " + taskCount + " tasks / "
+			System.out.println(threads + ": " + taskCount + " tasks / "
 					+ estimatedExecutionTime + "ms");
 		}
 	}
@@ -196,15 +197,15 @@ public class TestingConsole {
 	}
 
 	private static void sendSleep(int amount, int ms, final boolean log)
-			throws ConnectException, ConnectionRefusedException {
+			throws Exception {
 		Client client = _clientMap.get(DEFAULT_CLIENT_INSTANCE);
 		if (!client.isOnline()) {
 			ServerTestCase.connectClient(client);
 		}
 		for (int i = 0; i < amount; i++) {
-			Task task = new SleepTask(ms);
+			Task task = new SleepTask(client.getServerSession(), ms);
 
-			task.addObserver(new TaskObserverAdapter() {
+			task.addObserver(new NullTaskObserver() {
 				@Override
 				public void notifyExecuted(Task task) {
 					if (log) {

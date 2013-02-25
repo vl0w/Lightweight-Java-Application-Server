@@ -3,7 +3,6 @@ package ljas.commons.application;
 import java.io.Serializable;
 
 import ljas.commons.exceptions.ConnectionRefusedException;
-import ljas.commons.network.TaskSender;
 
 public interface LoginParameters extends Serializable {
 	/**
@@ -30,6 +29,7 @@ public interface LoginParameters extends Serializable {
 	 * @throws Exception
 	 *             The message of the exception will be sended back to the
 	 *             client as an error-message!
+	 * @Deprecated Use another solution here...
 	 */
-	public void check(TaskSender server) throws ConnectionRefusedException;
+	public void check() throws ConnectionRefusedException;
 }

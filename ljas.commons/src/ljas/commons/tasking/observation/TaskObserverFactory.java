@@ -8,24 +8,24 @@ import java.util.Map;
 import ljas.commons.tasking.Task;
 
 public class TaskObserverFactory {
-	private static TaskObserverFactory _instance;
-	private Map<Task, List<TaskObserver>> _observerMap;
+	private static TaskObserverFactory instance;
+	private Map<Task, List<TaskObserver>> observerMap;
 
 	public static TaskObserverFactory getInstance() {
-		if (_instance == null) {
-			_instance = new TaskObserverFactory();
+		if (instance == null) {
+			instance = new TaskObserverFactory();
 		}
 
-		return _instance;
+		return instance;
 	}
 
 	private TaskObserverFactory() {
-		_observerMap = new HashMap<Task, List<TaskObserver>>();
+		observerMap = new HashMap<Task, List<TaskObserver>>();
 	}
 
 	public void clearObservers(Task header) {
-		if (_observerMap.containsKey(header)) {
-			_observerMap.remove(header);
+		if (observerMap.containsKey(header)) {
+			observerMap.remove(header);
 		}
 	}
 
@@ -35,12 +35,12 @@ public class TaskObserverFactory {
 			observers = new ArrayList<TaskObserver>();
 		}
 		observers.add(observer);
-		_observerMap.put(header, observers);
+		observerMap.put(header, observers);
 	}
 
 	public void removeObserver(Task header, TaskObserver observer) {
-		if (_observerMap.containsKey(header)) {
-			List<TaskObserver> observers = _observerMap.get(header);
+		if (observerMap.containsKey(header)) {
+			List<TaskObserver> observers = observerMap.get(header);
 
 			if (observers.contains(observer)) {
 				observers.remove(observers.indexOf(observer));
@@ -49,8 +49,8 @@ public class TaskObserverFactory {
 	}
 
 	public List<TaskObserver> getTaskObservers(Task header) {
-		if (_observerMap.containsKey(header)) {
-			return _observerMap.get(header);
+		if (observerMap.containsKey(header)) {
+			return observerMap.get(header);
 		}
 
 		return null;
