@@ -12,7 +12,6 @@ import ljas.commons.threading.ThreadSystem;
 import org.apache.log4j.Logger;
 
 public class TaskSystemImpl implements TaskSystem {
-	public final int WORKER_DELAY = 5;
 	private TaskMonitor taskMonitor;
 	private ThreadSystem threadSystem;
 	private TaskSenderCache taskSenderCache;
@@ -23,10 +22,6 @@ public class TaskSystemImpl implements TaskSystem {
 		this.taskMonitor = taskMonitor;
 		this.taskSenderCache = new TaskSenderCache();
 		this.observer = new NullTaskSystemObserver();
-	}
-
-	private Logger getLogger() {
-		return Logger.getLogger(this.getClass());
 	}
 
 	@Override
@@ -81,5 +76,9 @@ public class TaskSystemImpl implements TaskSystem {
 	@Override
 	public void setTaskSystemObserver(TaskSystemObserver observer) {
 		this.observer = observer;
+	}
+
+	private Logger getLogger() {
+		return Logger.getLogger(this.getClass());
 	}
 }

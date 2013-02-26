@@ -9,7 +9,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import ljas.commons.tasking.monitoring.TaskMonitor;
 
 public class ThreadSystem {
-	public static final int WORKER_DELAY = 20;
+	private final int DEFAULT_DELAY = 20;
+	private final int IDLE_TIME_TO_SELF_DESTRUCTION = 10000;
 
 	private Set<RepetitiveThread> threads;
 	private ThreadFactory threadFactory;
@@ -19,6 +20,14 @@ public class ThreadSystem {
 		this.threads = new CopyOnWriteArraySet<>();
 		this.threadFactory = new ThreadFactory(this);
 		this.maximumTaskWorkers = maximumTaskWorkers;
+	}
+
+	public int getDefaultThreadDelay() {
+		return DEFAULT_DELAY;
+	}
+
+	public long getTimeForTaskExecutorThreadToSelfDestruction() {
+		return IDLE_TIME_TO_SELF_DESTRUCTION;
 	}
 
 	public ThreadFactory getThreadFactory() {

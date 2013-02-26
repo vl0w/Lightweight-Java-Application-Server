@@ -12,7 +12,6 @@ import ljas.commons.tasking.status.TaskState;
 import ljas.commons.tasking.status.impl.FinishedState;
 
 public class TaskExecutorThread extends RepetitiveThread {
-	private final static int IDLE_TIME_TO_SELF_DESTRUCTION = 10000;
 	private Queue<Task> taskQueue;
 	private TaskSystem taskSystem;
 	private int idleCycleCounter;
@@ -21,7 +20,7 @@ public class TaskExecutorThread extends RepetitiveThread {
 		super(threadSystem);
 		setName("TaskExecutor");
 		this.taskSystem = taskSystem;
-		this.taskQueue = new ConcurrentLinkedQueue<Task>();
+		this.taskQueue = new ConcurrentLinkedQueue<>();
 		this.idleCycleCounter = 0;
 		start();
 	}
@@ -31,9 +30,9 @@ public class TaskExecutorThread extends RepetitiveThread {
 	}
 
 	@Override
-	public void runCycle() throws Exception {
+	public void runCycle() {
 		try {
-			Task task = getTaskQueue().remove();
+			Task task = taskQueue.remove();
 
 			long startTime = System.currentTimeMillis();
 
@@ -86,8 +85,8 @@ public class TaskExecutorThread extends RepetitiveThread {
 
 		// Initial state
 		if (currentState == null) {
-			currentState = task.getStatusFactory().nextStatus(task,
-					currentState);
+			currentState = task.getStateFactory()
+					.nextStatus(task, currentState);
 		}
 
 		return currentState;
@@ -97,23 +96,26 @@ public class TaskExecutorThread extends RepetitiveThread {
 		TaskState currentStatus = getCurrentState(task);
 
 		if (!currentStatus.getClass().equals(FinishedState.class)) {
-			TaskState successorStatus = task.getStatusFactory().nextStatus(
-					task, currentStatus);
-			successorStatus.setTaskSystem(taskSystem);
-			task.setCurrentStatus(successorStatus);
-			successorStatus.getNavigator().navigate(task);
+			TaskState successorState = task.getStateFactory().nextStatus(task,
+					currentStatus);
+			successorState.setTaskSystem(taskSystem);
+			task.setCurrentState(successorState);
+			successorState.getNavigator().navigate(task);
 		}
 	}
 
 	private void workerIsIdleCycle() {
-		final int workerDelay = ThreadSystem.WORKER_DELAY;
+		final int workerDelay = getThreadSystem().getDefaultThreadDelay();
+		final long timeForWorkerToSelfDestruction = getThreadSystem()
+				.getTimeForTaskExecutorThreadToSelfDestruction();
 		sleepSilent(workerDelay);
 		idleCycleCounter++;
+
 		// Must destroy itself?
-		if (idleCycleCounter * workerDelay >= IDLE_TIME_TO_SELF_DESTRUCTION) {
+		if (idleCycleCounter * workerDelay >= timeForWorkerToSelfDestruction) {
 			getLogger().debug(
 					"TaskWorker has not been used since "
-							+ IDLE_TIME_TO_SELF_DESTRUCTION
+							+ timeForWorkerToSelfDestruction
 							+ "ms. Shuting it down.");
 			kill();
 		}
