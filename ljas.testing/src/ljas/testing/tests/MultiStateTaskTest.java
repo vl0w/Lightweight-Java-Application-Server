@@ -1,5 +1,6 @@
 package ljas.testing.tests;
 
+import static org.junit.Assert.assertEquals;
 import ljas.commons.client.Client;
 import ljas.testing.ServerTestCase;
 import ljas.testing.tasks.MultiStateTask;

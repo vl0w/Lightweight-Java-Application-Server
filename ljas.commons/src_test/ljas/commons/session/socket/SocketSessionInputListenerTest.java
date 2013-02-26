@@ -10,14 +10,13 @@ import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import junit.framework.TestCase;
 import ljas.commons.session.SessionObserver;
 import ljas.commons.tasking.monitoring.TaskMonitor;
 import ljas.commons.threading.ThreadSystem;
 
 import org.junit.Test;
 
-public class SocketSessionInputListenerTest extends TestCase {
+public class SocketSessionInputListenerTest {
 
 	@Test
 	public void testRunCycle_ObjectReceived_NotifyObservers() throws Exception {

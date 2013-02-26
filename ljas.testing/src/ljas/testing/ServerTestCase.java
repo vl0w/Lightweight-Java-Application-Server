@@ -1,10 +1,12 @@
 package ljas.testing;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
 import ljas.commons.application.LoginParameters;
 import ljas.commons.application.LoginParametersImpl;
 import ljas.commons.application.client.ClientApplication;
@@ -14,9 +16,26 @@ import ljas.commons.client.ClientImpl;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.exceptions.SessionException;
 
-public class ServerTestCase extends TestCase {
+import org.junit.After;
+import org.junit.Before;
+
+public class ServerTestCase {
 	public static final String APPLICATION_IDENTIFIER = "ljas.testing";
 	public static final String APPLICATION_VERSION = "1.0";
+
+	@Before
+	public void setUp() throws Exception {
+		ServerManager.startupServer();
+		assertTrue("Server is not online!", ServerManager.getServer()
+				.isOnline());
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		ServerManager.shutdownServer();
+		assertFalse("Server is still online!", ServerManager.getServer()
+				.isOnline());
+	}
 
 	public static Client createAndConnectClient()
 			throws ConnectionRefusedException, SessionException {
@@ -34,24 +53,6 @@ public class ServerTestCase extends TestCase {
 	public static Client createClient() throws SessionException,
 			ConnectionRefusedException {
 		return createClient(APPLICATION_IDENTIFIER, APPLICATION_VERSION);
-	}
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-
-		ServerManager.startupServer();
-		assertTrue("Server is not online!", ServerManager.getServer()
-				.isOnline());
-	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-
-		ServerManager.shutdownServer();
-		assertFalse("Server is still online!", ServerManager.getServer()
-				.isOnline());
 	}
 
 	protected static Client createClient(String applicationIdentifier,

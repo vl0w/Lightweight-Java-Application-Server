@@ -1,14 +1,14 @@
 package ljas.commons.tools;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 
-public class MapUtilTest extends TestCase {
+public class MapUtilTest {
 
 	@Test
 	public void testSortByValue() throws Exception {

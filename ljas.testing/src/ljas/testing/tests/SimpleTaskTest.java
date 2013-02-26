@@ -1,5 +1,7 @@
 package ljas.testing.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import ljas.commons.client.Client;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.observation.NullTaskObserver;
@@ -22,7 +24,7 @@ public class SimpleTaskTest extends ServerTestCase {
 			AdditionTask additionTask = new AdditionTask(client, v1, v2);
 			double sum = ((AdditionTask) client.runTaskSync(additionTask)).sum;
 
-			assertEquals(expectedValue, sum);
+			assertEquals(expectedValue, sum, 0.001);
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
@@ -51,6 +53,6 @@ public class SimpleTaskTest extends ServerTestCase {
 
 		double result = blocker.block();
 
-		assertEquals(expectedValue, result);
+		assertEquals(expectedValue, result, 0.001);
 	}
 }

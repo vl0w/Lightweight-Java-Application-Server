@@ -1,5 +1,8 @@
 package ljas.testing.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import ljas.commons.client.Client;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.state.login.LoginRefusedMessage;
@@ -9,13 +12,13 @@ import org.junit.Test;
 
 public class ConnectionTest extends ServerTestCase {
 
-	@Test
+	@Test(timeout = 5000)
 	public void testOneConnection() throws Exception {
 		Client client = createAndConnectClient();
 		assertTrue(client.isOnline());
 	}
 
-	@Test
+	@Test(timeout = 5000)
 	public void testServerFull() throws Exception {
 		createClients();
 

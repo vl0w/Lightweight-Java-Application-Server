@@ -2,12 +2,11 @@ package ljas.commons.threading;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import junit.framework.TestCase;
 import ljas.commons.tasking.monitoring.TaskMonitor;
 
 import org.junit.Test;
 
-public class BackgroundThreadTest extends TestCase {
+public class BackgroundThreadTest {
 
 	@Test
 	public void testRunCycle_TaskPerformed() throws Exception {

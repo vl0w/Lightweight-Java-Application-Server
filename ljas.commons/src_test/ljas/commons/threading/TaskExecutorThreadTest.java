@@ -1,5 +1,8 @@
 package ljas.commons.threading;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -10,7 +13,6 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
 import ljas.commons.exceptions.TaskException;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.TaskStateResult;
@@ -21,9 +23,10 @@ import ljas.commons.tasking.status.StateFactory;
 import ljas.commons.tasking.status.TaskState;
 import ljas.commons.tasking.status.navigator.TaskNavigator;
 
+import org.junit.Before;
 import org.junit.Test;
 
-public class TaskExecutorThreadTest extends TestCase {
+public class TaskExecutorThreadTest {
 
 	private Task task;
 	private TaskState currentState;
@@ -33,9 +36,8 @@ public class TaskExecutorThreadTest extends TestCase {
 	private TaskMonitor taskMonitor;
 	private List<TaskState> taskStateHistory;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void initMocksAndStubs() throws Exception {
 		// Initial Mocking
 		task = mock(Task.class);
 		currentState = mock(TaskState.class);
@@ -75,7 +77,6 @@ public class TaskExecutorThreadTest extends TestCase {
 		// Asserts
 		assertTrue(thread.scheduleTask(task));
 		assertEquals(task, thread.getTaskQueue().remove());
-
 	}
 
 	@Test
