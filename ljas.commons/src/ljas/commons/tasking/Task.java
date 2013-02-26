@@ -33,7 +33,7 @@ public abstract class Task implements Serializable {
 		return currentStatus;
 	}
 
-	public StateFactory getStatusFactory() {
+	public StateFactory getStateFactory() {
 		return statusFactory;
 	}
 
@@ -41,7 +41,7 @@ public abstract class Task implements Serializable {
 		return statusHistory;
 	}
 
-	public void setCurrentStatus(TaskState currentStatus) {
+	public void setCurrentState(TaskState currentStatus) {
 		this.currentStatus = currentStatus;
 	}
 
