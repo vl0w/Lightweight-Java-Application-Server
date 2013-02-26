@@ -2,6 +2,17 @@ package ljas.commons.threading;
 
 import ljas.commons.exceptions.RequestTimedOutException;
 
+/**
+ * Blocks the current thread until:
+ * <ul>
+ * <li>The {@link ThreadBlocker#release(Object)} function has been called</li>
+ * <li>The given time has been passed</li>
+ * </ul>
+ * 
+ * @author jonashansen
+ * 
+ * @param <V>
+ */
 public class ThreadBlocker<V> {
 	private long expirationTimeInMS;
 	private boolean isReleased;
@@ -10,16 +21,29 @@ public class ThreadBlocker<V> {
 
 	public ThreadBlocker(long expirationTimeInMS) {
 		this.expirationTimeInMS = expirationTimeInMS;
-		isReleased = false;
-		throwable = null;
-		returnValue = null;
+		this.isReleased = false;
+		this.throwable = null;
+		this.returnValue = null;
 	}
 
 	public void setExpiration(int expirationTimeInMS) {
 		this.expirationTimeInMS = expirationTimeInMS;
 	}
 
-	public V block() throws Throwable {
+	/**
+	 * Blocks the current thread
+	 * 
+	 * @return The object passed to the {@link ThreadBlocker#release(Object)}
+	 *         function
+	 * @throws Throwable
+	 *             When the {@link ThreadBlocker#release(Throwable)} function
+	 *             has been called
+	 * @throws RequestTimedOutException
+	 *             When the given time has passed
+	 * @see {@link ThreadBlocker#release(Object)}
+	 * @see {@link ThreadBlocker#release(Throwable)}
+	 */
+	public V block() throws Throwable, RequestTimedOutException {
 		isReleased = false;
 		int timeCounter = 0;
 		while (!isReleased) {
@@ -43,13 +67,18 @@ public class ThreadBlocker<V> {
 		return returnValue;
 	}
 
+	/**
+	 * Release by returning a value
+	 * 
+	 * @param returnValue
+	 */
 	public void release(V returnValue) {
 		isReleased = true;
 		this.returnValue = returnValue;
 	}
 
 	/**
-	 * Release the blocker by throwing an exception
+	 * Release by throwing an exception
 	 * 
 	 * @param t
 	 */
