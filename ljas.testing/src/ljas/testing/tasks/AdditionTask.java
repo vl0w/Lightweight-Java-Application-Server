@@ -5,6 +5,7 @@ import ljas.commons.tasking.facades.SimpleClientToServerTask;
 
 public class AdditionTask extends SimpleClientToServerTask {
 
+	private static final long serialVersionUID = 5952237921989154683L;
 	private double numOne;
 	private double numTwo;
 	public double sum;
@@ -18,7 +19,6 @@ public class AdditionTask extends SimpleClientToServerTask {
 	@Override
 	public void perform() {
 		sum = numOne + numTwo;
-
 	}
 
 }

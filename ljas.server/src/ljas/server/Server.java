@@ -18,7 +18,6 @@ import ljas.commons.tasking.environment.HasTaskSystem;
 import ljas.commons.tasking.environment.TaskSystem;
 import ljas.commons.tasking.environment.TaskSystemImpl;
 import ljas.commons.tasking.environment.TaskSystemSessionObserver;
-import ljas.commons.tasking.environment.observation.SendBackToSenderTaskSystemObserver;
 import ljas.commons.tasking.monitoring.TaskMonitor;
 import ljas.commons.threading.ThreadSystem;
 import ljas.server.login.ClientConnectionListener;
@@ -97,9 +96,6 @@ public final class Server extends TaskSystemSessionObserver implements
 
 		// Tasksystem
 		taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);
-		taskSystem
-				.setTaskSystemObserver(new SendBackToSenderTaskSystemObserver(
-						taskSystem));
 		setTaskSystem(taskSystem);
 
 		// Other stuff

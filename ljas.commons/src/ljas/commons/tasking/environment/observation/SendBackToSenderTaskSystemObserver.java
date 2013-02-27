@@ -7,6 +7,7 @@ import ljas.commons.tasking.environment.TaskSystem;
 
 import org.apache.log4j.Logger;
 
+@Deprecated
 public class SendBackToSenderTaskSystemObserver implements TaskSystemObserver {
 
 	private TaskSystem taskSystem;

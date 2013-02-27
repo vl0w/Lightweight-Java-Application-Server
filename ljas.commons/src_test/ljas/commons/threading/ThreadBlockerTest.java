@@ -36,7 +36,7 @@ public class ThreadBlockerTest {
 	@Test(timeout = 1000, expected = RequestTimedOutException.class)
 	public void testBlock_DoNotRelease_RequestTimedOutExceptionOccurs()
 			throws RequestTimedOutException, Throwable {
-		blocker.setExpiration(500);
+		blocker.setExpiration(100);
 		blocker.block();
 	}
 
@@ -52,7 +52,7 @@ public class ThreadBlockerTest {
 		public void run() {
 			try {
 				Thread.currentThread();
-				Thread.sleep(500);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				fail(e.getMessage());
 			}
@@ -72,7 +72,7 @@ public class ThreadBlockerTest {
 		public void run() {
 			try {
 				Thread.currentThread();
-				Thread.sleep(500);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				fail(e.getMessage());
 			}

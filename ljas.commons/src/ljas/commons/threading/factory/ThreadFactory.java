@@ -1,13 +1,14 @@
-package ljas.commons.threading;
+package ljas.commons.threading.factory;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.environment.TaskSystem;
-import ljas.commons.tools.MapUtil;
-import ljas.commons.tools.QueueUtils;
+import ljas.commons.tasking.monitoring.TaskMonitor;
+import ljas.commons.threading.BackgroundThread;
+import ljas.commons.threading.TaskExecutorThread;
+import ljas.commons.threading.ThreadSystem;
 
 public class ThreadFactory {
 
@@ -18,7 +19,7 @@ public class ThreadFactory {
 	}
 
 	public TaskExecutorThread createTaskThread(Task task, TaskSystem taskSystem) {
-
+		TaskMonitor taskMonitor = taskSystem.getTaskMonitor();
 		List<TaskExecutorThread> threads = threadSystem
 				.getThreads(TaskExecutorThread.class);
 
@@ -30,26 +31,21 @@ public class ThreadFactory {
 			return new TaskExecutorThread(threadSystem, taskSystem);
 		}
 
-		// Step 1: Make a ranking (workload) of all taskworkers
-		Map<TaskExecutorThread, Long> rankingList = new HashMap<>();
-		for (TaskExecutorThread thread : threads) {
-			List<Task> taskList = QueueUtils.toList(thread.getTaskQueue());
-			long estimatedExecutionTime = taskSystem.getTaskMonitor()
-					.getEstimatedExecutionTime(taskList);
-			rankingList.put(thread, new Long(estimatedExecutionTime));
+		if (!taskMonitor.hasStatistics(task)
+				&& threadCount < maxTaskWorkerCount) {
+			return new TaskExecutorThread(threadSystem, taskSystem);
 		}
 
 		// Step 2: Sort ranking list
-		rankingList = MapUtil.sortByValue(rankingList);
+		Collections.sort(threads, new ThreadRankingComparator(taskMonitor));
 
 		// Step 3: Average execution time of task
-		long averageTimeForTask = taskSystem.getTaskMonitor()
-				.getAverageTaskTime(task);
+		long averageTimeForTask = taskMonitor.getAverageTaskTime(task);
 
 		// Step 4: Decide
-		TaskExecutorThread laziestTaskWorker = rankingList.keySet().iterator()
-				.next();
-		long laziestWorkersExecutionTime = rankingList.get(laziestTaskWorker);
+		TaskExecutorThread laziestTaskWorker = threads.get(0);
+		long laziestWorkersExecutionTime = taskMonitor
+				.getEstimatedExecutionTime(laziestTaskWorker);
 
 		if (averageTimeForTask > laziestWorkersExecutionTime
 				|| threadCount >= maxTaskWorkerCount) {

@@ -15,13 +15,13 @@ import java.util.List;
 
 import ljas.commons.exceptions.TaskException;
 import ljas.commons.tasking.Task;
-import ljas.commons.tasking.TaskStateResult;
+import ljas.commons.tasking.TaskStepResult;
 import ljas.commons.tasking.environment.TaskSystem;
 import ljas.commons.tasking.environment.TaskSystemImpl;
+import ljas.commons.tasking.flow.TaskFlow;
+import ljas.commons.tasking.flow.TaskFlowBuilder;
 import ljas.commons.tasking.monitoring.TaskMonitor;
-import ljas.commons.tasking.status.StateFactory;
-import ljas.commons.tasking.status.TaskState;
-import ljas.commons.tasking.status.navigator.TaskNavigator;
+import ljas.commons.tasking.step.TaskStep;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,31 +29,23 @@ import org.junit.Test;
 public class TaskExecutorThreadTest {
 
 	private Task task;
-	private TaskState currentState;
-	private StateFactory stateFactory;
-	private TaskState successorState;
-	private TaskNavigator successorNavigator;
 	private TaskMonitor taskMonitor;
-	private List<TaskState> taskStateHistory;
+	private List<TaskStep> taskStepHistory;
+	private TaskFlow taskFlow;
+	private TaskStep step;
 
 	@Before
 	public void initMocksAndStubs() throws Exception {
 		// Initial Mocking
 		task = mock(Task.class);
-		currentState = mock(TaskState.class);
-		successorState = mock(TaskState.class);
-		stateFactory = mock(StateFactory.class);
-		successorNavigator = mock(TaskNavigator.class);
 		taskMonitor = mock(TaskMonitor.class);
-		taskStateHistory = new ArrayList<>();
+		taskStepHistory = new ArrayList<>();
+		step = mock(TaskStep.class);
+		taskFlow = new TaskFlowBuilder(task).perform(step).build();
 
 		// Initial Stubbing
-		when(task.getCurrentState()).thenReturn(currentState);
-		when(task.getStateFactory()).thenReturn(stateFactory);
-		when(stateFactory.nextStatus(task, currentState)).thenReturn(
-				successorState);
-		when(successorState.getNavigator()).thenReturn(successorNavigator);
-		when(task.getStateHistory()).thenReturn(taskStateHistory);
+		when(task.getTaskFlow()).thenReturn(taskFlow); // TODO
+		when(task.getStepHistory()).thenReturn(taskStepHistory);
 	}
 
 	@Test
@@ -80,8 +72,21 @@ public class TaskExecutorThreadTest {
 	}
 
 	@Test
-	public void testRunCycle_TaskFoundAndNoExceptionOccurs_VerifyExecutionAndNavigation()
+	public void testRunCycle_ThreeStepsAndOneNavigatorFound_VerifyExecutionAndNavigation()
 			throws TaskException {
+		// Initialize TaskFlow
+		TaskStep step1 = mock(TaskStep.class);
+		TaskStep step2 = mock(TaskStep.class);
+		TaskStep step3 = mock(TaskStep.class);
+
+		when(step1.isForNavigation()).thenReturn(Boolean.FALSE);
+		when(step2.isForNavigation()).thenReturn(Boolean.TRUE);
+		when(step3.isForNavigation()).thenReturn(Boolean.FALSE);
+
+		taskFlow = new TaskFlowBuilder(task).perform(step1).perform(step2)
+				.perform(step3).build();
+		when(task.getTaskFlow()).thenReturn(taskFlow);
+
 		// Setup thread
 		ThreadSystem threadSystem = new ThreadSystem(taskMonitor, 0);
 		TaskSystem taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);
@@ -93,22 +98,21 @@ public class TaskExecutorThreadTest {
 		thread.runCycle();
 
 		// Verifications
-		verify(currentState).setTaskSystem(taskSystem);
-		verify(currentState).execute();
-		verify(successorState).setTaskSystem(taskSystem);
-		verify(task).setCurrentState(successorState);
-		verify(successorNavigator).navigate(task);
-
+		verify(step1).setTaskSystem(taskSystem);
+		verify(step1).execute();
+		verify(step2).setTaskSystem(taskSystem);
+		verify(step2).execute();
 		verify(taskMonitor).monitorTaskTime(eq(task), anyLong());
 
 		// Asserts
-		assertTrue(taskStateHistory.contains(currentState));
+		assertTrue(taskStepHistory.contains(step1));
+		assertTrue(taskStepHistory.contains(step2));
 	}
 
 	@Test
 	public void testRunCycle_TaskStateHasNoResult_SuccessAsDefault() {
 		// Mocking & Stubbing
-		when(currentState.getResult()).thenReturn(TaskStateResult.NONE);
+		when(step.getResult()).thenReturn(TaskStepResult.NONE);
 
 		// Setup thread
 		TaskExecutorThread thread = createTaskExecutorThread();
@@ -118,7 +122,7 @@ public class TaskExecutorThreadTest {
 		thread.runCycle();
 
 		// Verification
-		verify(currentState).setResult(TaskStateResult.SUCCESS);
+		verify(step).setResult(TaskStepResult.SUCCESS);
 	}
 
 	@Test
@@ -129,7 +133,7 @@ public class TaskExecutorThreadTest {
 		TaskException expectedException = new TaskException(message);
 
 		// Mocking & Stubbing
-		doThrow(expectedException).when(currentState).execute();
+		doThrow(expectedException).when(step).execute();
 
 		// Setup thread
 		TaskExecutorThread thread = createTaskExecutorThread();
@@ -139,24 +143,8 @@ public class TaskExecutorThreadTest {
 		thread.runCycle();
 
 		// Verifications
-		verify(currentState).setResult(TaskStateResult.ERROR);
+		verify(step).setResult(TaskStepResult.ERROR);
 		verify(task).setResultMessage(message);
-	}
-
-	@Test
-	public void testRunCycle_TaskHasNoCurrentState_StateFactoryCreatesInitialState() {
-		// Mocking & Stubbing
-		when(task.getCurrentState()).thenReturn(null);
-
-		// Setup thread
-		TaskExecutorThread thread = createTaskExecutorThread();
-		thread.getTaskQueue().add(task);
-
-		// Run test
-		thread.runCycle();
-
-		// Verifications
-		verify(stateFactory).nextStatus(task, null);
 	}
 
 	@Test

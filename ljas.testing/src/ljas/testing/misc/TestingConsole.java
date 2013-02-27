@@ -203,7 +203,7 @@ public class TestingConsole {
 			ServerTestCase.connectClient(client);
 		}
 		for (int i = 0; i < amount; i++) {
-			Task task = new SleepTask(client.getServerSession(), ms);
+			Task task = new SleepTask(client, ms);
 
 			task.addObserver(new NullTaskObserver() {
 				@Override

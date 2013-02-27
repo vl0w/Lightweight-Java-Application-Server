@@ -1,16 +1,14 @@
-package ljas.commons.tasking.status.impl;
+package ljas.commons.tasking.step.impl;
 
 import java.util.List;
 
 import ljas.commons.exceptions.TaskException;
 import ljas.commons.tasking.Task;
-import ljas.commons.tasking.TaskStateResult;
+import ljas.commons.tasking.TaskStepResult;
 import ljas.commons.tasking.observation.TaskObserver;
 import ljas.commons.tasking.observation.TaskObserverFactory;
-import ljas.commons.tasking.status.AbstractTaskState;
-import ljas.commons.tasking.status.TaskState;
-import ljas.commons.tasking.status.navigator.LocalNavigator;
-import ljas.commons.tasking.status.navigator.TaskNavigator;
+import ljas.commons.tasking.step.AbstractTaskStep;
+import ljas.commons.tasking.step.TaskStep;
 
 /**
  * This class does the following things:
@@ -23,26 +21,22 @@ import ljas.commons.tasking.status.navigator.TaskNavigator;
  * @author jonashansen
  * 
  */
-public class FinishedState extends AbstractTaskState {
+public class FinishTaskStep extends AbstractTaskStep {
 	private static final long serialVersionUID = -5695204375616939223L;
+	private Task task;
 
-	public FinishedState(Task task) {
-		super(task);
+	public FinishTaskStep(Task task) {
+		this.task = task;
 	}
 
 	@Override
 	public void execute() throws TaskException {
-		TaskStateResult overallResult = getOverallResult();
+		TaskStepResult overallResult = getOverallResult();
 		notifyObservers(overallResult);
 	}
 
-	@Override
-	public TaskNavigator getNavigator() {
-		return new LocalNavigator();
-	}
-
-	private void notifyObservers(TaskStateResult overallResult) {
-		if (overallResult == TaskStateResult.SUCCESS) {
+	private void notifyObservers(TaskStepResult overallResult) {
+		if (overallResult == TaskStepResult.SUCCESS) {
 			notifySuccess();
 		} else {
 			notifyFail();
@@ -50,13 +44,13 @@ public class FinishedState extends AbstractTaskState {
 		notifyExecuted();
 	}
 
-	private TaskStateResult getOverallResult() {
-		List<TaskState> statusHistory = task.getStateHistory();
+	private TaskStepResult getOverallResult() {
+		List<TaskStep> statusHistory = task.getStepHistory();
 
-		TaskStateResult overallResult = TaskStateResult.SUCCESS;
-		for (TaskState taskStatus : statusHistory) {
-			if (taskStatus.getResult() == TaskStateResult.ERROR) {
-				overallResult = TaskStateResult.ERROR;
+		TaskStepResult overallResult = TaskStepResult.SUCCESS;
+		for (TaskStep taskStatus : statusHistory) {
+			if (taskStatus.getResult() == TaskStepResult.ERROR) {
+				overallResult = TaskStepResult.ERROR;
 				break;
 			}
 		}

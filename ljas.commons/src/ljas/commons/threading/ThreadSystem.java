@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import ljas.commons.tasking.monitoring.TaskMonitor;
+import ljas.commons.threading.factory.ThreadFactory;
 
 public class ThreadSystem {
 	private final int DEFAULT_DELAY = 20;

@@ -5,13 +5,19 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import ljas.commons.tasking.Task;
+import ljas.commons.threading.TaskExecutorThread;
 import ljas.commons.tools.Average;
+import ljas.commons.tools.QueueUtils;
 
 public class TaskMonitor {
 	private Map<Class<? extends Task>, Average> executionTimeMap;
 
 	public TaskMonitor() {
 		executionTimeMap = new ConcurrentHashMap<Class<? extends Task>, Average>();
+	}
+
+	public boolean hasStatistics(Task task) {
+		return executionTimeMap.containsKey(task);
 	}
 
 	public void monitorTaskTime(Task task, long millis) {
@@ -32,6 +38,11 @@ public class TaskMonitor {
 		} else {
 			return 0;
 		}
+	}
+
+	public long getEstimatedExecutionTime(TaskExecutorThread thread) {
+		List<Task> tasks = QueueUtils.toList(thread.getTaskQueue());
+		return getEstimatedExecutionTime(tasks);
 	}
 
 	public long getEstimatedExecutionTime(List<Task> tasks) {

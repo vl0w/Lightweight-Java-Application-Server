@@ -4,10 +4,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import ljas.commons.tasking.flow.TaskFlow;
 import ljas.commons.tasking.observation.TaskObserver;
 import ljas.commons.tasking.observation.TaskObserverFactory;
-import ljas.commons.tasking.status.StateFactory;
-import ljas.commons.tasking.status.TaskState;
+import ljas.commons.tasking.step.TaskStep;
 
 /**
  * 
@@ -21,28 +21,12 @@ public abstract class Task implements Serializable {
 	public static String MSG_SAFETY_CONCERN = "Task not executed due to safety concerns (Wrong Application ID)";
 
 	private long id;
-	private TaskState currentStatus;
-	private StateFactory statusFactory;
-	private List<TaskState> statusHistory;
-	/**
-	 * TODO is this necessary?
-	 */
+	private TaskFlow taskFlow;
+	private List<TaskStep> stepHistory;
 	private String resultMessage;
 
-	public TaskState getCurrentState() {
-		return currentStatus;
-	}
-
-	public StateFactory getStateFactory() {
-		return statusFactory;
-	}
-
-	public List<TaskState> getStateHistory() {
-		return statusHistory;
-	}
-
-	public void setCurrentState(TaskState currentStatus) {
-		this.currentStatus = currentStatus;
+	public List<TaskStep> getStepHistory() {
+		return stepHistory;
 	}
 
 	public String getResultMessage() {
@@ -57,12 +41,17 @@ public abstract class Task implements Serializable {
 		return id;
 	}
 
-	public Task(StateFactory statusFactory) {
+	public TaskFlow getTaskFlow() {
+		if (taskFlow == null) {
+			taskFlow = buildTaskFlow();
+		}
+		return taskFlow;
+	}
+
+	public Task() {
 		id = ++TASK_INSTANCE_COUNTER;
 		resultMessage = "";
-		this.statusFactory = statusFactory;
-		this.statusHistory = new ArrayList<>();
-		this.currentStatus = null;
+		this.stepHistory = new ArrayList<>();
 	}
 
 	@Override
@@ -94,4 +83,6 @@ public abstract class Task implements Serializable {
 	public void removeObserver(TaskObserver observer) {
 		TaskObserverFactory.getInstance().removeObserver(this, observer);
 	}
+
+	protected abstract TaskFlow buildTaskFlow();
 }

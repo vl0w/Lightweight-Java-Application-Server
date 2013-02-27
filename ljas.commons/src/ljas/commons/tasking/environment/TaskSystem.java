@@ -3,7 +3,6 @@ package ljas.commons.tasking.environment;
 import ljas.commons.session.Session;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.TaskSenderCache;
-import ljas.commons.tasking.environment.observation.TaskSystemObserver;
 import ljas.commons.tasking.monitoring.TaskMonitor;
 
 public interface TaskSystem {
@@ -17,7 +16,4 @@ public interface TaskSystem {
 
 	public void addBackgroundTask(Runnable runnable);
 
-	public TaskSystemObserver getTaskSystemObserver();
-
-	public void setTaskSystemObserver(TaskSystemObserver observer);
 }

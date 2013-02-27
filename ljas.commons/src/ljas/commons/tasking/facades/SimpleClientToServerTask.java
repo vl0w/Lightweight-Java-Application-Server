@@ -4,12 +4,9 @@ import ljas.commons.client.Client;
 import ljas.commons.exceptions.TaskException;
 import ljas.commons.session.Session;
 import ljas.commons.tasking.Task;
-import ljas.commons.tasking.status.AbstractTaskState;
-import ljas.commons.tasking.status.StateFactory;
-import ljas.commons.tasking.status.TaskState;
-import ljas.commons.tasking.status.impl.FinishedState;
-import ljas.commons.tasking.status.navigator.RemoteNavigator;
-import ljas.commons.tasking.status.navigator.TaskNavigator;
+import ljas.commons.tasking.flow.TaskFlow;
+import ljas.commons.tasking.flow.TaskFlowBuilder;
+import ljas.commons.tasking.step.AbstractTaskStep;
 
 /**
  * A facade for the {@link Task} class. Concrete implementations can override
@@ -24,7 +21,6 @@ public abstract class SimpleClientToServerTask extends Task {
 	private transient Session serverSession;
 
 	private SimpleClientToServerTask(Session serverSession) {
-		super(new StatusFactoryImpl());
 		this.serverSession = serverSession;
 	}
 
@@ -37,36 +33,21 @@ public abstract class SimpleClientToServerTask extends Task {
 	 */
 	public abstract void perform();
 
-	private static class StatusFactoryImpl implements StateFactory {
-		private static final long serialVersionUID = 1867428921769747086L;
-
-		@Override
-		public TaskState nextStatus(Task task, TaskState currentStatus) {
-			if (currentStatus == null) {
-				return ((SimpleClientToServerTask) task).new PerformStatus(task);
-			} else {
-				return new FinishedState(task);
-			}
-		}
-	}
-
-	private class PerformStatus extends AbstractTaskState {
+	private class PerformStep extends AbstractTaskStep {
 		private static final long serialVersionUID = 4590685021274585618L;
-
-		public PerformStatus(Task task) {
-			super(task);
-		}
 
 		@Override
 		public void execute() throws TaskException {
 			perform();
 		}
 
-		@Override
-		public TaskNavigator getNavigator() {
-			return new RemoteNavigator(serverSession);
-		}
-
 	}
 
+	@Override
+	protected final TaskFlow buildTaskFlow() {
+		TaskFlowBuilder builder = new TaskFlowBuilder(this);
+		builder.navigateRemote(serverSession).perform(new PerformStep())
+				.sendBack().finishTask();
+		return builder.build();
+	}
 }

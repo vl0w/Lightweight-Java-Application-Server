@@ -1,5 +1,5 @@
 package ljas.commons.tasking;
 
-public enum TaskStateResult {
+public enum TaskStepResult {
 	NONE, SUCCESS, WARNING, ERROR
 }

@@ -3,8 +3,6 @@ package ljas.commons.tasking.environment;
 import ljas.commons.session.Session;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.TaskSenderCache;
-import ljas.commons.tasking.environment.observation.NullTaskSystemObserver;
-import ljas.commons.tasking.environment.observation.TaskSystemObserver;
 import ljas.commons.tasking.monitoring.TaskMonitor;
 import ljas.commons.threading.TaskExecutorThread;
 import ljas.commons.threading.ThreadSystem;
@@ -15,13 +13,11 @@ public class TaskSystemImpl implements TaskSystem {
 	private TaskMonitor taskMonitor;
 	private ThreadSystem threadSystem;
 	private TaskSenderCache taskSenderCache;
-	private TaskSystemObserver observer;
 
 	public TaskSystemImpl(ThreadSystem threadSystem, TaskMonitor taskMonitor) {
 		this.threadSystem = threadSystem;
 		this.taskMonitor = taskMonitor;
 		this.taskSenderCache = new TaskSenderCache();
-		this.observer = new NullTaskSystemObserver();
 	}
 
 	@Override
@@ -66,16 +62,6 @@ public class TaskSystemImpl implements TaskSystem {
 	public boolean checkTask(Task task, Session session) throws Exception {
 		// TODO
 		return true;
-	}
-
-	@Override
-	public TaskSystemObserver getTaskSystemObserver() {
-		return observer;
-	}
-
-	@Override
-	public void setTaskSystemObserver(TaskSystemObserver observer) {
-		this.observer = observer;
 	}
 
 	private Logger getLogger() {

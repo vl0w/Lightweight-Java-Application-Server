@@ -6,10 +6,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ljas.commons.exceptions.TaskException;
 import ljas.commons.tasking.Task;
-import ljas.commons.tasking.TaskStateResult;
+import ljas.commons.tasking.TaskStepResult;
 import ljas.commons.tasking.environment.TaskSystem;
-import ljas.commons.tasking.status.TaskState;
-import ljas.commons.tasking.status.impl.FinishedState;
+import ljas.commons.tasking.step.TaskStep;
 
 public class TaskExecutorThread extends RepetitiveThread {
 	private Queue<Task> taskQueue;
@@ -36,8 +35,11 @@ public class TaskExecutorThread extends RepetitiveThread {
 
 			long startTime = System.currentTimeMillis();
 
-			executeCurrentState(task);
-			navigateSuccessor(task);
+			TaskStep step;
+			do {
+				step = task.getTaskFlow().nextStep();
+				executeStep(task, step);
+			} while (!step.isForNavigation());
 
 			long endTime = System.currentTimeMillis();
 			long duration = endTime - startTime;
@@ -48,6 +50,22 @@ public class TaskExecutorThread extends RepetitiveThread {
 		} catch (Exception e) {
 			getLogger().error(e);
 		}
+	}
+
+	private void executeStep(Task task, TaskStep step) {
+		step.setTaskSystem(taskSystem);
+		try {
+			step.execute();
+		} catch (TaskException e) {
+			step.setResult(TaskStepResult.ERROR);
+			task.setResultMessage(e.getMessage());
+		}
+
+		if (step.getResult() == TaskStepResult.NONE) {
+			step.setResult(TaskStepResult.SUCCESS);
+		}
+
+		task.getStepHistory().add(step);
 	}
 
 	/**
@@ -62,46 +80,6 @@ public class TaskExecutorThread extends RepetitiveThread {
 			return getTaskQueue().add(task);
 		}
 		return false;
-	}
-
-	private void executeCurrentState(Task task) {
-		TaskState state = getCurrentState(task);
-		try {
-			state.setTaskSystem(taskSystem);
-			state.execute();
-
-			if (state.getResult() == TaskStateResult.NONE) {
-				state.setResult(TaskStateResult.SUCCESS);
-			}
-		} catch (TaskException e) {
-			state.setResult(TaskStateResult.ERROR);
-			task.setResultMessage(e.getMessage());
-		}
-		task.getStateHistory().add(state);
-	}
-
-	private TaskState getCurrentState(Task task) {
-		TaskState currentState = task.getCurrentState();
-
-		// Initial state
-		if (currentState == null) {
-			currentState = task.getStateFactory()
-					.nextStatus(task, currentState);
-		}
-
-		return currentState;
-	}
-
-	private void navigateSuccessor(Task task) {
-		TaskState currentStatus = getCurrentState(task);
-
-		if (!currentStatus.getClass().equals(FinishedState.class)) {
-			TaskState successorState = task.getStateFactory().nextStatus(task,
-					currentStatus);
-			successorState.setTaskSystem(taskSystem);
-			task.setCurrentState(successorState);
-			successorState.getNavigator().navigate(task);
-		}
 	}
 
 	private void workerIsIdleCycle() {
