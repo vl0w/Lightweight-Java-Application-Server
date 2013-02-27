@@ -1,6 +1,7 @@
 package ljas.commons.exceptions;
 
 public class SessionException extends Exception {
+	private static final long serialVersionUID = 2680240287089474322L;
 
 	public SessionException() {
 	}
