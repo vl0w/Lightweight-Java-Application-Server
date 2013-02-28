@@ -8,6 +8,13 @@ import ljas.commons.tasking.step.impl.LocalNavigationStep;
 import ljas.commons.tasking.step.impl.RemoteNavigationStep;
 import ljas.commons.tasking.step.impl.SendBackToSenderStep;
 
+/**
+ * The {@link TaskFlowBuilder} is an easy way to design and create a
+ * {@link TaskFlow}.
+ * 
+ * @author jonashansen
+ * 
+ */
 public class TaskFlowBuilder {
 
 	private Task task;
