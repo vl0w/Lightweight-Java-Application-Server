@@ -38,6 +38,7 @@ public class SocketSession implements Session {
 
 		try {
 			socket = socketFactory.createSocket(ip, port);
+			socket.setKeepAlive(true);
 		} catch (Exception e) {
 			throw new SessionException(e);
 		}
@@ -68,7 +69,7 @@ public class SocketSession implements Session {
 	}
 
 	@Override
-	public void sendObject(Object obj) throws SessionException {
+	public synchronized void sendObject(Object obj) throws SessionException {
 		try {
 			ObjectOutputStream outputStream = new ObjectOutputStream(
 					socket.getOutputStream());

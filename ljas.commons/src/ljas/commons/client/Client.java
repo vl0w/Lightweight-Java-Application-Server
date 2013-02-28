@@ -16,9 +16,9 @@ import ljas.commons.tasking.observation.TaskObserver;
 
 public interface Client extends HasTaskSystem, HasState, ApplicationEnvironment {
 	/**
-	 * TODO set to 10000 The default time after a server request timeout occurs
+	 * The default time after a server request timeout occurs
 	 */
-	static long REQUEST_TIMEOUT_MS = 1000000;
+	static long REQUEST_TIMEOUT_MS = 1000;
 
 	/**
 	 * Connects to a server

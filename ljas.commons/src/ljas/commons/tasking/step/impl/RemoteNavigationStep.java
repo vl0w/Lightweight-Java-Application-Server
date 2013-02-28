@@ -44,6 +44,5 @@ public class RemoteNavigationStep extends NavigationStep {
 			task.getTaskFlow().currentStep().setResult(TaskStepResult.ERROR);
 			task.setResultMessage("Error while navigating task to remote session");
 		}
-
 	}
 }
