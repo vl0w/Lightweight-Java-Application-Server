@@ -28,9 +28,9 @@ public class SocketSessionInputListenerTest {
 		Socket socket = mock(Socket.class);
 		SessionObserver observer = mock(SessionObserver.class);
 
+		when(session.getSocket()).thenReturn(socket);
 		when(socket.getInputStream()).thenReturn(
 				new FakedInputStream(expectedObject));
-		when(session.getSocket()).thenReturn(socket);
 		when(session.getObserver()).thenReturn(observer);
 
 		// Run
@@ -42,6 +42,29 @@ public class SocketSessionInputListenerTest {
 
 		// Verifications
 		verify(observer).notiyObjectReceived(session, expectedObject);
+	}
+
+	@Test
+	public void testRunCycle_IOExceptionOccurs_CorrectErrorHandlingOccurs()
+			throws Exception {
+		// Mocking & Stubbing
+		SocketSession session = mock(SocketSession.class);
+		Socket socket = mock(Socket.class);
+		Runnable errorHandler = mock(Runnable.class);
+
+		when(session.getSocket()).thenReturn(socket);
+		when(socket.getInputStream()).thenThrow(new IOException());
+
+		// Run
+		ThreadSystem threadSystem = new ThreadSystem(new TaskMonitor(), 0);
+		SocketSessionInputListener listener = new SocketSessionInputListener(
+				threadSystem);
+		listener.setSession(session);
+		listener.setErrorHandler(errorHandler);
+		listener.runCycle();
+
+		// Verifications
+		verify(errorHandler).run();
 	}
 
 	private class FakedInputStream extends InputStream {

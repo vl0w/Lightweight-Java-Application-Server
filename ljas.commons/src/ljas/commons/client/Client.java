@@ -18,7 +18,7 @@ public interface Client extends HasTaskSystem, HasState, ApplicationEnvironment 
 	/**
 	 * The default time after a server request timeout occurs
 	 */
-	static long REQUEST_TIMEOUT_MS = 1000;
+	static long REQUEST_TIMEOUT_MS = 10000;
 
 	/**
 	 * Connects to a server

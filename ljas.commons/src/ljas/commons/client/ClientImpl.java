@@ -70,7 +70,7 @@ public class ClientImpl implements Client {
 		setState(RuntimeEnvironmentState.STARTUP);
 
 		try {
-			session = SessionFactory.prepareSession(threadSystem);
+			session = SessionFactory.prepareSession(this, threadSystem);
 
 			ClientLoginHandler loginHandler = new ClientLoginHandler(ip, port,
 					session, parameters);
@@ -117,10 +117,8 @@ public class ClientImpl implements Client {
 	@Override
 	public void disconnect() throws SessionException {
 		if (isOnline()) {
-			// _taskController.deactivate();
 			session.disconnect();
-
-			// getServerSocket().close();
+			threadSystem.killAll();
 			setState(RuntimeEnvironmentState.OFFLINE);
 		}
 	}

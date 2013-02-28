@@ -11,6 +11,10 @@ public abstract class AbstractTaskStep implements TaskStep, Serializable {
 	protected transient TaskSystem taskSystem;
 	protected TaskStepResult result;
 
+	public AbstractTaskStep() {
+		result = TaskStepResult.NONE;
+	}
+
 	@Override
 	public void setTaskSystem(TaskSystem taskSystem) {
 		this.taskSystem = taskSystem;

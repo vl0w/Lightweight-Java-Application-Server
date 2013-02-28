@@ -76,6 +76,12 @@ public class ThreadSystem {
 		}
 	}
 
+	public void killAll() {
+		for (RepetitiveThread thread : getThreads()) {
+			thread.kill();
+		}
+	}
+
 	public void goAll() {
 		for (RepetitiveThread thread : getThreads()) {
 			thread.go();

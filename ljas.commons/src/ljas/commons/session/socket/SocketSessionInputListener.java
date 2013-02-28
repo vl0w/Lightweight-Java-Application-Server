@@ -10,13 +10,24 @@ import ljas.commons.threading.ThreadSystem;
 public class SocketSessionInputListener extends RepetitiveThread {
 
 	private SocketSession session;
+	private Runnable errorHandler;
+
+	public SocketSessionInputListener(ThreadSystem threadSystem,
+			Runnable onErrorAction) {
+		super(threadSystem);
+		this.errorHandler = onErrorAction;
+	}
 
 	public SocketSessionInputListener(ThreadSystem threadSystem) {
-		super(threadSystem);
+		this(threadSystem, null);
 	}
 
 	public void setSession(SocketSession session) {
 		this.session = session;
+	}
+
+	public void setErrorHandler(Runnable errorHandler) {
+		this.errorHandler = errorHandler;
 	}
 
 	@Override
@@ -26,7 +37,12 @@ public class SocketSessionInputListener extends RepetitiveThread {
 				Object receivedObject = readObjectFromSocketStream();
 				notifyObservers(receivedObject);
 			} catch (IOException e) {
-				session.disconnect();
+				if (errorHandler != null) {
+					errorHandler.run();
+				} else {
+					getLogger().warn(
+							"No error handler for corrupt socket defined");
+				}
 			} catch (ClassNotFoundException e) {
 				getLogger().error("Session " + this + " sended unknown object",
 						e);

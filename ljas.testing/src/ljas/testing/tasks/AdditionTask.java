@@ -20,5 +20,4 @@ public class AdditionTask extends SimpleClientToServerTask {
 	public void perform() {
 		sum = numOne + numTwo;
 	}
-
 }

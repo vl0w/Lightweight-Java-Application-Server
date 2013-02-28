@@ -31,7 +31,7 @@ public class ThreadFactory {
 			return new TaskExecutorThread(threadSystem, taskSystem);
 		}
 
-		if (!taskMonitor.hasStatistics(task)
+		if (!taskMonitor.hasStatistics(task.getClass())
 				&& threadCount < maxTaskWorkerCount) {
 			return new TaskExecutorThread(threadSystem, taskSystem);
 		}

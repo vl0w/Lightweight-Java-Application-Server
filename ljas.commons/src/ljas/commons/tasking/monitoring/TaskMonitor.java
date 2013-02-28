@@ -16,8 +16,8 @@ public class TaskMonitor {
 		executionTimeMap = new ConcurrentHashMap<Class<? extends Task>, Average>();
 	}
 
-	public boolean hasStatistics(Task task) {
-		return executionTimeMap.containsKey(task);
+	public boolean hasStatistics(Class<? extends Task> taskClass) {
+		return executionTimeMap.containsKey(taskClass);
 	}
 
 	public void monitorTaskTime(Task task, long millis) {
