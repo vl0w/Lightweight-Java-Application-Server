@@ -51,6 +51,10 @@ public class ThreadSystem {
 		return maximumTaskWorkers;
 	}
 
+	public void setMaximumTaskWorkers(int maximumTaskWorkers) {
+		this.maximumTaskWorkers = maximumTaskWorkers;
+	}
+
 	@SuppressWarnings("unchecked")
 	public <V extends RepetitiveThread> List<V> getThreads(Class<V> workerClass) {
 		List<V> threads = new ArrayList<>();

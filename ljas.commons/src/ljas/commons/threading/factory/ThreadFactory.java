@@ -26,11 +26,12 @@ public class ThreadFactory {
 		int threadCount = threads.size();
 		int maxTaskWorkerCount = threadSystem.getMaximumTaskWorkers();
 
-		// First check: Create initial taskworker if there has none been before.
+		// Create initial thread
 		if (threadCount == 0) {
 			return new TaskExecutorThread(threadSystem, taskSystem);
 		}
 
+		// No statistics yet? Create a own thread if possible
 		if (!taskMonitor.hasStatistics(task.getClass())
 				&& threadCount < maxTaskWorkerCount) {
 			return new TaskExecutorThread(threadSystem, taskSystem);
@@ -47,7 +48,7 @@ public class ThreadFactory {
 		long laziestWorkersExecutionTime = taskMonitor
 				.getEstimatedExecutionTime(laziestTaskWorker);
 
-		if (averageTimeForTask > laziestWorkersExecutionTime
+		if (averageTimeForTask <= laziestWorkersExecutionTime
 				|| threadCount >= maxTaskWorkerCount) {
 			return laziestTaskWorker;
 		} else {
