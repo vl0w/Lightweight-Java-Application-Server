@@ -49,16 +49,15 @@ public class ClientImpl implements Client {
 	}
 
 	public ClientImpl(ClientApplication application) {
-		DOMConfigurator.configure("./configuration/log4j.xml");
-		setState(RuntimeEnvironmentState.OFFLINE);
+		this.state = RuntimeEnvironmentState.OFFLINE;
+		TaskMonitor taskMonitor = new TaskMonitor();
+		this.threadSystem = new ThreadSystem(taskMonitor, 1);
+		this.taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);
 
 		this.application = application;
-		application.setClient(this);
+		this.application.setClient(this);
 
-		TaskMonitor taskMonitor = new TaskMonitor();
-
-		threadSystem = new ThreadSystem(taskMonitor, 1);
-		taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);
+		DOMConfigurator.configure("./configuration/log4j.xml");
 	}
 
 	@Override
