@@ -57,7 +57,7 @@ public class ClientImpl implements Client {
 		this.application = application;
 		this.application.setClient(this);
 
-		DOMConfigurator.configure("./configuration/log4j.xml");
+		DOMConfigurator.configure("./log4j.xml");
 	}
 
 	@Override
