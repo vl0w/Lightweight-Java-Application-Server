@@ -15,7 +15,7 @@ import org.junit.Test;
 
 public class SimpleTaskTest extends ServerTestCase {
 
-	@Test(timeout = 1000)
+	@Test(timeout = 5000)
 	public void testSyncTask() {
 		try {
 			Client client = createAndConnectClient();
@@ -38,7 +38,7 @@ public class SimpleTaskTest extends ServerTestCase {
 		}
 	}
 
-	@Test(timeout = 1000)
+	@Test(timeout = 5000)
 	public void testAsyncTask() throws Throwable {
 		final ThreadBlocker<Double> blocker = new ThreadBlocker<>(10000);
 
