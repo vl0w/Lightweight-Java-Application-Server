@@ -29,8 +29,8 @@ import org.apache.log4j.xml.DOMConfigurator;
 public final class Server extends TaskSystemSessionObserver implements
 		HasTaskSystem, SessionHolder, HasState {
 	public static final String PROJECT_NAME = "LJAS";
-	public static final String PROJECT_HOMEPAGE = "http://github.com/Ganymed/Lightweight-Java-Application-Server";
-	public static final String SERVER_VERSION = "1.0.3";
+	public static final String PROJECT_HOMEPAGE = "http://github.com/vl0w/Lightweight-Java-Application-Server";
+	public static final String SERVER_VERSION = "1.1.0-SNAPSHOT";
 
 	private List<Session> sessions;
 	private RuntimeEnvironmentState serverState;
