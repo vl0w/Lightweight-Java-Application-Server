@@ -7,14 +7,17 @@ import ljas.commons.application.ApplicationEnvironment;
 import ljas.commons.application.LoginParameters;
 import ljas.commons.application.client.ClientApplicationException;
 import ljas.commons.exceptions.ConnectionRefusedException;
+import ljas.commons.exceptions.DisconnectException;
 import ljas.commons.exceptions.SessionException;
+import ljas.commons.session.Disconnectable;
 import ljas.commons.session.Session;
 import ljas.commons.state.HasState;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.environment.HasTaskSystem;
 import ljas.commons.tasking.observation.TaskObserver;
 
-public interface Client extends HasTaskSystem, HasState, ApplicationEnvironment {
+public interface Client extends HasTaskSystem, HasState,
+		ApplicationEnvironment, Disconnectable {
 	/**
 	 * The default time after a server request timeout occurs
 	 */
@@ -31,14 +34,13 @@ public interface Client extends HasTaskSystem, HasState, ApplicationEnvironment 
 	 *            The parameters. See {@link LoginParameters}
 	 * @throws ConnectionRefusedException
 	 *             Occurs when the server refused the connection attempt
+	 * @throws DisconnectException
 	 * @throws ConnectException
 	 *             Occurs when the server could not be reached
 	 * @throws IOException
 	 */
 	void connect(String ip, int port, LoginParameters parameters)
 			throws ConnectionRefusedException, SessionException;
-
-	void disconnect() throws SessionException;
 
 	boolean isOnline();
 

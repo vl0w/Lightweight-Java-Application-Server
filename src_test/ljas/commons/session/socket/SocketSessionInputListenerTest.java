@@ -45,12 +45,11 @@ public class SocketSessionInputListenerTest {
 	}
 
 	@Test
-	public void testRunCycle_IOExceptionOccurs_CorrectErrorHandlingOccurs()
+	public void testRunCycle_IOExceptionOccurs_SessionGetsDisconnected()
 			throws Exception {
 		// Mocking & Stubbing
 		SocketSession session = mock(SocketSession.class);
 		Socket socket = mock(Socket.class);
-		Runnable errorHandler = mock(Runnable.class);
 
 		when(session.getSocket()).thenReturn(socket);
 		when(socket.getInputStream()).thenThrow(new IOException());
@@ -60,11 +59,11 @@ public class SocketSessionInputListenerTest {
 		SocketSessionInputListener listener = new SocketSessionInputListener(
 				threadSystem);
 		listener.setSession(session);
-		listener.setErrorHandler(errorHandler);
+		listener.setDisconnectable(session);
 		listener.runCycle();
 
 		// Verifications
-		verify(errorHandler).run();
+		verify(session).disconnect();
 	}
 
 	private class FakedInputStream extends InputStream {

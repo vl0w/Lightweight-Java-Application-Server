@@ -4,18 +4,20 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 
+import ljas.commons.exceptions.DisconnectException;
+import ljas.commons.session.Disconnectable;
 import ljas.commons.threading.RepetitiveThread;
 import ljas.commons.threading.ThreadSystem;
 
 public class SocketSessionInputListener extends RepetitiveThread {
 
 	private SocketSession session;
-	private Runnable errorHandler;
+	private Disconnectable disconnectable;
 
 	public SocketSessionInputListener(ThreadSystem threadSystem,
-			Runnable onErrorAction) {
+			Disconnectable disconnectable) {
 		super(threadSystem);
-		this.errorHandler = onErrorAction;
+		this.disconnectable = disconnectable;
 	}
 
 	public SocketSessionInputListener(ThreadSystem threadSystem) {
@@ -26,8 +28,8 @@ public class SocketSessionInputListener extends RepetitiveThread {
 		this.session = session;
 	}
 
-	public void setErrorHandler(Runnable errorHandler) {
-		this.errorHandler = errorHandler;
+	public void setDisconnectable(Disconnectable disconnectable) {
+		this.disconnectable = disconnectable;
 	}
 
 	@Override
@@ -37,16 +39,24 @@ public class SocketSessionInputListener extends RepetitiveThread {
 				Object receivedObject = readObjectFromSocketStream();
 				notifyObservers(receivedObject);
 			} catch (IOException e) {
-				if (errorHandler != null) {
-					errorHandler.run();
-				} else {
-					getLogger().warn(
-							"No error handler for corrupt socket defined");
-				}
+				disconnect();
 			} catch (ClassNotFoundException e) {
 				getLogger().error("Session " + this + " sended unknown object",
 						e);
 			}
+		}
+	}
+
+	private void disconnect() {
+		if (disconnectable != null) {
+			try {
+				disconnectable.disconnect();
+			} catch (DisconnectException e1) {
+				getLogger().error("Unable to disconnect " + disconnectable, e1);
+			}
+		} else {
+			getLogger()
+					.warn("Unable to disconnect session/client due to occured IOException");
 		}
 	}
 

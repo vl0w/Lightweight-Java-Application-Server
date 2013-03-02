@@ -5,6 +5,7 @@ import ljas.commons.application.LoginParameters;
 import ljas.commons.application.client.ClientApplication;
 import ljas.commons.application.client.ClientApplicationException;
 import ljas.commons.exceptions.ConnectionRefusedException;
+import ljas.commons.exceptions.DisconnectException;
 import ljas.commons.exceptions.RequestTimedOutException;
 import ljas.commons.exceptions.SessionException;
 import ljas.commons.session.Session;
@@ -64,7 +65,11 @@ public class ClientImpl implements Client {
 	public void connect(String ip, int port, LoginParameters parameters)
 			throws ConnectionRefusedException, SessionException {
 		if (isOnline()) {
-			disconnect();
+			try {
+				disconnect();
+			} catch (DisconnectException e) {
+				getLogger().error("Unable to disconnect client.", e);
+			}
 		}
 		setState(RuntimeEnvironmentState.STARTUP);
 
@@ -114,7 +119,7 @@ public class ClientImpl implements Client {
 	}
 
 	@Override
-	public void disconnect() throws SessionException {
+	public void disconnect() throws DisconnectException {
 		if (isOnline()) {
 			session.disconnect();
 			threadSystem.killAll();
