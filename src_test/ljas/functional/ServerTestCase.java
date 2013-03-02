@@ -7,12 +7,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import ljas.client.Client;
+import ljas.client.ClientImpl;
 import ljas.commons.application.LoginParameters;
 import ljas.commons.application.LoginParametersImpl;
 import ljas.commons.application.client.ClientApplication;
 import ljas.commons.application.client.ClientApplicationAdapter;
-import ljas.commons.client.Client;
-import ljas.commons.client.ClientImpl;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.exceptions.SessionException;
 

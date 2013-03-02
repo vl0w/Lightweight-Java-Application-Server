@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import ljas.commons.client.Client;
+import ljas.client.Client;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.monitoring.TaskMonitor;

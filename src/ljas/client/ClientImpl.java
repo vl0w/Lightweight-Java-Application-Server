@@ -1,4 +1,4 @@
-package ljas.commons.client;
+package ljas.client;
 
 import ljas.commons.application.Application;
 import ljas.commons.application.LoginParameters;

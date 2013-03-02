@@ -1,6 +1,6 @@
 package ljas.commons.tasking.facades;
 
-import ljas.commons.client.Client;
+import ljas.client.Client;
 import ljas.commons.exceptions.TaskException;
 import ljas.commons.session.Session;
 import ljas.commons.tasking.Task;

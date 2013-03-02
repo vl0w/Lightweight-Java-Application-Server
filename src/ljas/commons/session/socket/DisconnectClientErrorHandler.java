@@ -3,7 +3,7 @@ package ljas.commons.session.socket;
 import java.io.IOException;
 import java.net.Socket;
 
-import ljas.commons.client.Client;
+import ljas.client.Client;
 import ljas.commons.exceptions.SessionException;
 
 import org.apache.log4j.Logger;

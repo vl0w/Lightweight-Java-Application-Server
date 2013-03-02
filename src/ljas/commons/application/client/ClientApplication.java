@@ -1,7 +1,7 @@
 package ljas.commons.application.client;
 
+import ljas.client.Client;
 import ljas.commons.application.Application;
-import ljas.commons.client.Client;
 
 public abstract class ClientApplication extends Application {
 	private Client client;

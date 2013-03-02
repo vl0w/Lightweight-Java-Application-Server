@@ -1,7 +1,7 @@
 package ljas.functional.tests;
 
 import static org.junit.Assert.assertEquals;
-import ljas.commons.client.Client;
+import ljas.client.Client;
 import ljas.functional.ServerTestCase;
 import ljas.functional.tasks.MultiStepTask;
 

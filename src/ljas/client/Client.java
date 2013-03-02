@@ -1,4 +1,4 @@
-package ljas.commons.client;
+package ljas.client;
 
 import java.io.IOException;
 import java.net.ConnectException;

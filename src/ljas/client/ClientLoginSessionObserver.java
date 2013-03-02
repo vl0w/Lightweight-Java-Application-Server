@@ -1,4 +1,4 @@
-package ljas.commons.client;
+package ljas.client;
 
 import ljas.commons.session.Session;
 import ljas.commons.session.SessionObserver;

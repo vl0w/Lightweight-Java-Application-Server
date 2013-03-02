@@ -3,7 +3,7 @@ package ljas.functional.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import ljas.commons.client.Client;
+import ljas.client.Client;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.state.login.LoginRefusedMessage;
 import ljas.functional.ServerTestCase;
