@@ -194,7 +194,7 @@ public final class Server extends TaskSystemSessionObserver implements
 
 			getLogger().debug(
 					"Deactivating " + threadSystem.getClass().getSimpleName());
-			threadSystem.forceKillAll();
+			threadSystem.killAll();
 
 			getLogger().info(this + " is offline");
 			setState(RuntimeEnvironmentState.OFFLINE);

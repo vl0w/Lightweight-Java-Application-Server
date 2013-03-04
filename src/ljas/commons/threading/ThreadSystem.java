@@ -77,22 +77,6 @@ public class ThreadSystem {
 		}
 	}
 
-	public void forceKillAll() {
-		for (RepetitiveThread thread : getThreads()) {
-			thread.kill();
-		}
-
-		// boolean hasRunningThreads = true;
-		// while (hasRunningThreads) {
-		// for (RepetitiveThread thread : getThreads()) {
-		// if (!thread.isKilled()) {
-		// continue;
-		// }
-		// }
-		// break;
-		// }
-	}
-
 	public void killAll() {
 		for (RepetitiveThread thread : getThreads()) {
 			thread.kill();
