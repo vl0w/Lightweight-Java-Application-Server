@@ -45,10 +45,4 @@ public class TaskSystemImpl implements TaskSystem {
 	public TaskSenderCache getSenderCache() {
 		return taskSenderCache;
 	}
-
-	@Override
-	public void addBackgroundTask(Runnable runnable) {
-		threadSystem.getThreadFactory().createBackgroundThread(runnable);
-	}
-
 }

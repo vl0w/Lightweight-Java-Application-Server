@@ -137,7 +137,8 @@ public final class Server extends TaskSystemSessionObserver implements
 		// Tasks
 		ClientConnectionListener clientConnectionListener = new ClientConnectionListener(
 				this);
-		taskSystem.addBackgroundTask(clientConnectionListener);
+		threadSystem.getThreadFactory().createBackgroundThread(
+				clientConnectionListener);
 
 		// Start application
 		getLogger().debug("Starting application");

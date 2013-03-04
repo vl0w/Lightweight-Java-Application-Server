@@ -13,7 +13,4 @@ public interface TaskSystem {
 	public TaskMonitor getTaskMonitor();
 
 	public TaskSenderCache getSenderCache();
-
-	public void addBackgroundTask(Runnable runnable);
-
 }
