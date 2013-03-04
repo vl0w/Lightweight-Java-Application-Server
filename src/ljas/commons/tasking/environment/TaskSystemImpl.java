@@ -25,21 +25,13 @@ public class TaskSystemImpl implements TaskSystem {
 		return taskMonitor;
 	}
 
-	/**
-	 * Adds the task to the queue. The task has to have the state DO_PERFORM or
-	 * DO_CHECK!
-	 * 
-	 * @param task
-	 *            The task to add to the queue
-	 */
 	@Override
 	public void scheduleTask(Task task) {
-		getLogger().debug("Scheduled task '" + task + "'");
+		Logger.getLogger(getClass()).debug("Scheduled task '" + task + "'");
 
 		TaskExecutorThread thread;
 		do {
-			thread = threadSystem.getThreadFactory().createTaskThread(task,
-					this);
+			thread = threadSystem.getThreadFactory().createTaskThread(this);
 		} while (!thread.scheduleTask(task));
 	}
 
@@ -59,12 +51,4 @@ public class TaskSystemImpl implements TaskSystem {
 		threadSystem.getThreadFactory().createBackgroundThread(runnable);
 	}
 
-	public boolean checkTask(Task task, Session session) throws Exception {
-		// TODO
-		return true;
-	}
-
-	private Logger getLogger() {
-		return Logger.getLogger(this.getClass());
-	}
 }

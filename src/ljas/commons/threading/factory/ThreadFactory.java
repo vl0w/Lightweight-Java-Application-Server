@@ -1,11 +1,10 @@
 package ljas.commons.threading.factory;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import ljas.commons.tasking.Task;
 import ljas.commons.tasking.environment.TaskSystem;
-import ljas.commons.tasking.monitoring.TaskMonitor;
 import ljas.commons.threading.BackgroundThread;
 import ljas.commons.threading.TaskExecutorThread;
 import ljas.commons.threading.ThreadSystem;
@@ -13,52 +12,39 @@ import ljas.commons.threading.ThreadSystem;
 public class ThreadFactory {
 
 	private ThreadSystem threadSystem;
+	private List<TaskExecutorThread> taskExecutors;
 
 	public ThreadFactory(ThreadSystem threadSystem) {
 		this.threadSystem = threadSystem;
+		this.taskExecutors = new ArrayList<>();
 	}
 
-	public TaskExecutorThread createTaskThread(Task task, TaskSystem taskSystem) {
-		TaskMonitor taskMonitor = taskSystem.getTaskMonitor();
-		List<TaskExecutorThread> threads = threadSystem
-				.getThreads(TaskExecutorThread.class);
-
-		int threadCount = threads.size();
-		int maxTaskWorkerCount = threadSystem.getMaximumTaskWorkers();
-
-		// Create initial thread
-		if (threadCount == 0) {
-			return new TaskExecutorThread(threadSystem, taskSystem);
+	public TaskExecutorThread createTaskThread(TaskSystem taskSystem) {
+		if (taskExecutors.size() == 0) {
+			addTaskExecutorThreads(taskSystem);
 		}
-
-		// No statistics yet? Create a own thread if possible
-		if (!taskMonitor.hasStatistics(task.getClass())
-				&& threadCount < maxTaskWorkerCount) {
-			return new TaskExecutorThread(threadSystem, taskSystem);
-		}
-
-		// Step 2: Sort ranking list
-		Collections.sort(threads, new ThreadRankingComparator(taskMonitor));
-
-		// Step 3: Average execution time of task
-		long averageTimeForTask = taskMonitor.getAverageTaskTime(task);
-
-		// Step 4: Decide
-		TaskExecutorThread laziestTaskWorker = threads.get(0);
-		long laziestWorkersExecutionTime = taskMonitor
-				.getEstimatedExecutionTime(laziestTaskWorker);
-
-		if (averageTimeForTask <= laziestWorkersExecutionTime
-				|| threadCount >= maxTaskWorkerCount) {
-			return laziestTaskWorker;
-		} else {
-			return new TaskExecutorThread(threadSystem, taskSystem);
-		}
+		updateTaskExecutorsByMonitoring();
+		return taskExecutors.get(0);
 	}
 
 	public BackgroundThread createBackgroundThread(Runnable runnable) {
 		BackgroundThread thread = new BackgroundThread(threadSystem, runnable);
 		thread.start();
 		return thread;
+	}
+
+	public void updateTaskExecutorsByMonitoring() {
+		ThreadRankingComparator comparator = new ThreadRankingComparator(
+				threadSystem.getTaskMonitor());
+		Collections.sort(taskExecutors, comparator);
+	}
+
+	private void addTaskExecutorThreads(TaskSystem taskSystem) {
+		int maximumThreads = threadSystem.getMaximumTaskWorkers();
+		for (int i = 0; i < maximumThreads; i++) {
+			TaskExecutorThread thread = new TaskExecutorThread(threadSystem,
+					taskSystem);
+			taskExecutors.add(thread);
+		}
 	}
 }

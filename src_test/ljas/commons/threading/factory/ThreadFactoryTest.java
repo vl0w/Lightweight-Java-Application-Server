@@ -3,10 +3,6 @@ package ljas.commons.threading.factory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.environment.TaskSystem;
 import ljas.commons.tasking.environment.TaskSystemImpl;
@@ -19,19 +15,18 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class ThreadFactoryTest {
-	private ThreadFactory factory;
-	private ThreadSystem threadSystem;
+
 	private TaskMonitor taskMonitor;
+	private ThreadSystem threadSystem;
 	private TaskSystem taskSystem;
-	private Task task;
+	private ThreadFactory factory;
 
 	@Before
 	public void setUp() {
-		task = mock(Task.class);
-		taskMonitor = mock(TaskMonitor.class);
-		threadSystem = new ThreadSystem(taskMonitor, 0);
+		taskMonitor = new TaskMonitor();
+		threadSystem = new ThreadSystem(taskMonitor, 2);
 		taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);
-		factory = new ThreadFactory(threadSystem);
+		factory = threadSystem.getThreadFactory();
 	}
 
 	@Test
@@ -42,111 +37,39 @@ public class ThreadFactoryTest {
 	}
 
 	@Test
-	public void testCreateTaskThread_NoThreadsYet_CreateNewOne() {
+	public void testCreateTaskThread_NoThreadsYet_CreateNewOnes() {
 		// Run
-		TaskExecutorThread thread = factory.createTaskThread(task, taskSystem);
+		factory.createTaskThread(taskSystem);
 
 		// Asserts
-		List<TaskExecutorThread> threads = threadSystem
-				.getThreads(TaskExecutorThread.class);
-		assertEquals(1, threads.size());
-		assertEquals(thread, threads.get(0));
+		assertEquals(2, threadSystem.getThreads(TaskExecutorThread.class)
+				.size());
 	}
 
 	@Test
-	public void testCreateTaskThread_NoStatisticsYet_CreateNewOne() {
-		// Stubbing
-		monitorHasStatistics(false);
+	public void testCreateTaskThread_SeverallThreads_PickLaziest() {
+		// Initialize Threads
+		factory.createTaskThread(taskSystem);
+
+		// Fake some tasks
+		Task task1 = mock(Task.class);
+		Task task2 = mock(Task.class);
+		taskMonitor.monitorTaskTime(task1, 5000);
+		taskMonitor.monitorTaskTime(task2, 10000);
+
+		threadSystem.pauseAll();
+		TaskExecutorThread thread1 = threadSystem.getThreads(
+				TaskExecutorThread.class).get(0);
+		thread1.scheduleTask(task2);
+		TaskExecutorThread thread2 = threadSystem.getThreads(
+				TaskExecutorThread.class).get(1);
+		thread1.scheduleTask(task1);
 
 		// Run
-		TaskExecutorThread thread = factory.createTaskThread(task, taskSystem);
+		TaskExecutorThread pickedThread = threadSystem.getThreadFactory()
+				.createTaskThread(taskSystem);
 
 		// Asserts
-		List<TaskExecutorThread> threads = threadSystem
-				.getThreads(TaskExecutorThread.class);
-		assertEquals(1, threads.size());
-		assertEquals(thread, threads.get(0));
-	}
-
-	@Test
-	public void testCreateTaskThread_SeveralThreadsAndSmallTask_PickLaziest() {
-		// Initialization
-		threadSystem.setMaximumTaskWorkers(5);
-
-		createThread(2000);
-		TaskExecutorThread expectedThread = createThread(500);
-		createThread(1000);
-
-		// Stubbing
-		monitorHasStatistics(true);
-		setAverageTimeForTask(500);
-
-		// Run
-		TaskExecutorThread pickedThread = factory.createTaskThread(task,
-				taskSystem);
-
-		// Asserts
-		assertEquals(expectedThread, pickedThread);
-	}
-
-	@Test
-	public void testCreateTaskThread_MaximumPossibleThreadsCreated_PickLaziest() {
-		// Initialization
-		threadSystem.setMaximumTaskWorkers(3);
-
-		createThread(2000);
-		TaskExecutorThread expectedThread = createThread(500);
-		createThread(1000);
-
-		// Stubbing
-		monitorHasStatistics(true);
-		setAverageTimeForTask(5000);
-
-		// Run
-		TaskExecutorThread pickedThread = factory.createTaskThread(task,
-				taskSystem);
-
-		// Asserts
-		assertEquals(expectedThread, pickedThread);
-	}
-
-	@Test
-	public void testCreateTaskThread_BigTaskAndNotMaximumPossibleThreadsCreated_CreateNewOne() {
-		// Initialization
-		threadSystem.setMaximumTaskWorkers(5);
-
-		createThread(2000);
-		createThread(500);
-		createThread(1000);
-
-		// Stubbing
-		monitorHasStatistics(true);
-		setAverageTimeForTask(5000);
-
-		// Run
-		factory.createTaskThread(task, taskSystem);
-
-		// Asserts
-		List<TaskExecutorThread> threads = threadSystem
-				.getThreads(TaskExecutorThread.class);
-		assertEquals(4, threads.size());
-	}
-
-	private void monitorHasStatistics(boolean hasStatistics) {
-		when(taskMonitor.hasStatistics(task.getClass())).thenReturn(
-				Boolean.valueOf(hasStatistics));
-	}
-
-	private void setAverageTimeForTask(long averageTime) {
-		when(taskMonitor.getAverageTaskTime(task)).thenReturn(
-				Long.valueOf(averageTime));
-	}
-
-	private TaskExecutorThread createThread(long estimatedExecutionTime) {
-		TaskExecutorThread thread = new TaskExecutorThread(threadSystem,
-				taskSystem);
-		when(taskMonitor.getEstimatedExecutionTime(thread)).thenReturn(
-				Long.valueOf(estimatedExecutionTime));
-		return thread;
+		assertEquals(thread2, pickedThread);
 	}
 }

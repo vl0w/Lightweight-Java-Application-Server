@@ -147,32 +147,6 @@ public class TaskExecutorThreadTest {
 		verify(task).setResultMessage(message);
 	}
 
-	@Test
-	public void testRunCycle_NoTaskAndThreadWasTooLongIdle_ThreadGetsKilled()
-			throws InterruptedException {
-		// Mocking & Stubbing
-		ThreadSystem threadSystem = mock(ThreadSystem.class);
-		when(threadSystem.getDefaultThreadDelay()).thenReturn(
-				Integer.valueOf(1));
-		when(threadSystem.getTimeForTaskExecutorThreadToSelfDestruction())
-				.thenReturn(Long.valueOf(5));
-
-		// Setup thread
-		TaskSystem taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);
-		TaskExecutorThread thread = createTaskExecutorThread(threadSystem,
-				taskSystem);
-
-		// Run test
-		for (int i = 0; i < threadSystem
-				.getTimeForTaskExecutorThreadToSelfDestruction()
-				/ threadSystem.getDefaultThreadDelay(); i++) {
-			thread.runCycle();
-		}
-
-		// Asserts
-		assertTrue("Thread is expected to be killed", thread.isKilled());
-	}
-
 	private TaskExecutorThread createTaskExecutorThread() {
 		ThreadSystem threadSystem = new ThreadSystem(taskMonitor, 0);
 		TaskSystem taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);

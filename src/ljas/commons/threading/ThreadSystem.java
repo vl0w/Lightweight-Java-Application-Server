@@ -11,24 +11,25 @@ import ljas.commons.threading.factory.ThreadFactory;
 
 public class ThreadSystem {
 	private final int DEFAULT_DELAY = 20;
-	private final int IDLE_TIME_TO_SELF_DESTRUCTION = 10000;
 
 	private Set<RepetitiveThread> threads;
 	private ThreadFactory threadFactory;
 	private int maximumTaskWorkers;
+	private TaskMonitor taskMonitor;
 
 	public ThreadSystem(TaskMonitor taskMonitor, int maximumTaskWorkers) {
+		this.taskMonitor = taskMonitor;
 		this.threads = new CopyOnWriteArraySet<>();
 		this.threadFactory = new ThreadFactory(this);
 		this.maximumTaskWorkers = maximumTaskWorkers;
 	}
 
-	public int getDefaultThreadDelay() {
-		return DEFAULT_DELAY;
+	public TaskMonitor getTaskMonitor() {
+		return taskMonitor;
 	}
 
-	public long getTimeForTaskExecutorThreadToSelfDestruction() {
-		return IDLE_TIME_TO_SELF_DESTRUCTION;
+	public int getDefaultThreadDelay() {
+		return DEFAULT_DELAY;
 	}
 
 	public ThreadFactory getThreadFactory() {

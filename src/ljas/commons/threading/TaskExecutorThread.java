@@ -13,14 +13,12 @@ import ljas.commons.tasking.step.TaskStep;
 public class TaskExecutorThread extends RepetitiveThread {
 	private Queue<Task> taskQueue;
 	private TaskSystem taskSystem;
-	private int idleCycleCounter;
 
 	public TaskExecutorThread(ThreadSystem threadSystem, TaskSystem taskSystem) {
 		super(threadSystem);
 		setName("TaskExecutor");
 		this.taskSystem = taskSystem;
 		this.taskQueue = new ConcurrentLinkedQueue<>();
-		this.idleCycleCounter = 0;
 		start();
 	}
 
@@ -44,9 +42,12 @@ public class TaskExecutorThread extends RepetitiveThread {
 			long endTime = System.currentTimeMillis();
 			long duration = endTime - startTime;
 			taskSystem.getTaskMonitor().monitorTaskTime(task, duration);
+			getThreadSystem().getThreadFactory()
+					.updateTaskExecutorsByMonitoring();
 
 		} catch (NoSuchElementException e) {
-			workerIsIdleCycle();
+			final int workerDelay = getThreadSystem().getDefaultThreadDelay();
+			sleepSilent(workerDelay);
 		} catch (Exception e) {
 			getLogger().error(e);
 		}
@@ -76,27 +77,10 @@ public class TaskExecutorThread extends RepetitiveThread {
 	 * @return True when the task has succesfully been scheduled for execution.
 	 */
 	public boolean scheduleTask(Task task) {
-		if (!isKilled()) {
-			return getTaskQueue().add(task);
+		if (isKilled()) {
+			return false;
 		}
-		return false;
-	}
-
-	private void workerIsIdleCycle() {
-		final int workerDelay = getThreadSystem().getDefaultThreadDelay();
-		final long timeForWorkerToSelfDestruction = getThreadSystem()
-				.getTimeForTaskExecutorThreadToSelfDestruction();
-		sleepSilent(workerDelay);
-		idleCycleCounter++;
-
-		// Must destroy itself?
-		if (idleCycleCounter * workerDelay >= timeForWorkerToSelfDestruction) {
-			getLogger().debug(
-					"TaskWorker has not been used since "
-							+ timeForWorkerToSelfDestruction
-							+ "ms. Shuting it down.");
-			kill();
-		}
+		return getTaskQueue().add(task);
 	}
 
 	/**
