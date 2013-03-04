@@ -3,17 +3,29 @@ package ljas.commons.threading;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import ljas.commons.tasking.monitoring.TaskMonitor;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class ThreadSystemTest {
+
+	private ThreadSystem threadSystem;
+
+	@Before
+	public void setUpThreadSystem() {
+		threadSystem = new ThreadSystem(0);
+	}
+
+	@After
+	public void tearDownThreadSystem() {
+		threadSystem.killAll();
+	}
 
 	@Test
 	public void testRegisterThread() {
 		RepetitiveThread thread = mock(RepetitiveThread.class);
 
-		ThreadSystem threadSystem = new ThreadSystem(new TaskMonitor(), 0);
 		threadSystem.registerThread(thread);
 
 		assertEquals(1, threadSystem.getThreads().size());
@@ -24,10 +36,10 @@ public class ThreadSystemTest {
 	public void testUnregisterThread() {
 		RepetitiveThread thread = mock(RepetitiveThread.class);
 
-		ThreadSystem threadSystem = new ThreadSystem(new TaskMonitor(), 0);
 		threadSystem.registerThread(thread);
 		threadSystem.unregisterThread(thread);
 
+		verify(thread).kill();
 		assertEquals(0, threadSystem.getThreads().size());
 	}
 
@@ -36,7 +48,6 @@ public class ThreadSystemTest {
 		RepetitiveThread thread1 = mock(RepetitiveThread.class);
 		RepetitiveThread thread2 = mock(RepetitiveThread.class);
 
-		ThreadSystem threadSystem = new ThreadSystem(new TaskMonitor(), 0);
 		threadSystem.registerThread(thread1);
 		threadSystem.registerThread(thread2);
 		threadSystem.pauseAll();
@@ -46,25 +57,10 @@ public class ThreadSystemTest {
 	}
 
 	@Test
-	public void testForceKillAll() {
-		RepetitiveThread thread1 = mock(RepetitiveThread.class);
-		RepetitiveThread thread2 = mock(RepetitiveThread.class);
-
-		ThreadSystem threadSystem = new ThreadSystem(new TaskMonitor(), 0);
-		threadSystem.registerThread(thread1);
-		threadSystem.registerThread(thread2);
-		threadSystem.forceKillAll();
-
-		verify(thread1).forceKill();
-		verify(thread2).forceKill();
-	}
-
-	@Test
 	public void testKillAll() {
 		RepetitiveThread thread1 = mock(RepetitiveThread.class);
 		RepetitiveThread thread2 = mock(RepetitiveThread.class);
 
-		ThreadSystem threadSystem = new ThreadSystem(new TaskMonitor(), 0);
 		threadSystem.registerThread(thread1);
 		threadSystem.registerThread(thread2);
 		threadSystem.killAll();
@@ -78,7 +74,6 @@ public class ThreadSystemTest {
 		RepetitiveThread thread1 = mock(RepetitiveThread.class);
 		RepetitiveThread thread2 = mock(RepetitiveThread.class);
 
-		ThreadSystem threadSystem = new ThreadSystem(new TaskMonitor(), 0);
 		threadSystem.registerThread(thread1);
 		threadSystem.registerThread(thread2);
 		threadSystem.goAll();

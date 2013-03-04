@@ -88,7 +88,7 @@ public class TaskExecutorThreadTest {
 		when(task.getTaskFlow()).thenReturn(taskFlow);
 
 		// Setup thread
-		ThreadSystem threadSystem = new ThreadSystem(taskMonitor, 0);
+		ThreadSystem threadSystem = new ThreadSystem(0);
 		TaskSystem taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);
 		TaskExecutorThread thread = createTaskExecutorThread(threadSystem,
 				taskSystem);
@@ -107,6 +107,9 @@ public class TaskExecutorThreadTest {
 		// Asserts
 		assertTrue(taskStepHistory.contains(step1));
 		assertTrue(taskStepHistory.contains(step2));
+
+		// TODO: ASDF
+		threadSystem.killAll();
 	}
 
 	@Test
@@ -148,7 +151,7 @@ public class TaskExecutorThreadTest {
 	}
 
 	private TaskExecutorThread createTaskExecutorThread() {
-		ThreadSystem threadSystem = new ThreadSystem(taskMonitor, 0);
+		ThreadSystem threadSystem = new ThreadSystem(0);
 		TaskSystem taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);
 		return createTaskExecutorThread(threadSystem, taskSystem);
 	}

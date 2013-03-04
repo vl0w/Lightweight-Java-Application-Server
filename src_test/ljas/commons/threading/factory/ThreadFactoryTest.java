@@ -1,6 +1,7 @@
 package ljas.commons.threading.factory;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import ljas.commons.tasking.Task;
@@ -11,6 +12,7 @@ import ljas.commons.threading.BackgroundThread;
 import ljas.commons.threading.TaskExecutorThread;
 import ljas.commons.threading.ThreadSystem;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,10 +25,15 @@ public class ThreadFactoryTest {
 
 	@Before
 	public void setUp() {
+		threadSystem = new ThreadSystem(2);
 		taskMonitor = new TaskMonitor();
-		threadSystem = new ThreadSystem(taskMonitor, 2);
 		taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);
 		factory = threadSystem.getThreadFactory();
+	}
+
+	@After
+	public void tearDown() {
+		threadSystem.killAll();
 	}
 
 	@Test
@@ -48,12 +55,12 @@ public class ThreadFactoryTest {
 
 	@Test
 	public void testCreateTaskThread_SeverallThreads_PickLaziest() {
-		// Initialize Threads
+		// Initialize threads
 		factory.createTaskThread(taskSystem);
 
 		// Fake some tasks
-		Task task1 = mock(Task.class);
-		Task task2 = mock(Task.class);
+		Task task1 = mock(TaskOne.class);
+		Task task2 = mock(TaskTwo.class);
 		taskMonitor.monitorTaskTime(task1, 5000);
 		taskMonitor.monitorTaskTime(task2, 10000);
 
@@ -63,13 +70,37 @@ public class ThreadFactoryTest {
 		thread1.scheduleTask(task2);
 		TaskExecutorThread thread2 = threadSystem.getThreads(
 				TaskExecutorThread.class).get(1);
-		thread1.scheduleTask(task1);
+		thread2.scheduleTask(task1);
 
 		// Run
-		TaskExecutorThread pickedThread = threadSystem.getThreadFactory()
-				.createTaskThread(taskSystem);
+		TaskExecutorThread pickedThread = factory.createTaskThread(taskSystem);
 
 		// Asserts
 		assertEquals(thread2, pickedThread);
+	}
+
+	@Test
+	public void testCreateTaskThread_KillOne_NewOneGetsCreated() {
+		// Initialize threads
+		factory.createTaskThread(taskSystem);
+
+		// Kill thread
+		TaskExecutorThread thread = factory.createTaskThread(taskSystem);
+		thread.kill();
+
+		// Recreate threads
+		factory.createTaskThread(taskSystem);
+
+		// Asserts
+		assertFalse(threadSystem.getThreads(TaskExecutorThread.class).contains(
+				thread));
+	}
+
+	private abstract class TaskOne extends Task {
+
+	}
+
+	private abstract class TaskTwo extends Task {
+
 	}
 }

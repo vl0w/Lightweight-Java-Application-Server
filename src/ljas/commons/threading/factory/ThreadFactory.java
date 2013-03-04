@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import ljas.commons.tasking.environment.TaskSystem;
+import ljas.commons.tasking.monitoring.TaskMonitor;
 import ljas.commons.threading.BackgroundThread;
 import ljas.commons.threading.TaskExecutorThread;
 import ljas.commons.threading.ThreadSystem;
@@ -20,10 +21,9 @@ public class ThreadFactory {
 	}
 
 	public TaskExecutorThread createTaskThread(TaskSystem taskSystem) {
-		if (taskExecutors.size() == 0) {
-			addTaskExecutorThreads(taskSystem);
-		}
-		updateTaskExecutorsByMonitoring();
+		cleanCacheByKilledThreads();
+		addMissingThreadsToCache(taskSystem);
+		updateTaskExecutorsByMonitoring(taskSystem.getTaskMonitor());
 		return taskExecutors.get(0);
 	}
 
@@ -33,15 +33,26 @@ public class ThreadFactory {
 		return thread;
 	}
 
-	public void updateTaskExecutorsByMonitoring() {
+	public void updateTaskExecutorsByMonitoring(TaskMonitor monitor) {
 		ThreadRankingComparator comparator = new ThreadRankingComparator(
-				threadSystem.getTaskMonitor());
+				monitor);
 		Collections.sort(taskExecutors, comparator);
 	}
 
-	private void addTaskExecutorThreads(TaskSystem taskSystem) {
+	private void cleanCacheByKilledThreads() {
+		List<TaskExecutorThread> threadsToDelete = new ArrayList<>();
+		for (TaskExecutorThread thread : taskExecutors) {
+			if (thread.isKilled()) {
+				threadsToDelete.add(thread);
+			}
+		}
+		taskExecutors.removeAll(threadsToDelete);
+	}
+
+	private void addMissingThreadsToCache(TaskSystem taskSystem) {
 		int maximumThreads = threadSystem.getMaximumTaskWorkers();
-		for (int i = 0; i < maximumThreads; i++) {
+		int currentThreads = taskExecutors.size();
+		for (int i = currentThreads; i < maximumThreads; i++) {
 			TaskExecutorThread thread = new TaskExecutorThread(threadSystem,
 					taskSystem);
 			taskExecutors.add(thread);

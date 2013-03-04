@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import ljas.commons.tasking.monitoring.TaskMonitor;
 import ljas.commons.threading.factory.ThreadFactory;
 
 public class ThreadSystem {
@@ -15,17 +14,17 @@ public class ThreadSystem {
 	private Set<RepetitiveThread> threads;
 	private ThreadFactory threadFactory;
 	private int maximumTaskWorkers;
-	private TaskMonitor taskMonitor;
+	private String executingEnvDescription;
 
-	public ThreadSystem(TaskMonitor taskMonitor, int maximumTaskWorkers) {
-		this.taskMonitor = taskMonitor;
+	public ThreadSystem(int maximumTaskWorkers) {
+		this("Unknown", maximumTaskWorkers);
+	}
+
+	public ThreadSystem(String executingEnvDescription, int maximumTaskWorkers) {
 		this.threads = new CopyOnWriteArraySet<>();
 		this.threadFactory = new ThreadFactory(this);
 		this.maximumTaskWorkers = maximumTaskWorkers;
-	}
-
-	public TaskMonitor getTaskMonitor() {
-		return taskMonitor;
+		this.executingEnvDescription = executingEnvDescription;
 	}
 
 	public int getDefaultThreadDelay() {
@@ -41,6 +40,9 @@ public class ThreadSystem {
 	}
 
 	public void unregisterThread(RepetitiveThread thread) {
+		if (!thread.isKilled()) {
+			thread.kill();
+		}
 		threads.remove(thread);
 	}
 
@@ -77,8 +79,18 @@ public class ThreadSystem {
 
 	public void forceKillAll() {
 		for (RepetitiveThread thread : getThreads()) {
-			thread.forceKill();
+			thread.kill();
 		}
+
+		// boolean hasRunningThreads = true;
+		// while (hasRunningThreads) {
+		// for (RepetitiveThread thread : getThreads()) {
+		// if (!thread.isKilled()) {
+		// continue;
+		// }
+		// }
+		// break;
+		// }
 	}
 
 	public void killAll() {
@@ -91,5 +103,10 @@ public class ThreadSystem {
 		for (RepetitiveThread thread : getThreads()) {
 			thread.go();
 		}
+	}
+
+	@Override
+	public String toString() {
+		return executingEnvDescription;
 	}
 }

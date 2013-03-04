@@ -11,6 +11,7 @@ public abstract class RepetitiveThread extends Thread {
 	public RepetitiveThread(ThreadSystem threadSystem) {
 		this.threadSystem = threadSystem;
 		this.isKilled = false;
+		setName(threadSystem.toString() + ":" + getClass().getSimpleName());
 	}
 
 	protected Logger getLogger() {
@@ -45,11 +46,6 @@ public abstract class RepetitiveThread extends Thread {
 		threadSystem.unregisterThread(this);
 	}
 
-	public void forceKill() {
-		kill();
-		interrupt();
-	}
-
 	public boolean isRunning() {
 		if (thisThread == null && blinker == null) {
 			return false;
@@ -60,6 +56,10 @@ public abstract class RepetitiveThread extends Thread {
 
 	public boolean isKilled() {
 		return isKilled;
+	}
+
+	public boolean isPaused() {
+		return blinker == null && !isKilled;
 	}
 
 	@Override
@@ -75,4 +75,5 @@ public abstract class RepetitiveThread extends Thread {
 	}
 
 	protected abstract void runCycle() throws Exception;
+
 }

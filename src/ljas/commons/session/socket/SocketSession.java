@@ -58,7 +58,7 @@ public class SocketSession implements Session {
 				getLogger().error("Error while disconnecting session " + this,
 						e);
 			}
-			listener.forceKill();
+			listener.kill();
 
 			if (observer != null) {
 				observer.notifySessionDisconnected(this);

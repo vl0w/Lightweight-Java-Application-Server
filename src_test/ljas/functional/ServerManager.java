@@ -23,9 +23,10 @@ public abstract class ServerManager {
 	// TODO exception handling
 	public static void startupServer() throws Exception {
 		Server server = getServer();
-		if (!server.isOnline()) {
-			server.startup();
+		if (server.isOnline()) {
+			server.shutdown();
 		}
+		server.startup();
 	}
 
 	// TODO exception handling

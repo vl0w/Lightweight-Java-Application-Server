@@ -57,4 +57,16 @@ public class TaskMonitor {
 		return estimatedTime;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (Class<? extends Task> taskClass : executionTimeMap.keySet()) {
+			sb.append(taskClass.getSimpleName());
+			sb.append(":");
+			sb.append(executionTimeMap.get(taskClass).asInt());
+			sb.append("\n");
+		}
+		return sb.toString();
+	}
+
 }

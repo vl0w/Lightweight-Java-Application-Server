@@ -24,6 +24,7 @@ public class ClientConnectionListener implements Runnable {
 					server);
 			SessionFactory.createSocketSession(server.getThreadSystem(),
 					clientSocket, serverLoginSessionObserver);
+			// new Thread(new OnConnect(clientSocket)).start();
 		} catch (SocketTimeoutException e) {
 			// Log nothing, let it be
 		} catch (IOException e) {

@@ -8,6 +8,7 @@ import ljas.commons.exceptions.TaskException;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.TaskStepResult;
 import ljas.commons.tasking.environment.TaskSystem;
+import ljas.commons.tasking.monitoring.TaskMonitor;
 import ljas.commons.tasking.step.TaskStep;
 
 public class TaskExecutorThread extends RepetitiveThread {
@@ -16,7 +17,6 @@ public class TaskExecutorThread extends RepetitiveThread {
 
 	public TaskExecutorThread(ThreadSystem threadSystem, TaskSystem taskSystem) {
 		super(threadSystem);
-		setName("TaskExecutor");
 		this.taskSystem = taskSystem;
 		this.taskQueue = new ConcurrentLinkedQueue<>();
 		start();
@@ -41,15 +41,16 @@ public class TaskExecutorThread extends RepetitiveThread {
 
 			long endTime = System.currentTimeMillis();
 			long duration = endTime - startTime;
-			taskSystem.getTaskMonitor().monitorTaskTime(task, duration);
+			TaskMonitor taskMonitor = taskSystem.getTaskMonitor();
+			taskMonitor.monitorTaskTime(task, duration);
 			getThreadSystem().getThreadFactory()
-					.updateTaskExecutorsByMonitoring();
+					.updateTaskExecutorsByMonitoring(taskMonitor);
 
 		} catch (NoSuchElementException e) {
 			final int workerDelay = getThreadSystem().getDefaultThreadDelay();
 			sleepSilent(workerDelay);
 		} catch (Exception e) {
-			getLogger().error(e);
+			getLogger().error("Unknown exception occured on " + toString(), e);
 		}
 	}
 
@@ -96,4 +97,28 @@ public class TaskExecutorThread extends RepetitiveThread {
 		}
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(getName());
+		sb.append("\n");
+		sb.append(getTaskQueue().size()).append(" tasks");
+		sb.append("\n");
+		long estimatedExecutionTime = taskSystem.getTaskMonitor()
+				.getEstimatedExecutionTime(this);
+		sb.append(estimatedExecutionTime).append("ms to go");
+		sb.append("\n");
+		if (isRunning()) {
+			sb.append("Currently running");
+		} else if (isKilled()) {
+			sb.append("Currently running");
+		} else if (isPaused()) {
+			sb.append("Currently paused");
+		} else {
+			sb.append("Unkwown state");
+		}
+
+		return sb.toString();
+	}
 }

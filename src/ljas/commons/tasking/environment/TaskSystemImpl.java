@@ -14,6 +14,10 @@ public class TaskSystemImpl implements TaskSystem {
 	private ThreadSystem threadSystem;
 	private TaskSenderCache taskSenderCache;
 
+	public TaskSystemImpl(ThreadSystem threadSystem) {
+		this(threadSystem, new TaskMonitor());
+	}
+
 	public TaskSystemImpl(ThreadSystem threadSystem, TaskMonitor taskMonitor) {
 		this.threadSystem = threadSystem;
 		this.taskMonitor = taskMonitor;

@@ -33,7 +33,7 @@ public class SocketSessionTest {
 
 		// Verifications
 		verify(socket).close();
-		verify(socketInputListener).forceKill();
+		verify(socketInputListener).kill();
 		verify(sessionObserver).notifySessionDisconnected(session);
 
 		// Asserts
@@ -94,7 +94,7 @@ public class SocketSessionTest {
 
 		// Verifications: Disconnected
 		verify(socket).close();
-		verify(socketInputListener).forceKill();
+		verify(socketInputListener).kill();
 		verify(sessionObserver).notifySessionDisconnected(session);
 
 		// Verifications: Connected

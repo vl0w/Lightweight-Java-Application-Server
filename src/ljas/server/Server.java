@@ -18,7 +18,6 @@ import ljas.commons.tasking.environment.HasTaskSystem;
 import ljas.commons.tasking.environment.TaskSystem;
 import ljas.commons.tasking.environment.TaskSystemImpl;
 import ljas.commons.tasking.environment.TaskSystemSessionObserver;
-import ljas.commons.tasking.monitoring.TaskMonitor;
 import ljas.commons.threading.ThreadSystem;
 import ljas.server.configuration.ServerConfiguration;
 import ljas.server.login.ClientConnectionListener;
@@ -87,15 +86,12 @@ public final class Server extends TaskSystemSessionObserver implements
 		// Application
 		this.application = application;
 
-		// TaskMonitor
-		TaskMonitor taskMonitor = new TaskMonitor();
-
 		// ThreadSystem
-		threadSystem = new ThreadSystem(taskMonitor,
+		threadSystem = new ThreadSystem(Server.class.getSimpleName(),
 				configuration.getMaxTaskWorkerCount());
 
 		// Tasksystem
-		taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);
+		taskSystem = new TaskSystemImpl(threadSystem);
 		setTaskSystem(taskSystem);
 
 		// Other stuff
@@ -135,10 +131,13 @@ public final class Server extends TaskSystemSessionObserver implements
 		setServerSocket(new ServerSocket(getConfiguration().getPort()));
 
 		// Tasks
-		ClientConnectionListener clientConnectionListener = new ClientConnectionListener(
-				this);
-		threadSystem.getThreadFactory().createBackgroundThread(
-				clientConnectionListener);
+		for (int i = 0; i < 5; i++) {
+
+			ClientConnectionListener connectionListener = new ClientConnectionListener(
+					this);
+			threadSystem.getThreadFactory().createBackgroundThread(
+					connectionListener);
+		}
 
 		// Start application
 		getLogger().debug("Starting application");

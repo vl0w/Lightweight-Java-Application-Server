@@ -18,7 +18,6 @@ import ljas.commons.tasking.Task;
 import ljas.commons.tasking.environment.TaskSystem;
 import ljas.commons.tasking.environment.TaskSystemImpl;
 import ljas.commons.tasking.environment.TaskSystemSessionObserver;
-import ljas.commons.tasking.monitoring.TaskMonitor;
 import ljas.commons.tasking.observation.NullTaskObserver;
 import ljas.commons.threading.ThreadBlocker;
 import ljas.commons.threading.ThreadSystem;
@@ -51,9 +50,8 @@ public class ClientImpl implements Client {
 
 	public ClientImpl(ClientApplication application) {
 		this.state = RuntimeEnvironmentState.OFFLINE;
-		TaskMonitor taskMonitor = new TaskMonitor();
-		this.threadSystem = new ThreadSystem(taskMonitor, 1);
-		this.taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);
+		this.threadSystem = new ThreadSystem("Client", 1);
+		this.taskSystem = new TaskSystemImpl(threadSystem);
 
 		this.application = application;
 		this.application.setClient(this);

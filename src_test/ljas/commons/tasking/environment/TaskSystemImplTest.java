@@ -7,21 +7,32 @@ import java.util.List;
 
 import ljas.commons.session.Session;
 import ljas.commons.tasking.Task;
-import ljas.commons.tasking.monitoring.TaskMonitor;
 import ljas.commons.threading.TaskExecutorThread;
 import ljas.commons.threading.ThreadSystem;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class TaskSystemImplTest {
+
+	private ThreadSystem threadSystem;
+
+	@Before
+	public void setUpThreadSystem() {
+		threadSystem = new ThreadSystem(1);
+	}
+
+	@After
+	public void tearDownThreadSystem() {
+		threadSystem.killAll();
+	}
 
 	@Test
 	public void testScheduleTask_NoSession_DelegateTaskToThreadSystem() {
 		// Initialization
 		Task task = mock(Task.class);
-		TaskMonitor taskMonitor = new TaskMonitor();
-		ThreadSystem threadSystem = new ThreadSystem(taskMonitor, 1);
-		TaskSystem taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);
+		TaskSystem taskSystem = new TaskSystemImpl(threadSystem);
 
 		// Run test
 		taskSystem.scheduleTask(task);
@@ -39,9 +50,7 @@ public class TaskSystemImplTest {
 		// Initialization
 		Session session = mock(Session.class);
 		Task task = mock(Task.class);
-		TaskMonitor taskMonitor = new TaskMonitor();
-		ThreadSystem threadSystem = new ThreadSystem(taskMonitor, 1);
-		TaskSystem taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);
+		TaskSystem taskSystem = new TaskSystemImpl(threadSystem);
 
 		// Run test
 		taskSystem.scheduleTask(task, session);
@@ -55,9 +64,7 @@ public class TaskSystemImplTest {
 	public void testAddBackgroundTask_DelegateTaskToThreadSystem() {
 		// Initialization
 		Task task = mock(Task.class);
-		TaskMonitor taskMonitor = new TaskMonitor();
-		ThreadSystem threadSystem = new ThreadSystem(taskMonitor, 1);
-		TaskSystem taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);
+		TaskSystem taskSystem = new TaskSystemImpl(threadSystem);
 
 		// Run test
 		taskSystem.scheduleTask(task);

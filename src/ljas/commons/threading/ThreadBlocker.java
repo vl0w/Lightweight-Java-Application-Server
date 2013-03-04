@@ -56,7 +56,7 @@ public class ThreadBlocker<V> {
 					throw new RequestTimedOutException();
 				}
 			} catch (InterruptedException e) {
-				// nothing
+				throwable = e;
 			}
 		}
 

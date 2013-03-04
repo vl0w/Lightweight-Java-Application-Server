@@ -11,7 +11,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import ljas.commons.session.SessionObserver;
-import ljas.commons.tasking.monitoring.TaskMonitor;
 import ljas.commons.threading.ThreadSystem;
 
 import org.junit.Test;
@@ -34,7 +33,7 @@ public class SocketSessionInputListenerTest {
 		when(session.getObserver()).thenReturn(observer);
 
 		// Run
-		ThreadSystem threadSystem = new ThreadSystem(new TaskMonitor(), 0);
+		ThreadSystem threadSystem = new ThreadSystem(0);
 		SocketSessionInputListener listener = new SocketSessionInputListener(
 				threadSystem);
 		listener.setSession(session);
@@ -42,6 +41,9 @@ public class SocketSessionInputListenerTest {
 
 		// Verifications
 		verify(observer).notiyObjectReceived(session, expectedObject);
+
+		// TODO: ASDF
+		threadSystem.killAll();
 	}
 
 	@Test
@@ -55,7 +57,7 @@ public class SocketSessionInputListenerTest {
 		when(socket.getInputStream()).thenThrow(new IOException());
 
 		// Run
-		ThreadSystem threadSystem = new ThreadSystem(new TaskMonitor(), 0);
+		ThreadSystem threadSystem = new ThreadSystem(0);
 		SocketSessionInputListener listener = new SocketSessionInputListener(
 				threadSystem);
 		listener.setSession(session);
@@ -64,6 +66,9 @@ public class SocketSessionInputListenerTest {
 
 		// Verifications
 		verify(session).disconnect();
+
+		// TODO: ASDF
+		threadSystem.killAll();
 	}
 
 	private class FakedInputStream extends InputStream {

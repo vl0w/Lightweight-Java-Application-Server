@@ -15,6 +15,7 @@ import ljas.commons.application.client.ClientApplication;
 import ljas.commons.application.client.ClientApplicationAdapter;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.exceptions.SessionException;
+import ljas.server.Server;
 
 import org.junit.After;
 import org.junit.Before;
@@ -33,8 +34,9 @@ public class ServerTestCase {
 	@After
 	public void tearDown() throws Exception {
 		ServerManager.shutdownServer();
-		assertFalse("Server is still online!", ServerManager.getServer()
-				.isOnline());
+		Server server = ServerManager.getServer();
+		assertFalse("Server is still online!", server.isOnline());
+		assertTrue(server.getThreadSystem().getThreads().isEmpty());
 	}
 
 	public static Client createAndConnectClient()

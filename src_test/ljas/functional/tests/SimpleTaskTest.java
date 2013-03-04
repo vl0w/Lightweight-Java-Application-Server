@@ -2,7 +2,6 @@ package ljas.functional.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import ljas.client.Client;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.observation.NullTaskObserver;
@@ -16,31 +15,27 @@ import org.junit.Test;
 public class SimpleTaskTest extends ServerTestCase {
 
 	@Test(timeout = 5000)
-	public void testSyncTask() {
-		try {
-			Client client = createAndConnectClient();
+	public void testSyncTask() throws Exception {
+		Client client = createAndConnectClient();
 
-			double v1 = Math.random();
-			double v2 = Math.random();
-			double expectedValue = v1 + v2;
-			AdditionTask additionTask = new AdditionTask(client, v1, v2);
-			double sum = ((AdditionTask) client.runTaskSync(additionTask)).sum;
+		double v1 = Math.random();
+		double v2 = Math.random();
+		double expectedValue = v1 + v2;
+		AdditionTask additionTask = new AdditionTask(client, v1, v2);
+		double sum = ((AdditionTask) client.runTaskSync(additionTask)).sum;
 
-			assertEquals(expectedValue, sum, 0.001);
+		assertEquals(expectedValue, sum, 0.001);
 
-			// Ensure that the task has been executed on the server
-			assertTrue(
-					"The task was expected to be executed on the server. As the TaskMonitor of the server does not have any statistics of the task, it might not have been there for some reason.",
-					ServerManager.getServer().getTaskSystem().getTaskMonitor()
-							.hasStatistics(additionTask.getClass()));
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
+		// Ensure that the task has been executed on the server
+		assertTrue(
+				"The task was expected to be executed on the server. As the TaskMonitor of the server does not have any statistics of the task, it might not have been there for some reason.",
+				ServerManager.getServer().getTaskSystem().getTaskMonitor()
+						.hasStatistics(additionTask.getClass()));
 	}
 
 	@Test(timeout = 5000)
 	public void testAsyncTask() throws Throwable {
-		final ThreadBlocker<Double> blocker = new ThreadBlocker<>(10000);
+		final ThreadBlocker<Double> blocker = new ThreadBlocker<>(1000000);
 
 		Client client = createAndConnectClient();
 

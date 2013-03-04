@@ -7,8 +7,8 @@ public class BackgroundThread extends RepetitiveThread {
 	public BackgroundThread(ThreadSystem threadSystem, Runnable runnable) {
 		super(threadSystem);
 		this.runnable = runnable;
-		setName("BackgroundWorker (" + runnable.getClass().getSimpleName()
-				+ ")");
+
+		setName(getName() + " / " + runnable.getClass().getSimpleName());
 	}
 
 	@Override
