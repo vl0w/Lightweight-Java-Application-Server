@@ -20,8 +20,7 @@ public class SendBackToSenderStep extends NavigationStep {
 
 	@Override
 	public void execute() throws TaskException {
-		Session senderSession = getTaskSystem().getSenderCache()
-				.removeSenderSession(task);
+		Session senderSession = getTaskSystem().getSenderCache().remove(task);
 		try {
 			senderSession.sendObject(task);
 		} catch (SessionException e) {

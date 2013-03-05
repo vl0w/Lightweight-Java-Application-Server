@@ -60,8 +60,7 @@ public class TaskSystemImplTest {
 		taskSystem.scheduleTask(task, session);
 
 		// Asserts
-		assertEquals(session,
-				taskSystem.getSenderCache().removeSenderSession(task));
+		assertEquals(session, taskSystem.getSenderCache().remove(task));
 	}
 
 	@Test

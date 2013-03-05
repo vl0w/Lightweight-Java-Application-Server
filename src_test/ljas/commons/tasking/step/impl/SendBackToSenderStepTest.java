@@ -7,11 +7,14 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import ljas.commons.exceptions.SessionException;
 import ljas.commons.exceptions.TaskException;
 import ljas.commons.session.Session;
 import ljas.commons.tasking.Task;
-import ljas.commons.tasking.TaskSenderCache;
 import ljas.commons.tasking.TaskStepResult;
 import ljas.commons.tasking.environment.TaskSystem;
 
@@ -34,10 +37,10 @@ public class SendBackToSenderStepTest {
 		TaskSystem taskSystem = mock(TaskSystem.class);
 		Session session = mock(Session.class);
 
-		TaskSenderCache senderCache = new TaskSenderCache();
-		senderCache.put(task, session);
+		Map<Task, Session> senderCacheMap = new HashMap<>();
+		senderCacheMap.put(task, session);
 
-		when(taskSystem.getSenderCache()).thenReturn(senderCache);
+		when(taskSystem.getSenderCache()).thenReturn(senderCacheMap);
 
 		// Run test
 		SendBackToSenderStep step = new SendBackToSenderStep(task);
@@ -56,10 +59,10 @@ public class SendBackToSenderStepTest {
 		TaskSystem taskSystem = mock(TaskSystem.class);
 		Session session = mock(Session.class);
 
-		TaskSenderCache senderCache = new TaskSenderCache();
-		senderCache.put(task, session);
+		Map<Task, Session> senderCacheMap = new HashMap<>();
+		senderCacheMap.put(task, session);
 
-		when(taskSystem.getSenderCache()).thenReturn(senderCache);
+		when(taskSystem.getSenderCache()).thenReturn(senderCacheMap);
 
 		doThrow(SessionException.class).when(session).sendObject(task);
 

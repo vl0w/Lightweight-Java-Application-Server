@@ -1,8 +1,9 @@
 package ljas.commons.tasking.environment;
 
+import java.util.Map;
+
 import ljas.commons.session.Session;
 import ljas.commons.tasking.Task;
-import ljas.commons.tasking.TaskSenderCache;
 import ljas.commons.tasking.monitoring.TaskMonitor;
 
 public interface TaskSystem {
@@ -12,5 +13,5 @@ public interface TaskSystem {
 
 	TaskMonitor getTaskMonitor();
 
-	TaskSenderCache getSenderCache();
+	Map<Task, Session> getSenderCache();
 }
