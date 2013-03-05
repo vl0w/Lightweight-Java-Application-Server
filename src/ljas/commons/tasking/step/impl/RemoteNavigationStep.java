@@ -25,8 +25,7 @@ public class RemoteNavigationStep extends NavigationStep {
 
 	public RemoteNavigationStep(Task task, Session session) {
 		this.task = task;
-		sessionHashCode = session.hashCode();
-		SessionStore.put(sessionHashCode, session);
+		sessionHashCode = SessionStore.put(session);
 	}
 
 	private Logger getLogger() {

@@ -26,11 +26,13 @@ import ljas.commons.tasking.step.impl.RemoteNavigationStep;
 public class SessionStore {
 	private static Map<Integer, Session> store = new HashMap<>();
 
-	public static Session findSession(int hashcode) {
-		return store.get(Integer.valueOf(hashcode));
+	public static Session findSession(int sessionHashCode) {
+		return store.get(Integer.valueOf(sessionHashCode));
 	}
 
-	public static void put(int hashcode, Session session) {
-		store.put(Integer.valueOf(hashcode), session);
+	public static int put(Session session) {
+		Integer hashCode = Integer.valueOf(session.hashCode());
+		store.put(hashCode, session);
+		return hashCode;
 	}
 }
