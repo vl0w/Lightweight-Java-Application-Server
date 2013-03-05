@@ -1,5 +1,7 @@
 package ljas.commons.tasking.flow;
 
+import java.util.List;
+
 import ljas.commons.session.Session;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.step.TaskStep;
@@ -51,8 +53,9 @@ public class TaskFlowBuilder {
 	}
 
 	public TaskFlow build() {
-		if (!flow.getSteps().get(flow.getSteps().size() - 1).getClass()
-				.equals(FinishTaskStep.class)) {
+		List<TaskStep> steps = flow.getSteps();
+		TaskStep lastStep = steps.get(steps.size() - 1);
+		if (!(lastStep instanceof FinishTaskStep)) {
 			finishTask();
 		}
 		return flow;
