@@ -3,7 +3,6 @@ package ljas.commons.tasking.observation;
 import ljas.commons.tasking.Task;
 
 /**
- * TODO Notify with warnings!
  * 
  * @author jonashansen
  * 
@@ -11,7 +10,9 @@ import ljas.commons.tasking.Task;
 public interface TaskObserver {
 	void notifyExecuted(Task task);
 
-	void notifyFail(Task task);
+	void notifyExecutedWithErrors(Task task);
 
-	void notifySuccess(Task task);
+	void notifyExecutedWithSuccess(Task task);
+
+	void notifyExecutedWithWarnings(Task task);
 }

@@ -10,12 +10,17 @@ public class NullTaskObserver implements TaskObserver {
 	}
 
 	@Override
-	public void notifyFail(Task task) {
+	public void notifyExecutedWithErrors(Task task) {
 		// nothing
 	}
 
 	@Override
-	public void notifySuccess(Task task) {
+	public void notifyExecutedWithSuccess(Task task) {
+		// nothing
+	}
+
+	@Override
+	public void notifyExecutedWithWarnings(Task task) {
 		// nothing
 	}
 

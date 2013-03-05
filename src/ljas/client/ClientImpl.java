@@ -151,7 +151,7 @@ public class ClientImpl implements Client {
 			}
 
 			@Override
-			public void notifyFail(Task task) {
+			public void notifyExecutedWithErrors(Task task) {
 				ClientApplicationException exception = new ClientApplicationException(
 						task.getResultMessage());
 				threadBlocker.release(exception);

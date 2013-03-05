@@ -36,10 +36,18 @@ public class FinishTaskStep extends AbstractTaskStep {
 	}
 
 	private void notifyObservers(TaskStepResult overallResult) {
-		if (overallResult == TaskStepResult.SUCCESS) {
+		switch (overallResult) {
+		case SUCCESS:
 			notifySuccess();
-		} else {
+			break;
+		case WARNING:
+			notifyWarning();
+			break;
+		case ERROR:
 			notifyFail();
+			break;
+		default:
+			break;
 		}
 		notifyExecuted();
 	}
@@ -49,35 +57,46 @@ public class FinishTaskStep extends AbstractTaskStep {
 
 		TaskStepResult overallResult = TaskStepResult.SUCCESS;
 		for (TaskStep taskStatus : statusHistory) {
-			if (taskStatus.getResult() == TaskStepResult.ERROR) {
+			if (taskStatus.getResult() == TaskStepResult.WARNING) {
+				overallResult = TaskStepResult.WARNING;
+			} else if (taskStatus.getResult() == TaskStepResult.ERROR) {
 				overallResult = TaskStepResult.ERROR;
 				break;
 			}
 		}
+
 		return overallResult;
 	}
 
 	private void notifyFail() {
-		List<TaskObserver> observers = TaskObserverManager.getInstance()
-				.getTaskObservers(task);
+		List<TaskObserver> observers = getObservers();
 		for (TaskObserver observer : observers) {
-			observer.notifyFail(task);
+			observer.notifyExecutedWithErrors(task);
+		}
+	}
+
+	private void notifyWarning() {
+		List<TaskObserver> observers = getObservers();
+		for (TaskObserver observer : observers) {
+			observer.notifyExecutedWithWarnings(task);
 		}
 	}
 
 	private void notifySuccess() {
-		List<TaskObserver> observers = TaskObserverManager.getInstance()
-				.getTaskObservers(task);
+		List<TaskObserver> observers = getObservers();
 		for (TaskObserver observer : observers) {
-			observer.notifySuccess(task);
+			observer.notifyExecutedWithSuccess(task);
 		}
 	}
 
 	private void notifyExecuted() {
-		List<TaskObserver> observers = TaskObserverManager.getInstance()
-				.getTaskObservers(task);
+		List<TaskObserver> observers = getObservers();
 		for (TaskObserver observer : observers) {
 			observer.notifyExecuted(task);
 		}
+	}
+
+	private List<TaskObserver> getObservers() {
+		return TaskObserverManager.getInstance().getTaskObservers(task);
 	}
 }
