@@ -6,11 +6,11 @@ import ljas.commons.tasking.TaskSenderCache;
 import ljas.commons.tasking.monitoring.TaskMonitor;
 
 public interface TaskSystem {
-	public void scheduleTask(Task task);
+	void scheduleTask(Task task);
 
-	public void scheduleTask(Task task, Session session);
+	void scheduleTask(Task task, Session session);
 
-	public TaskMonitor getTaskMonitor();
+	TaskMonitor getTaskMonitor();
 
-	public TaskSenderCache getSenderCache();
+	TaskSenderCache getSenderCache();
 }
