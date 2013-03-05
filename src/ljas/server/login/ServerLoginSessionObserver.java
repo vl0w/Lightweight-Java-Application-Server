@@ -8,6 +8,7 @@ import ljas.commons.session.SessionObserver;
 import ljas.commons.state.login.LoginAcceptedMessage;
 import ljas.commons.state.login.LoginRefusedMessage;
 import ljas.server.Server;
+import ljas.server.ServerTasksystemSessionObserver;
 
 public class ServerLoginSessionObserver implements SessionObserver {
 	private Server server;
@@ -40,7 +41,10 @@ public class ServerLoginSessionObserver implements SessionObserver {
 			// Send answer
 			session.sendObject(welcome);
 
-			session.setObserver(server);
+			// Create new Observer
+			ServerTasksystemSessionObserver observer = new ServerTasksystemSessionObserver(
+					server);
+			session.setObserver(observer);
 		} catch (ConnectionRefusedException cre) {
 			server.getLogger().info(
 					"New connection refused (" + session + "), "

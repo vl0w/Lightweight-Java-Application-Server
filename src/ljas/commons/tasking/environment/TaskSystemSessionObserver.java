@@ -6,12 +6,6 @@ import ljas.commons.tasking.Task;
 
 import org.apache.log4j.Logger;
 
-/**
- * TODO Avoid polymorphism - Server extends this
- * 
- * @author jonashansen
- * 
- */
 public class TaskSystemSessionObserver implements SessionObserver {
 	private TaskSystem taskSystem;
 
@@ -20,15 +14,6 @@ public class TaskSystemSessionObserver implements SessionObserver {
 	}
 
 	public TaskSystemSessionObserver(TaskSystem taskSystem) {
-		this.taskSystem = taskSystem;
-	}
-
-	// TODO REMOVE this!
-	public TaskSystemSessionObserver() {
-	}
-
-	// TODO REMOVE this!
-	public void setTaskSystem(TaskSystem taskSystem) {
 		this.taskSystem = taskSystem;
 	}
 
@@ -45,7 +30,7 @@ public class TaskSystemSessionObserver implements SessionObserver {
 
 	@Override
 	public void notifySessionDisconnected(Session session) {
-		// TODO Auto-generated method stub
+		// Nothing as default
 	}
 
 	private Logger getLogger() {

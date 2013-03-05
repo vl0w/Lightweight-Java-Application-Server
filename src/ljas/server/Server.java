@@ -7,7 +7,6 @@ import java.util.List;
 
 import ljas.commons.application.LoginParameters;
 import ljas.commons.application.server.ServerApplication;
-import ljas.commons.application.server.ServerApplicationException;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.session.Session;
 import ljas.commons.session.SessionHolder;
@@ -17,7 +16,6 @@ import ljas.commons.state.login.LoginRefusedMessage;
 import ljas.commons.tasking.environment.HasTaskSystem;
 import ljas.commons.tasking.environment.TaskSystem;
 import ljas.commons.tasking.environment.TaskSystemImpl;
-import ljas.commons.tasking.environment.TaskSystemSessionObserver;
 import ljas.commons.threading.ThreadSystem;
 import ljas.server.configuration.ServerConfiguration;
 import ljas.server.login.ClientConnectionListener;
@@ -25,8 +23,7 @@ import ljas.server.login.ClientConnectionListener;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
-public final class Server extends TaskSystemSessionObserver implements
-		HasTaskSystem, SessionHolder, HasState {
+public final class Server implements HasTaskSystem, SessionHolder, HasState {
 	public static final String PROJECT_NAME = "LJAS";
 	public static final String PROJECT_HOMEPAGE = "http://github.com/vl0w/Lightweight-Java-Application-Server";
 	public static final String SERVER_VERSION = "1.1.0-SNAPSHOT";
@@ -80,24 +77,13 @@ public final class Server extends TaskSystemSessionObserver implements
 	// CONSTRUCTORS
 	public Server(ServerApplication application,
 			ServerConfiguration configuration) throws IOException {
-		// Set the configuration
 		this.configuration = configuration;
-
-		// Application
 		this.application = application;
-
-		// ThreadSystem
-		threadSystem = new ThreadSystem(Server.class.getSimpleName(),
+		this.threadSystem = new ThreadSystem(Server.class.getSimpleName(),
 				configuration.getMaxTaskWorkerCount());
-
-		// Tasksystem
-		taskSystem = new TaskSystemImpl(threadSystem);
-		setTaskSystem(taskSystem);
-
-		// Other stuff
-		// TODO
-		setState(RuntimeEnvironmentState.OFFLINE);
-		sessions = new ArrayList<>();
+		this.taskSystem = new TaskSystemImpl(threadSystem);
+		this.serverState = RuntimeEnvironmentState.OFFLINE;
+		this.sessions = new ArrayList<>();
 
 		// Logging
 		DOMConfigurator.configure(getConfiguration().getLog4JFilePath());
@@ -211,7 +197,6 @@ public final class Server extends TaskSystemSessionObserver implements
 	@Override
 	public void addSession(Session session) {
 		sessions.add(session);
-		session.setObserver(this);
 	}
 
 	@Override
@@ -222,24 +207,5 @@ public final class Server extends TaskSystemSessionObserver implements
 	@Override
 	public List<Session> getSessions() {
 		return sessions;
-	}
-
-	@Override
-	public void notifySessionDisconnected(Session session) {
-		// Remove from Application
-		try {
-			getApplication().removeUser(session);
-		} catch (ServerApplicationException e) {
-			getLogger().error("Error while deleting user from application", e);
-		}
-
-		// Remove from client list
-		if (!getSessions().remove(session)) {
-			getLogger().error("Unable to delete session from server");
-		}
-
-		getLogger().info(
-				"Client disconnected (" + session + "), "
-						+ (getSessions().size()) + " connection(s) overall");
 	}
 }
