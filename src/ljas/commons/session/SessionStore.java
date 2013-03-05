@@ -24,11 +24,7 @@ import ljas.commons.tasking.step.impl.RemoteNavigationStep;
  * @see RemoteNavigationStep
  */
 public class SessionStore {
-	private static Map<Integer, Session> store;
-
-	static {
-		store = new HashMap<>();
-	}
+	private static Map<Integer, Session> store = new HashMap<>();
 
 	public static Session findSession(int hashcode) {
 		return store.get(Integer.valueOf(hashcode));

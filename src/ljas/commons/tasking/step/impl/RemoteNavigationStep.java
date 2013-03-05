@@ -41,7 +41,7 @@ public class RemoteNavigationStep extends NavigationStep {
 		} catch (SessionException e) {
 			getLogger().error("Error while navigating task to remote session",
 					e);
-			task.getTaskFlow().currentStep().setResult(TaskStepResult.ERROR);
+			setResult(TaskStepResult.ERROR);
 			task.setResultMessage("Error while navigating task to remote session");
 		}
 	}
