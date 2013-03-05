@@ -11,7 +11,7 @@ public class TaskFlowImpl implements TaskFlow {
 	private static final long serialVersionUID = -2170203817126055325L;
 
 	private Queue<TaskStep> steps;
-	private TaskStep lastPoppedStep;
+	private TaskStep lastRemovedStep;
 
 	public TaskFlowImpl() {
 		this.steps = new LinkedList<>();
@@ -19,13 +19,13 @@ public class TaskFlowImpl implements TaskFlow {
 
 	@Override
 	public TaskStep nextStep() {
-		lastPoppedStep = steps.remove();
-		return lastPoppedStep;
+		lastRemovedStep = steps.remove();
+		return lastRemovedStep;
 	}
 
 	@Override
 	public TaskStep currentStep() {
-		return lastPoppedStep;
+		return lastRemovedStep;
 	}
 
 	public void addStep(TaskStep step) {
