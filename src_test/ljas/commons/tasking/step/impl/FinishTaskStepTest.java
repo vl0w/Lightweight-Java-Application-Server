@@ -1,5 +1,6 @@
 package ljas.commons.tasking.step.impl;
 
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -33,6 +34,12 @@ public class FinishTaskStepTest {
 
 		observer = mock(TaskObserver.class);
 		TaskObserverManager.getInstance().add(task, observer);
+	}
+
+	@Test
+	public void testGeneral_IsNotForNavigation() {
+		FinishTaskStep step = new FinishTaskStep(task);
+		assertFalse(step.isForNavigation());
 	}
 
 	@Test

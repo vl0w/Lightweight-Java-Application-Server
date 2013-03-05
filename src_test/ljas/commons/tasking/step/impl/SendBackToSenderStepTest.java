@@ -1,6 +1,7 @@
 package ljas.commons.tasking.step.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -17,6 +18,13 @@ import ljas.commons.tasking.environment.TaskSystem;
 import org.junit.Test;
 
 public class SendBackToSenderStepTest {
+
+	@Test
+	public void testGeneral_IsForNavigation() {
+		Task task = mock(Task.class);
+		LocalNavigationStep step = new LocalNavigationStep(task);
+		assertTrue(step.isForNavigation());
+	}
 
 	@Test
 	public void testExecute_SenderSessionFound_SendObject()
