@@ -98,9 +98,13 @@ public class ThreadFactoryTest {
 
 	private abstract class TaskOne extends Task {
 
+		private static final long serialVersionUID = 1L;
+
 	}
 
 	private abstract class TaskTwo extends Task {
+
+		private static final long serialVersionUID = 1L;
 
 	}
 }
