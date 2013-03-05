@@ -30,11 +30,6 @@ public class PropertyServerConfiguration implements ServerConfiguration {
 	}
 
 	@Override
-	public String getMessasgeOfTheDay() {
-		return properties.getProperty("MessageOfTheDay");
-	}
-
-	@Override
 	public int getMaxTaskWorkerCount() {
 		return Integer.valueOf(properties.getProperty("MaxTaskWorkers"));
 	}

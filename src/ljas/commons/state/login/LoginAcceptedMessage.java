@@ -1,11 +1,9 @@
 package ljas.commons.state.login;
 
-
 public class LoginAcceptedMessage implements LoginMessage {
 	private static final long serialVersionUID = 5359705297664395635L;
 
 	private String serverName;
-	private String messageOfTheDay;
 
 	public String getHostName() {
 		return serverName;
@@ -15,16 +13,7 @@ public class LoginAcceptedMessage implements LoginMessage {
 		serverName = value;
 	}
 
-	public String getMessageOfTheDay() {
-		return messageOfTheDay;
-	}
-
-	public void setMessageOfTheDay(String value) {
-		messageOfTheDay = value;
-	}
-
-	public LoginAcceptedMessage(String serverName, String messageOfTheDay) {
+	public LoginAcceptedMessage(String serverName) {
 		this.serverName = serverName;
-		this.messageOfTheDay = messageOfTheDay;
 	}
 }

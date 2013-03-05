@@ -10,8 +10,6 @@ public interface ServerConfiguration {
 
 	public abstract String getHostContact();
 
-	public abstract String getMessasgeOfTheDay();
-
 	public abstract int getMaxTaskWorkerCount();
 
 	public abstract String getLog4JFilePath();

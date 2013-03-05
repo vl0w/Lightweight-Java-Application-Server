@@ -25,11 +25,6 @@ public class TestingServerConfiguration implements ServerConfiguration {
 	}
 
 	@Override
-	public String getMessasgeOfTheDay() {
-		return "The cake is a lie!";
-	}
-
-	@Override
 	public int getMaxTaskWorkerCount() {
 		return 10;
 	}
