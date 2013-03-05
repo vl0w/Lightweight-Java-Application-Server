@@ -22,7 +22,7 @@ public class LocalNavigationStep extends NavigationStep {
 
 	@Override
 	public void execute() throws TaskException {
-		task.getTaskFlow().currentStep().getTaskSystem().scheduleTask(task);
+		getTaskSystem().scheduleTask(task);
 	}
 
 }
