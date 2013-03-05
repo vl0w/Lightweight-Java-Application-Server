@@ -30,6 +30,11 @@ public class TaskSystemImpl implements TaskSystem {
 	}
 
 	@Override
+	public TaskSenderCache getSenderCache() {
+		return taskSenderCache;
+	}
+
+	@Override
 	public void scheduleTask(Task task) {
 		Logger.getLogger(getClass()).debug("Scheduled task '" + task + "'");
 
@@ -43,10 +48,5 @@ public class TaskSystemImpl implements TaskSystem {
 	public void scheduleTask(Task task, Session senderSession) {
 		getSenderCache().put(task, senderSession);
 		scheduleTask(task);
-	}
-
-	@Override
-	public TaskSenderCache getSenderCache() {
-		return taskSenderCache;
 	}
 }
