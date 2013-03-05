@@ -9,20 +9,18 @@ import ljas.commons.tasking.observation.TaskObserver;
 import ljas.commons.tasking.observation.TaskObserverManager;
 import ljas.commons.tasking.step.TaskStep;
 
-/**
- * 
- * @author Jonas Hansen
- * 
- */
 public abstract class Task implements Serializable {
 	private static int TASK_INSTANCE_COUNTER = 0;
 	private static final long serialVersionUID = -8887389539021809582L;
 
-	public static String MSG_SAFETY_CONCERN = "Task not executed due to safety concerns (Wrong Application ID)";
-
 	private long id;
 	private TaskFlow taskFlow;
 	private List<TaskStep> stepHistory;
+
+	public Task() {
+		id = ++TASK_INSTANCE_COUNTER;
+		this.stepHistory = new ArrayList<>();
+	}
 
 	public List<TaskStep> getStepHistory() {
 		return stepHistory;
@@ -39,9 +37,12 @@ public abstract class Task implements Serializable {
 		return taskFlow;
 	}
 
-	public Task() {
-		id = ++TASK_INSTANCE_COUNTER;
-		this.stepHistory = new ArrayList<>();
+	public void addObserver(TaskObserver observer) {
+		TaskObserverManager.getInstance().add(this, observer);
+	}
+
+	public void removeObserver(TaskObserver observer) {
+		TaskObserverManager.getInstance().remove(this, observer);
 	}
 
 	@Override
@@ -64,14 +65,6 @@ public abstract class Task implements Serializable {
 	@Override
 	public String toString() {
 		return "Task [" + getClass().getSimpleName() + "]";
-	}
-
-	public void addObserver(TaskObserver observer) {
-		TaskObserverManager.getInstance().add(this, observer);
-	}
-
-	public void removeObserver(TaskObserver observer) {
-		TaskObserverManager.getInstance().remove(this, observer);
 	}
 
 	protected abstract TaskFlow buildTaskFlow();
