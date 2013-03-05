@@ -34,6 +34,10 @@ public class TaskSystemImplTest {
 		Task task = mock(Task.class);
 		TaskSystem taskSystem = new TaskSystemImpl(threadSystem);
 
+		// Pause threads
+		threadSystem.getThreadFactory().createTaskThread(taskSystem);
+		threadSystem.pauseAll();
+
 		// Run test
 		taskSystem.scheduleTask(task);
 
