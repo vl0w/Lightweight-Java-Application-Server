@@ -10,7 +10,7 @@ import java.util.List;
 import ljas.client.Client;
 import ljas.client.ClientImpl;
 import ljas.commons.application.LoginParameters;
-import ljas.commons.application.LoginParametersImpl;
+import ljas.commons.application.NullLoginParameters;
 import ljas.commons.application.client.ClientApplication;
 import ljas.commons.application.client.NullClientApplication;
 import ljas.commons.exceptions.ConnectionRefusedException;
@@ -47,7 +47,7 @@ public class ServerTestCase {
 
 	public static void connectClient(Client client)
 			throws ConnectionRefusedException, SessionException {
-		LoginParameters parameters = new LoginParametersImpl(
+		LoginParameters parameters = new NullLoginParameters(
 				client.getApplication());
 		client.connect("localhost", 1666, parameters);
 	}

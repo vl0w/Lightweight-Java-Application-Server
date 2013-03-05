@@ -14,12 +14,12 @@ public abstract class ServerApplication extends Application {
 	 * 
 	 * @param connection
 	 *            The connection to the user
-	 * @param parameter
+	 * @param parameters
 	 *            The login parameters
 	 * @throws ServerApplicationException
 	 */
-	public abstract void registerUser(Session session, LoginParameters parameter)
-			throws ServerApplicationException;
+	public abstract void registerUser(Session session,
+			LoginParameters parameters) throws ServerApplicationException;
 
 	/**
 	 * Gets called, when a user closed the server connection or the server lost
