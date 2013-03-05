@@ -12,7 +12,7 @@ import ljas.client.ClientImpl;
 import ljas.commons.application.LoginParameters;
 import ljas.commons.application.LoginParametersImpl;
 import ljas.commons.application.client.ClientApplication;
-import ljas.commons.application.client.ClientApplicationAdapter;
+import ljas.commons.application.client.NullClientApplication;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.exceptions.SessionException;
 import ljas.server.Server;
@@ -60,7 +60,7 @@ public class ServerTestCase {
 	protected static Client createClient(String applicationIdentifier,
 			String applicationVersion) throws SessionException,
 			ConnectionRefusedException {
-		ClientApplication application = new ClientApplicationAdapter(
+		ClientApplication application = new NullClientApplication(
 				applicationIdentifier, applicationVersion);
 
 		Client client = new ClientImpl(application);

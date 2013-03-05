@@ -2,7 +2,7 @@ package ljas.functional;
 
 import java.io.IOException;
 
-import ljas.commons.application.server.ServerApplicationAdapter;
+import ljas.commons.application.server.NullServerApplication;
 import ljas.server.Server;
 
 public abstract class ServerManager {
@@ -16,7 +16,7 @@ public abstract class ServerManager {
 	}
 
 	public static Server createServer() throws IOException {
-		return new Server(new ServerApplicationAdapter("ljas.testing", "1.0"),
+		return new Server(new NullServerApplication("ljas.testing", "1.0"),
 				new TestingServerConfiguration());
 	}
 
