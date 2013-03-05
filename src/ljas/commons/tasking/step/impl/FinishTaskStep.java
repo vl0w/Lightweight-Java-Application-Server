@@ -35,8 +35,24 @@ public class FinishTaskStep extends AbstractTaskStep {
 		notifyObservers(overallResult);
 	}
 
-	private void notifyObservers(TaskStepResult overallResult) {
-		switch (overallResult) {
+	private TaskStepResult getOverallResult() {
+		List<TaskStep> statusHistory = task.getStepHistory();
+	
+		TaskStepResult overallResult = TaskStepResult.SUCCESS;
+		for (TaskStep taskStatus : statusHistory) {
+			if (taskStatus.getResult() == TaskStepResult.WARNING) {
+				overallResult = TaskStepResult.WARNING;
+			} else if (taskStatus.getResult() == TaskStepResult.ERROR) {
+				overallResult = TaskStepResult.ERROR;
+				break;
+			}
+		}
+	
+		return overallResult;
+	}
+
+	private void notifyObservers(TaskStepResult result) {
+		switch (result) {
 		case SUCCESS:
 			notifySuccess();
 			break;
@@ -50,22 +66,6 @@ public class FinishTaskStep extends AbstractTaskStep {
 			break;
 		}
 		notifyExecuted();
-	}
-
-	private TaskStepResult getOverallResult() {
-		List<TaskStep> statusHistory = task.getStepHistory();
-
-		TaskStepResult overallResult = TaskStepResult.SUCCESS;
-		for (TaskStep taskStatus : statusHistory) {
-			if (taskStatus.getResult() == TaskStepResult.WARNING) {
-				overallResult = TaskStepResult.WARNING;
-			} else if (taskStatus.getResult() == TaskStepResult.ERROR) {
-				overallResult = TaskStepResult.ERROR;
-				break;
-			}
-		}
-
-		return overallResult;
 	}
 
 	private void notifyFail() {
