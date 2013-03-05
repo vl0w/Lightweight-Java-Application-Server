@@ -96,29 +96,4 @@ public class TaskExecutorThread extends RepetitiveThread {
 			// nothing
 		}
 	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(getName());
-		sb.append("\n");
-		sb.append(getTaskQueue().size()).append(" tasks");
-		sb.append("\n");
-		long estimatedExecutionTime = taskSystem.getTaskMonitor()
-				.getEstimatedExecutionTime(this);
-		sb.append(estimatedExecutionTime).append("ms to go");
-		sb.append("\n");
-		if (isRunning()) {
-			sb.append("Currently running");
-		} else if (isKilled()) {
-			sb.append("Currently running");
-		} else if (isPaused()) {
-			sb.append("Currently paused");
-		} else {
-			sb.append("Unkwown state");
-		}
-
-		return sb.toString();
-	}
 }
