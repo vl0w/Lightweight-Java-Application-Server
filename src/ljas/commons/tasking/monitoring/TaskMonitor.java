@@ -16,10 +16,6 @@ public class TaskMonitor {
 		executionTimeMap = new ConcurrentHashMap<Class<? extends Task>, Average>();
 	}
 
-	public boolean hasStatistics(Class<? extends Task> taskClass) {
-		return executionTimeMap.containsKey(taskClass);
-	}
-
 	public void monitorTaskTime(Task task, long millis) {
 		Class<? extends Task> clazz = task.getClass();
 
@@ -56,17 +52,4 @@ public class TaskMonitor {
 
 		return estimatedTime;
 	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		for (Class<? extends Task> taskClass : executionTimeMap.keySet()) {
-			sb.append(taskClass.getSimpleName());
-			sb.append(":");
-			sb.append(executionTimeMap.get(taskClass).asInt());
-			sb.append("\n");
-		}
-		return sb.toString();
-	}
-
 }

@@ -30,7 +30,7 @@ public class SimpleTaskTest extends ServerTestCase {
 		assertTrue(
 				"The task was expected to be executed on the server. As the TaskMonitor of the server does not have any statistics of the task, it might not have been there for some reason.",
 				ServerManager.getServer().getTaskSystem().getTaskMonitor()
-						.hasStatistics(additionTask.getClass()));
+						.getAverageTaskTime(additionTask) != 0);
 	}
 
 	@Test(timeout = 5000)
