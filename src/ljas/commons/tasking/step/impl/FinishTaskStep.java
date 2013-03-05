@@ -6,7 +6,7 @@ import ljas.commons.exceptions.TaskException;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.TaskStepResult;
 import ljas.commons.tasking.observation.TaskObserver;
-import ljas.commons.tasking.observation.TaskObserverFactory;
+import ljas.commons.tasking.observation.TaskObserverManager;
 import ljas.commons.tasking.step.AbstractTaskStep;
 import ljas.commons.tasking.step.TaskStep;
 
@@ -58,7 +58,7 @@ public class FinishTaskStep extends AbstractTaskStep {
 	}
 
 	private void notifyFail() {
-		List<TaskObserver> observers = TaskObserverFactory.getInstance()
+		List<TaskObserver> observers = TaskObserverManager.getInstance()
 				.getTaskObservers(task);
 		for (TaskObserver observer : observers) {
 			observer.notifyFail(task);
@@ -66,7 +66,7 @@ public class FinishTaskStep extends AbstractTaskStep {
 	}
 
 	private void notifySuccess() {
-		List<TaskObserver> observers = TaskObserverFactory.getInstance()
+		List<TaskObserver> observers = TaskObserverManager.getInstance()
 				.getTaskObservers(task);
 		for (TaskObserver observer : observers) {
 			observer.notifySuccess(task);
@@ -74,7 +74,7 @@ public class FinishTaskStep extends AbstractTaskStep {
 	}
 
 	private void notifyExecuted() {
-		List<TaskObserver> observers = TaskObserverFactory.getInstance()
+		List<TaskObserver> observers = TaskObserverManager.getInstance()
 				.getTaskObservers(task);
 		for (TaskObserver observer : observers) {
 			observer.notifyExecuted(task);

@@ -9,9 +9,9 @@ import ljas.commons.tasking.Task;
  * 
  */
 public interface TaskObserver {
-	public void notifyExecuted(Task task);
+	void notifyExecuted(Task task);
 
-	public void notifyFail(Task task);
+	void notifyFail(Task task);
 
-	public void notifySuccess(Task task);
+	void notifySuccess(Task task);
 }

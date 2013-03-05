@@ -6,7 +6,7 @@ import java.util.List;
 
 import ljas.commons.tasking.flow.TaskFlow;
 import ljas.commons.tasking.observation.TaskObserver;
-import ljas.commons.tasking.observation.TaskObserverFactory;
+import ljas.commons.tasking.observation.TaskObserverManager;
 import ljas.commons.tasking.step.TaskStep;
 
 /**
@@ -77,11 +77,11 @@ public abstract class Task implements Serializable {
 	}
 
 	public void addObserver(TaskObserver observer) {
-		TaskObserverFactory.getInstance().putObserver(this, observer);
+		TaskObserverManager.getInstance().add(this, observer);
 	}
 
 	public void removeObserver(TaskObserver observer) {
-		TaskObserverFactory.getInstance().removeObserver(this, observer);
+		TaskObserverManager.getInstance().remove(this, observer);
 	}
 
 	protected abstract TaskFlow buildTaskFlow();
