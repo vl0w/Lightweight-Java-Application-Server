@@ -2,7 +2,6 @@ package ljas.commons.tasking.step.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -64,7 +63,8 @@ public class SendBackToSenderStepTest {
 
 		when(taskSystem.getSenderCache()).thenReturn(senderCacheMap);
 
-		doThrow(SessionException.class).when(session).sendObject(task);
+		SessionException expectedException = new SessionException();
+		doThrow(expectedException).when(session).sendObject(task);
 
 		// Run test
 		SendBackToSenderStep step = new SendBackToSenderStep(task);
@@ -73,6 +73,6 @@ public class SendBackToSenderStepTest {
 
 		// Asserts & Verifications
 		assertEquals(TaskStepResult.ERROR, step.getResult());
-		verify(task).setResultMessage(anyString());
+		assertEquals(expectedException, step.getException().getCause());
 	}
 }

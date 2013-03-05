@@ -147,7 +147,7 @@ public class TaskExecutorThreadTest {
 
 		// Verifications
 		verify(step).setResult(TaskStepResult.ERROR);
-		verify(task).setResultMessage(message);
+		verify(step).setException(expectedException);
 	}
 
 	private TaskExecutorThread createTaskExecutorThread() {

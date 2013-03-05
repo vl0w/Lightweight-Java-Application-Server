@@ -33,4 +33,8 @@ public interface TaskStep {
 	void setResult(TaskStepResult result);
 
 	boolean isForNavigation();
+
+	void setException(TaskException exception);
+
+	TaskException getException();
 }

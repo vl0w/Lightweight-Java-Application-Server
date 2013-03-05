@@ -23,11 +23,13 @@ public class FinishTaskStepTest {
 
 	private Task task;
 	private List<TaskStep> executedSteps;
+	private List<TaskException> exceptions;
 	private TaskObserver observer;
 
 	@Before
 	public void setUp() {
 		executedSteps = new ArrayList<>();
+		exceptions = new ArrayList<>();
 
 		task = mock(Task.class);
 		when(task.getStepHistory()).thenReturn(executedSteps);
@@ -60,7 +62,7 @@ public class FinishTaskStepTest {
 	public void testExecute_OneStepFailed_NotifyFailAndExecuted()
 			throws TaskException {
 		addStepWithResult(TaskStepResult.SUCCESS);
-		addStepWithResult(TaskStepResult.ERROR);
+		addStepWithError(new TaskException());
 		addStepWithResult(TaskStepResult.SUCCESS);
 
 		FinishTaskStep step = new FinishTaskStep(task);
@@ -89,7 +91,7 @@ public class FinishTaskStepTest {
 			throws TaskException {
 		addStepWithResult(TaskStepResult.SUCCESS);
 		addStepWithResult(TaskStepResult.WARNING);
-		addStepWithResult(TaskStepResult.ERROR);
+		addStepWithError(new TaskException());
 		addStepWithResult(TaskStepResult.WARNING);
 
 		FinishTaskStep step = new FinishTaskStep(task);
@@ -111,26 +113,39 @@ public class FinishTaskStepTest {
 		verify(observer).notifyExecuted(task);
 	}
 
+	private void addStepWithError(TaskException exception) {
+		exceptions.add(exception);
+		TaskStep step = mock(TaskStep.class);
+		when(step.getException()).thenReturn(exception);
+		when(step.getResult()).thenReturn(TaskStepResult.ERROR);
+		executedSteps.add(step);
+	}
+
 	private void addStepWithResult(TaskStepResult result) {
+		if (result == TaskStepResult.ERROR) {
+			throw new IllegalArgumentException(
+					"Use addStepWithError(...) instead!");
+		}
+
 		TaskStep step = mock(TaskStep.class);
 		when(step.getResult()).thenReturn(result);
 		executedSteps.add(step);
 	}
 
 	private void verifyFailNotification() {
-		verify(observer).notifyExecutedWithErrors(task);
+		verify(observer).notifyExecutedWithErrors(task, exceptions);
 		verify(observer, never()).notifyExecutedWithSuccess(task);
 		verify(observer, never()).notifyExecutedWithWarnings(task);
 	}
 
 	private void verifyWarningNotification() {
-		verify(observer, never()).notifyExecutedWithErrors(task);
+		verify(observer, never()).notifyExecutedWithErrors(task, exceptions);
 		verify(observer, never()).notifyExecutedWithSuccess(task);
 		verify(observer).notifyExecutedWithWarnings(task);
 	}
 
 	private void verifySuccessNotification() {
-		verify(observer, never()).notifyExecutedWithErrors(task);
+		verify(observer, never()).notifyExecutedWithErrors(task, exceptions);
 		verify(observer).notifyExecutedWithSuccess(task);
 		verify(observer, never()).notifyExecutedWithWarnings(task);
 	}

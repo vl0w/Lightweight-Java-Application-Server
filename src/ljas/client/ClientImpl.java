@@ -1,5 +1,7 @@
 package ljas.client;
 
+import java.util.List;
+
 import ljas.commons.application.Application;
 import ljas.commons.application.LoginParameters;
 import ljas.commons.application.client.ClientApplication;
@@ -8,6 +10,7 @@ import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.exceptions.DisconnectException;
 import ljas.commons.exceptions.RequestTimedOutException;
 import ljas.commons.exceptions.SessionException;
+import ljas.commons.exceptions.TaskException;
 import ljas.commons.session.Session;
 import ljas.commons.session.SessionFactory;
 import ljas.commons.state.RuntimeEnvironmentState;
@@ -151,9 +154,10 @@ public class ClientImpl implements Client {
 			}
 
 			@Override
-			public void notifyExecutedWithErrors(Task task) {
+			public void notifyExecutedWithErrors(Task task,
+					List<TaskException> exceptions) {
 				ClientApplicationException exception = new ClientApplicationException(
-						task.getResultMessage());
+						exceptions);
 				threadBlocker.release(exception);
 			}
 		});

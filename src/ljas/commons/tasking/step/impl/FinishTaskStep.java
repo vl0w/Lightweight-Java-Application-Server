@@ -1,5 +1,6 @@
 package ljas.commons.tasking.step.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ljas.commons.exceptions.TaskException;
@@ -37,7 +38,7 @@ public class FinishTaskStep extends AbstractTaskStep {
 
 	private TaskStepResult getOverallResult() {
 		List<TaskStep> statusHistory = task.getStepHistory();
-	
+
 		TaskStepResult overallResult = TaskStepResult.SUCCESS;
 		for (TaskStep taskStatus : statusHistory) {
 			if (taskStatus.getResult() == TaskStepResult.WARNING) {
@@ -47,7 +48,7 @@ public class FinishTaskStep extends AbstractTaskStep {
 				break;
 			}
 		}
-	
+
 		return overallResult;
 	}
 
@@ -70,8 +71,9 @@ public class FinishTaskStep extends AbstractTaskStep {
 
 	private void notifyFail() {
 		List<TaskObserver> observers = getObservers();
+		List<TaskException> exceptions = collectAllExceptions();
 		for (TaskObserver observer : observers) {
-			observer.notifyExecutedWithErrors(task);
+			observer.notifyExecutedWithErrors(task, exceptions);
 		}
 	}
 
@@ -94,6 +96,19 @@ public class FinishTaskStep extends AbstractTaskStep {
 		for (TaskObserver observer : observers) {
 			observer.notifyExecuted(task);
 		}
+	}
+
+	private List<TaskException> collectAllExceptions() {
+		List<TaskException> exceptions = new ArrayList<>();
+
+		for (TaskStep step : task.getStepHistory()) {
+			TaskException exception = step.getException();
+			if (exception != null) {
+				exceptions.add(exception);
+			}
+		}
+
+		return exceptions;
 	}
 
 	private List<TaskObserver> getObservers() {

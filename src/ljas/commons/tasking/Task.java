@@ -23,18 +23,9 @@ public abstract class Task implements Serializable {
 	private long id;
 	private TaskFlow taskFlow;
 	private List<TaskStep> stepHistory;
-	private String resultMessage;
 
 	public List<TaskStep> getStepHistory() {
 		return stepHistory;
-	}
-
-	public String getResultMessage() {
-		return resultMessage;
-	}
-
-	public void setResultMessage(String value) {
-		resultMessage = value;
 	}
 
 	public long getId() {
@@ -50,7 +41,6 @@ public abstract class Task implements Serializable {
 
 	public Task() {
 		id = ++TASK_INSTANCE_COUNTER;
-		resultMessage = "";
 		this.stepHistory = new ArrayList<>();
 	}
 

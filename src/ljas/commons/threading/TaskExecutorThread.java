@@ -60,7 +60,7 @@ public class TaskExecutorThread extends RepetitiveThread {
 			step.execute();
 		} catch (TaskException e) {
 			step.setResult(TaskStepResult.ERROR);
-			task.setResultMessage(e.getMessage());
+			step.setException(e);
 		}
 
 		if (step.getResult() == TaskStepResult.NONE) {

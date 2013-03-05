@@ -2,8 +2,8 @@ package ljas.commons.tasking.step.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -45,6 +45,7 @@ public class RemoteNavigationStepTest {
 		step.execute();
 
 		verify(session).sendObject(task);
+		assertNull(step.getException());
 	}
 
 	@Test
@@ -52,13 +53,15 @@ public class RemoteNavigationStepTest {
 			throws TaskException, SessionException {
 		Task task = mock(Task.class);
 		Session session = mock(Session.class);
-		doThrow(SessionException.class).when(session).sendObject(task);
+
+		SessionException expectedException = new SessionException();
+		doThrow(expectedException).when(session).sendObject(task);
 
 		RemoteNavigationStep step = new RemoteNavigationStep(task, session);
 		step.execute();
 
 		assertEquals(TaskStepResult.ERROR, step.getResult());
-		verify(task).setResultMessage(anyString());
+		assertEquals(expectedException, step.getException().getCause());
 	}
 
 }

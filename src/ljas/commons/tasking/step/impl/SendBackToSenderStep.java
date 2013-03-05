@@ -24,9 +24,11 @@ public class SendBackToSenderStep extends NavigationStep {
 		try {
 			senderSession.sendObject(task);
 		} catch (SessionException e) {
-			getLogger().error("Error while navigating Task back to sender.", e);
+			String errorMessage = "Error while navigating Task back to sender.";
+			getLogger().error(errorMessage, e);
+
 			setResult(TaskStepResult.ERROR);
-			task.setResultMessage("Error while navigating Task back to sender.");
+			setException(new TaskException(errorMessage, e));
 		}
 	}
 
