@@ -108,8 +108,7 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState,
 		getLogger().info(
 				"See \"" + PROJECT_HOMEPAGE + "\" for more information");
 		getLogger().info(
-				"This server is hosted by " + getConfiguration().getHostName()
-						+ " (" + getConfiguration().getHostContact() + ")");
+				"This server is hosted by " + getConfiguration().getHostName());
 
 		getLogger().debug("Configuration: " + getConfiguration().toString());
 

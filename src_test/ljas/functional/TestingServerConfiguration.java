@@ -20,11 +20,6 @@ public class TestingServerConfiguration implements ServerConfiguration {
 	}
 
 	@Override
-	public String getHostContact() {
-		return "http://github.com/Ganymed/Lightweight-Java-Application-Server";
-	}
-
-	@Override
 	public int getMaxTaskWorkerCount() {
 		return 10;
 	}

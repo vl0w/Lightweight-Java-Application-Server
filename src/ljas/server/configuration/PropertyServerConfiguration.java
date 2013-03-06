@@ -25,11 +25,6 @@ public class PropertyServerConfiguration implements ServerConfiguration {
 	}
 
 	@Override
-	public String getHostContact() {
-		return properties.getProperty("HostContact");
-	}
-
-	@Override
 	public int getMaxTaskWorkerCount() {
 		return Integer.valueOf(properties.getProperty("MaxTaskWorkers"));
 	}

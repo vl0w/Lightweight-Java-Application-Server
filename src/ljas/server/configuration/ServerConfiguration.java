@@ -8,8 +8,6 @@ public interface ServerConfiguration {
 
 	public abstract String getHostName();
 
-	public abstract String getHostContact();
-
 	public abstract int getMaxTaskWorkerCount();
 
 	public abstract String getLog4JFilePath();
