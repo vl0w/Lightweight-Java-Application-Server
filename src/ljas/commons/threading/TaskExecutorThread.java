@@ -9,6 +9,7 @@ import ljas.commons.tasking.Task;
 import ljas.commons.tasking.TaskStepResult;
 import ljas.commons.tasking.environment.TaskSystem;
 import ljas.commons.tasking.monitoring.TaskMonitor;
+import ljas.commons.tasking.step.ExecutingContext;
 import ljas.commons.tasking.step.TaskStep;
 
 public class TaskExecutorThread extends RepetitiveThread {
@@ -55,9 +56,11 @@ public class TaskExecutorThread extends RepetitiveThread {
 	}
 
 	private void executeStep(Task task, TaskStep step) {
-		step.setTaskSystem(taskSystem);
+
+		ExecutingContext context = getExecutingContext();
+
 		try {
-			step.execute();
+			step.execute(context);
 		} catch (TaskException e) {
 			step.setResult(TaskStepResult.ERROR);
 			step.setException(e);
@@ -95,5 +98,11 @@ public class TaskExecutorThread extends RepetitiveThread {
 		} catch (InterruptedException e) {
 			// nothing
 		}
+	}
+
+	private ExecutingContext getExecutingContext() {
+		ExecutingContext context = new ExecutingContext();
+		context.setTaskSystem(taskSystem);
+		return context;
 	}
 }

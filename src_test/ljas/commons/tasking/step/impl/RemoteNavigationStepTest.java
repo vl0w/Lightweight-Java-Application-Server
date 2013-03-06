@@ -13,6 +13,7 @@ import ljas.commons.session.Session;
 import ljas.commons.session.SessionStore;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.TaskStepResult;
+import ljas.commons.tasking.step.ExecutingContext;
 
 import org.junit.Test;
 
@@ -41,8 +42,7 @@ public class RemoteNavigationStepTest {
 		Task task = mock(Task.class);
 		Session session = mock(Session.class);
 
-		RemoteNavigationStep step = new RemoteNavigationStep(task, session);
-		step.execute();
+		RemoteNavigationStep step = executeStep(task, session);
 
 		verify(session).sendObject(task);
 		assertNull(step.getException());
@@ -57,11 +57,18 @@ public class RemoteNavigationStepTest {
 		SessionException expectedException = new SessionException();
 		doThrow(expectedException).when(session).sendObject(task);
 
-		RemoteNavigationStep step = new RemoteNavigationStep(task, session);
-		step.execute();
+		RemoteNavigationStep step = executeStep(task, session);
 
 		assertEquals(TaskStepResult.ERROR, step.getResult());
 		assertEquals(expectedException, step.getException().getCause());
+	}
+
+	private RemoteNavigationStep executeStep(Task task, Session session)
+			throws TaskException {
+		ExecutingContext context = new ExecutingContext();
+		RemoteNavigationStep step = new RemoteNavigationStep(task, session);
+		step.execute(context);
+		return step;
 	}
 
 }

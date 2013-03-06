@@ -3,6 +3,7 @@ package ljas.commons.tasking.step.impl;
 import ljas.commons.exceptions.TaskException;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.environment.TaskSystem;
+import ljas.commons.tasking.step.ExecutingContext;
 import ljas.commons.tasking.step.NavigationStep;
 
 /**
@@ -21,8 +22,8 @@ public class LocalNavigationStep extends NavigationStep {
 	}
 
 	@Override
-	public void execute() throws TaskException {
-		getTaskSystem().scheduleTask(task);
+	public void execute(ExecutingContext context) throws TaskException {
+		context.getTaskSystem().scheduleTask(task);
 	}
 
 }

@@ -9,6 +9,7 @@ import ljas.commons.tasking.TaskStepResult;
 import ljas.commons.tasking.observation.TaskObserver;
 import ljas.commons.tasking.observation.TaskObserverManager;
 import ljas.commons.tasking.step.AbstractTaskStep;
+import ljas.commons.tasking.step.ExecutingContext;
 import ljas.commons.tasking.step.TaskStep;
 
 /**
@@ -31,7 +32,7 @@ public class FinishTaskStep extends AbstractTaskStep {
 	}
 
 	@Override
-	public void execute() throws TaskException {
+	public void execute(ExecutingContext context) throws TaskException {
 		TaskStepResult overallResult = getOverallResult();
 		notifyObservers(overallResult);
 	}

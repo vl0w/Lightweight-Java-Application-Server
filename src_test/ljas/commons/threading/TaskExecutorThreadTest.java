@@ -3,6 +3,7 @@ package ljas.commons.threading;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -21,6 +22,7 @@ import ljas.commons.tasking.environment.TaskSystemImpl;
 import ljas.commons.tasking.flow.TaskFlow;
 import ljas.commons.tasking.flow.TaskFlowBuilder;
 import ljas.commons.tasking.monitoring.TaskMonitor;
+import ljas.commons.tasking.step.ExecutingContext;
 import ljas.commons.tasking.step.TaskStep;
 
 import org.junit.Before;
@@ -98,10 +100,8 @@ public class TaskExecutorThreadTest {
 		thread.runCycle();
 
 		// Verifications
-		verify(step1).setTaskSystem(taskSystem);
-		verify(step1).execute();
-		verify(step2).setTaskSystem(taskSystem);
-		verify(step2).execute();
+		verify(step1).execute(any(ExecutingContext.class));
+		verify(step2).execute(any(ExecutingContext.class));
 		verify(taskMonitor).monitorTaskTime(eq(task), anyLong());
 
 		// Asserts
@@ -136,7 +136,8 @@ public class TaskExecutorThreadTest {
 		TaskException expectedException = new TaskException(message);
 
 		// Mocking & Stubbing
-		doThrow(expectedException).when(step).execute();
+		doThrow(expectedException).when(step).execute(
+				any(ExecutingContext.class));
 
 		// Setup thread
 		TaskExecutorThread thread = createTaskExecutorThread();

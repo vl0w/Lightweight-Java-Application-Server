@@ -16,6 +16,7 @@ import ljas.commons.session.Session;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.TaskStepResult;
 import ljas.commons.tasking.environment.TaskSystem;
+import ljas.commons.tasking.step.ExecutingContext;
 
 import org.junit.Test;
 
@@ -42,9 +43,7 @@ public class SendBackToSenderStepTest {
 		when(taskSystem.getSenderCache()).thenReturn(senderCacheMap);
 
 		// Run test
-		SendBackToSenderStep step = new SendBackToSenderStep(task);
-		step.setTaskSystem(taskSystem);
-		step.execute();
+		executeStep(task, taskSystem);
 
 		// Verifications
 		verify(session).sendObject(task);
@@ -67,12 +66,21 @@ public class SendBackToSenderStepTest {
 		doThrow(expectedException).when(session).sendObject(task);
 
 		// Run test
-		SendBackToSenderStep step = new SendBackToSenderStep(task);
-		step.setTaskSystem(taskSystem);
-		step.execute();
+		SendBackToSenderStep step = executeStep(task, taskSystem);
 
 		// Asserts & Verifications
 		assertEquals(TaskStepResult.ERROR, step.getResult());
 		assertEquals(expectedException, step.getException().getCause());
+	}
+
+	private SendBackToSenderStep executeStep(Task task, TaskSystem taskSystem)
+			throws TaskException {
+		ExecutingContext context = new ExecutingContext();
+		context.setTaskSystem(taskSystem);
+
+		SendBackToSenderStep step = new SendBackToSenderStep(task);
+		step.execute(context);
+
+		return step;
 	}
 }

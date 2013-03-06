@@ -35,7 +35,7 @@ public class SimpleTaskTest extends ServerTestCase {
 
 	@Test(timeout = 5000)
 	public void testAsyncTask() throws Throwable {
-		final ThreadBlocker<Double> blocker = new ThreadBlocker<>(1000000);
+		final ThreadBlocker<Double> blocker = new ThreadBlocker<>(5000);
 
 		Client client = createAndConnectClient();
 

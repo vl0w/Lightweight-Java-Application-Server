@@ -7,6 +7,7 @@ import ljas.commons.tasking.Task;
 import ljas.commons.tasking.flow.TaskFlow;
 import ljas.commons.tasking.flow.TaskFlowBuilder;
 import ljas.commons.tasking.step.AbstractTaskStep;
+import ljas.commons.tasking.step.ExecutingContext;
 
 /**
  * A facade for the {@link Task} class. Concrete implementations can override
@@ -31,14 +32,14 @@ public abstract class SimpleClientToServerTask extends Task {
 	/**
 	 * This method will be performed on the server
 	 */
-	public abstract void perform();
+	public abstract void perform(ExecutingContext context);
 
 	private class PerformStep extends AbstractTaskStep {
 		private static final long serialVersionUID = 4590685021274585618L;
 
 		@Override
-		public void execute() throws TaskException {
-			perform();
+		public void execute(ExecutingContext context) throws TaskException {
+			perform(context);
 		}
 
 	}

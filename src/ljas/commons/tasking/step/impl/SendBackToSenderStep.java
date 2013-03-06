@@ -5,6 +5,7 @@ import ljas.commons.exceptions.TaskException;
 import ljas.commons.session.Session;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.TaskStepResult;
+import ljas.commons.tasking.step.ExecutingContext;
 import ljas.commons.tasking.step.NavigationStep;
 
 import org.apache.log4j.Logger;
@@ -19,8 +20,9 @@ public class SendBackToSenderStep extends NavigationStep {
 	}
 
 	@Override
-	public void execute() throws TaskException {
-		Session senderSession = getTaskSystem().getSenderCache().remove(task);
+	public void execute(ExecutingContext context) throws TaskException {
+		Session senderSession = context.getTaskSystem().getSenderCache()
+				.remove(task);
 		try {
 			senderSession.sendObject(task);
 		} catch (SessionException e) {

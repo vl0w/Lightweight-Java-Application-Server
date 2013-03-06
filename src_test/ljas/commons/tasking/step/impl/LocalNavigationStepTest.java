@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import ljas.commons.exceptions.TaskException;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.environment.TaskSystem;
+import ljas.commons.tasking.step.ExecutingContext;
 
 import org.junit.Test;
 
@@ -24,10 +25,18 @@ public class LocalNavigationStepTest {
 		TaskSystem taskSystem = mock(TaskSystem.class);
 		Task task = mock(Task.class);
 
-		LocalNavigationStep step = new LocalNavigationStep(task);
-		step.setTaskSystem(taskSystem);
-		step.execute();
+		executeStep(taskSystem, task);
 
 		verify(taskSystem).scheduleTask(task);
 	}
+
+	private void executeStep(TaskSystem taskSystem, Task task)
+			throws TaskException {
+		ExecutingContext context = new ExecutingContext();
+		context.setTaskSystem(taskSystem);
+
+		LocalNavigationStep step = new LocalNavigationStep(task);
+		step.execute(context);
+	}
+
 }

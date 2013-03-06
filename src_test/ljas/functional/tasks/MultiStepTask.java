@@ -8,6 +8,7 @@ import ljas.commons.tasking.Task;
 import ljas.commons.tasking.flow.TaskFlow;
 import ljas.commons.tasking.flow.TaskFlowBuilder;
 import ljas.commons.tasking.step.AbstractTaskStep;
+import ljas.commons.tasking.step.ExecutingContext;
 
 public class MultiStepTask extends Task {
 
@@ -28,7 +29,7 @@ public class MultiStepTask extends Task {
 		private static final long serialVersionUID = 3894635864810244602L;
 
 		@Override
-		public void execute() throws TaskException {
+		public void execute(ExecutingContext context) throws TaskException {
 			counter.incrementAndGet();
 		}
 

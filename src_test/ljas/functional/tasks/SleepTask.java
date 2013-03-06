@@ -2,6 +2,7 @@ package ljas.functional.tasks;
 
 import ljas.client.Client;
 import ljas.commons.tasking.facades.SimpleClientToServerTask;
+import ljas.commons.tasking.step.ExecutingContext;
 
 public class SleepTask extends SimpleClientToServerTask {
 
@@ -15,7 +16,7 @@ public class SleepTask extends SimpleClientToServerTask {
 	}
 
 	@Override
-	public void perform() {
+	public void perform(ExecutingContext context) {
 		try {
 			Thread.currentThread();
 			Thread.sleep(time);

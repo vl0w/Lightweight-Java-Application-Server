@@ -2,6 +2,7 @@ package ljas.functional.tasks;
 
 import ljas.client.Client;
 import ljas.commons.tasking.facades.SimpleClientToServerTask;
+import ljas.commons.tasking.step.ExecutingContext;
 
 public class AdditionTask extends SimpleClientToServerTask {
 
@@ -17,7 +18,7 @@ public class AdditionTask extends SimpleClientToServerTask {
 	}
 
 	@Override
-	public void perform() {
+	public void perform(ExecutingContext context) {
 		sum = numOne + numTwo;
 	}
 }

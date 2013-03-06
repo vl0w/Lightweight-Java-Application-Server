@@ -6,6 +6,7 @@ import ljas.commons.session.Session;
 import ljas.commons.session.SessionStore;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.TaskStepResult;
+import ljas.commons.tasking.step.ExecutingContext;
 import ljas.commons.tasking.step.NavigationStep;
 
 import org.apache.log4j.Logger;
@@ -33,7 +34,7 @@ public class RemoteNavigationStep extends NavigationStep {
 	}
 
 	@Override
-	public void execute() throws TaskException {
+	public void execute(ExecutingContext context) throws TaskException {
 		try {
 			Session session = SessionStore.findSession(sessionHashCode);
 			session.sendObject(task);

@@ -14,6 +14,7 @@ import ljas.commons.tasking.Task;
 import ljas.commons.tasking.TaskStepResult;
 import ljas.commons.tasking.observation.TaskObserver;
 import ljas.commons.tasking.observation.TaskObserverManager;
+import ljas.commons.tasking.step.ExecutingContext;
 import ljas.commons.tasking.step.TaskStep;
 
 import org.junit.Before;
@@ -51,8 +52,7 @@ public class FinishTaskStepTest {
 		addStepWithResult(TaskStepResult.SUCCESS);
 		addStepWithResult(TaskStepResult.SUCCESS);
 
-		FinishTaskStep step = new FinishTaskStep(task);
-		step.execute();
+		executeStep();
 
 		verifySuccessNotification();
 		verify(observer).notifyExecuted(task);
@@ -65,8 +65,7 @@ public class FinishTaskStepTest {
 		addStepWithError(new TaskException());
 		addStepWithResult(TaskStepResult.SUCCESS);
 
-		FinishTaskStep step = new FinishTaskStep(task);
-		step.execute();
+		executeStep();
 
 		verifyFailNotification();
 		verify(observer).notifyExecuted(task);
@@ -79,8 +78,7 @@ public class FinishTaskStepTest {
 		addStepWithResult(TaskStepResult.WARNING);
 		addStepWithResult(TaskStepResult.SUCCESS);
 
-		FinishTaskStep step = new FinishTaskStep(task);
-		step.execute();
+		executeStep();
 
 		verifyWarningNotification();
 		verify(observer).notifyExecuted(task);
@@ -94,8 +92,7 @@ public class FinishTaskStepTest {
 		addStepWithError(new TaskException());
 		addStepWithResult(TaskStepResult.WARNING);
 
-		FinishTaskStep step = new FinishTaskStep(task);
-		step.execute();
+		executeStep();
 
 		verifyFailNotification();
 		verify(observer).notifyExecuted(task);
@@ -106,11 +103,16 @@ public class FinishTaskStepTest {
 			throws TaskException {
 		addStepWithResult(TaskStepResult.NONE);
 
-		FinishTaskStep step = new FinishTaskStep(task);
-		step.execute();
+		executeStep();
 
 		verifySuccessNotification();
 		verify(observer).notifyExecuted(task);
+	}
+
+	private void executeStep() throws TaskException {
+		ExecutingContext context = new ExecutingContext();
+		FinishTaskStep step = new FinishTaskStep(task);
+		step.execute(context);
 	}
 
 	private void addStepWithError(TaskException exception) {
