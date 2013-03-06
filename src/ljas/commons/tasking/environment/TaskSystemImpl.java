@@ -29,6 +29,7 @@ public class TaskSystemImpl implements TaskSystem {
 		this.threadSystem = threadSystem;
 		this.taskMonitor = taskMonitor;
 		this.taskSenderCache = new HashMap<>();
+		this.applicationEnvironment = applicationEnvironment;
 	}
 
 	@Override
