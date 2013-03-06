@@ -57,7 +57,7 @@ public class TaskExecutorThread extends RepetitiveThread {
 
 	private void executeStep(Task task, TaskStep step) {
 
-		ExecutingContext context = getExecutingContext();
+		ExecutingContext context = getExecutingContext(task);
 
 		try {
 			step.execute(context);
@@ -100,8 +100,8 @@ public class TaskExecutorThread extends RepetitiveThread {
 		}
 	}
 
-	private ExecutingContext getExecutingContext() {
-		ExecutingContext context = new ExecutingContext();
+	private ExecutingContext getExecutingContext(Task task) {
+		ExecutingContext context = new ExecutingContext(task);
 		context.setTaskSystem(taskSystem);
 		return context;
 	}

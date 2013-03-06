@@ -65,7 +65,7 @@ public class RemoteNavigationStepTest {
 
 	private RemoteNavigationStep executeStep(Task task, Session session)
 			throws TaskException {
-		ExecutingContext context = new ExecutingContext();
+		ExecutingContext context = new ExecutingContext(task);
 		RemoteNavigationStep step = new RemoteNavigationStep(task, session);
 		step.execute(context);
 		return step;

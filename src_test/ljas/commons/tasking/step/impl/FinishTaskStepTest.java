@@ -110,7 +110,7 @@ public class FinishTaskStepTest {
 	}
 
 	private void executeStep() throws TaskException {
-		ExecutingContext context = new ExecutingContext();
+		ExecutingContext context = new ExecutingContext(task);
 		FinishTaskStep step = new FinishTaskStep(task);
 		step.execute(context);
 	}

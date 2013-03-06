@@ -75,7 +75,7 @@ public class SendBackToSenderStepTest {
 
 	private SendBackToSenderStep executeStep(Task task, TaskSystem taskSystem)
 			throws TaskException {
-		ExecutingContext context = new ExecutingContext();
+		ExecutingContext context = new ExecutingContext(task);
 		context.setTaskSystem(taskSystem);
 
 		SendBackToSenderStep step = new SendBackToSenderStep(task);
