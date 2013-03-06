@@ -1,7 +1,6 @@
 package ljas.commons.tasking.observation;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -63,8 +62,8 @@ public class TaskObserverManagerTest {
 	}
 
 	@Test
-	public void testGetTaskObserver_NoObserverFound_MustReturnNull() {
+	public void testGetTaskObserver_NoObserverFound_MustReturnEmptyList() {
 		Task task = mock(Task.class);
-		assertNull(manager.getTaskObservers(task));
+		assertTrue(manager.getTaskObservers(task).isEmpty());
 	}
 }

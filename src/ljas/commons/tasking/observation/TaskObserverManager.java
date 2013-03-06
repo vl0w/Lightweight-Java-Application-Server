@@ -25,9 +25,6 @@ public class TaskObserverManager {
 
 	public void add(Task task, TaskObserver observer) {
 		List<TaskObserver> observers = getTaskObservers(task);
-		if (observers == null) {
-			observers = new ArrayList<TaskObserver>();
-		}
 		observers.add(observer);
 		observerMap.put(task, observers);
 	}
@@ -46,7 +43,6 @@ public class TaskObserverManager {
 		if (observerMap.containsKey(task)) {
 			return observerMap.get(task);
 		}
-
-		return null;
+		return new ArrayList<>();
 	}
 }
