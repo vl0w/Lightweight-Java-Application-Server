@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
+import ljas.commons.application.ApplicationEnvironment;
 import ljas.commons.session.Session;
 import ljas.commons.tasking.Task;
 import ljas.commons.threading.TaskExecutorThread;
@@ -32,7 +33,9 @@ public class TaskSystemImplTest {
 	public void testScheduleTask_NoSession_DelegateTaskToThreadSystem() {
 		// Initialization
 		Task task = mock(Task.class);
-		TaskSystem taskSystem = new TaskSystemImpl(threadSystem);
+		ApplicationEnvironment applicationEnvironment = mock(ApplicationEnvironment.class);
+		TaskSystem taskSystem = new TaskSystemImpl(threadSystem,
+				applicationEnvironment);
 
 		// Pause threads
 		threadSystem.getThreadFactory().createTaskThread(taskSystem);
@@ -54,7 +57,9 @@ public class TaskSystemImplTest {
 		// Initialization
 		Session session = mock(Session.class);
 		Task task = mock(Task.class);
-		TaskSystem taskSystem = new TaskSystemImpl(threadSystem);
+		ApplicationEnvironment applicationEnvironment = mock(ApplicationEnvironment.class);
+		TaskSystem taskSystem = new TaskSystemImpl(threadSystem,
+				applicationEnvironment);
 
 		// Run test
 		taskSystem.scheduleTask(task, session);
@@ -67,7 +72,9 @@ public class TaskSystemImplTest {
 	public void testAddBackgroundTask_DelegateTaskToThreadSystem() {
 		// Initialization
 		Task task = mock(Task.class);
-		TaskSystem taskSystem = new TaskSystemImpl(threadSystem);
+		ApplicationEnvironment applicationEnvironment = mock(ApplicationEnvironment.class);
+		TaskSystem taskSystem = new TaskSystemImpl(threadSystem,
+				applicationEnvironment);
 
 		// Run test
 		taskSystem.scheduleTask(task);

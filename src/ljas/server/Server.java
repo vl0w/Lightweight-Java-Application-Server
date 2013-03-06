@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
 
+import ljas.commons.application.ApplicationEnvironment;
 import ljas.commons.application.LoginParameters;
 import ljas.commons.application.server.ServerApplication;
 import ljas.commons.exceptions.ConnectionRefusedException;
@@ -23,7 +24,8 @@ import ljas.server.login.ClientConnectionListener;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
-public final class Server implements HasTaskSystem, SessionHolder, HasState {
+public final class Server implements HasTaskSystem, SessionHolder, HasState,
+		ApplicationEnvironment {
 	public static final String PROJECT_NAME = "LJAS";
 	public static final String PROJECT_HOMEPAGE = "http://github.com/vl0w/Lightweight-Java-Application-Server";
 	public static final String SERVER_VERSION = "1.1.0-SNAPSHOT";
@@ -62,6 +64,7 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState {
 		return Logger.getLogger(getClass());
 	}
 
+	@Override
 	public ServerApplication getApplication() {
 		return application;
 	}
@@ -81,7 +84,7 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState {
 		this.application = application;
 		this.threadSystem = new ThreadSystem(Server.class.getSimpleName(),
 				configuration.getMaxTaskWorkerCount());
-		this.taskSystem = new TaskSystemImpl(threadSystem);
+		this.taskSystem = new TaskSystemImpl(threadSystem, this);
 		this.serverState = RuntimeEnvironmentState.OFFLINE;
 		this.sessions = new ArrayList<>();
 

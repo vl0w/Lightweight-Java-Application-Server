@@ -1,5 +1,6 @@
 package ljas.commons.tasking.step;
 
+import ljas.commons.application.Application;
 import ljas.commons.tasking.environment.TaskSystem;
 
 public class ExecutingContext {
@@ -11,5 +12,9 @@ public class ExecutingContext {
 
 	public TaskSystem getTaskSystem() {
 		return taskSystem;
+	}
+
+	public Application getApplication() {
+		return taskSystem.getApplicationEnvironment().getApplication();
 	}
 }

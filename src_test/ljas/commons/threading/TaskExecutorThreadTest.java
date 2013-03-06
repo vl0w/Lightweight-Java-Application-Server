@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import ljas.commons.application.ApplicationEnvironment;
 import ljas.commons.exceptions.TaskException;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.TaskStepResult;
@@ -91,7 +92,9 @@ public class TaskExecutorThreadTest {
 
 		// Setup thread
 		ThreadSystem threadSystem = new ThreadSystem(0);
-		TaskSystem taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);
+		ApplicationEnvironment applicationEnvironment = mock(ApplicationEnvironment.class);
+		TaskSystem taskSystem = new TaskSystemImpl(threadSystem,
+				applicationEnvironment, taskMonitor);
 		TaskExecutorThread thread = createTaskExecutorThread(threadSystem,
 				taskSystem);
 		thread.getTaskQueue().add(task);
@@ -153,7 +156,9 @@ public class TaskExecutorThreadTest {
 
 	private TaskExecutorThread createTaskExecutorThread() {
 		ThreadSystem threadSystem = new ThreadSystem(0);
-		TaskSystem taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);
+		ApplicationEnvironment applicationEnvironment = mock(ApplicationEnvironment.class);
+		TaskSystem taskSystem = new TaskSystemImpl(threadSystem,
+				applicationEnvironment, taskMonitor);
 		return createTaskExecutorThread(threadSystem, taskSystem);
 	}
 

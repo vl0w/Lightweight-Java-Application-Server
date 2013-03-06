@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import ljas.commons.application.ApplicationEnvironment;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.environment.TaskSystem;
 import ljas.commons.tasking.environment.TaskSystemImpl;
@@ -27,7 +28,9 @@ public class ThreadFactoryTest {
 	public void setUp() {
 		threadSystem = new ThreadSystem(2);
 		taskMonitor = new TaskMonitor();
-		taskSystem = new TaskSystemImpl(threadSystem, taskMonitor);
+		ApplicationEnvironment applicationEnvironment = mock(ApplicationEnvironment.class);
+		taskSystem = new TaskSystemImpl(threadSystem, applicationEnvironment,
+				taskMonitor);
 		factory = threadSystem.getThreadFactory();
 	}
 

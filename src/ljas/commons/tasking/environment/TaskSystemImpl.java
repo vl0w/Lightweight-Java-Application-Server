@@ -3,6 +3,7 @@ package ljas.commons.tasking.environment;
 import java.util.HashMap;
 import java.util.Map;
 
+import ljas.commons.application.ApplicationEnvironment;
 import ljas.commons.session.Session;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.monitoring.TaskMonitor;
@@ -15,12 +16,16 @@ public class TaskSystemImpl implements TaskSystem {
 	private TaskMonitor taskMonitor;
 	private ThreadSystem threadSystem;
 	private Map<Task, Session> taskSenderCache;
+	private ApplicationEnvironment applicationEnvironment;
 
-	public TaskSystemImpl(ThreadSystem threadSystem) {
-		this(threadSystem, new TaskMonitor());
+	public TaskSystemImpl(ThreadSystem threadSystem,
+			ApplicationEnvironment applicationEnvironment) {
+		this(threadSystem, applicationEnvironment, new TaskMonitor());
 	}
 
-	public TaskSystemImpl(ThreadSystem threadSystem, TaskMonitor taskMonitor) {
+	public TaskSystemImpl(ThreadSystem threadSystem,
+			ApplicationEnvironment applicationEnvironment,
+			TaskMonitor taskMonitor) {
 		this.threadSystem = threadSystem;
 		this.taskMonitor = taskMonitor;
 		this.taskSenderCache = new HashMap<>();
@@ -50,5 +55,10 @@ public class TaskSystemImpl implements TaskSystem {
 	public void scheduleTask(Task task, Session senderSession) {
 		getSenderCache().put(task, senderSession);
 		scheduleTask(task);
+	}
+
+	@Override
+	public ApplicationEnvironment getApplicationEnvironment() {
+		return applicationEnvironment;
 	}
 }

@@ -54,7 +54,7 @@ public class ClientImpl implements Client {
 	public ClientImpl(ClientApplication application) {
 		this.state = RuntimeEnvironmentState.OFFLINE;
 		this.threadSystem = new ThreadSystem("Client", 1);
-		this.taskSystem = new TaskSystemImpl(threadSystem);
+		this.taskSystem = new TaskSystemImpl(threadSystem, this);
 
 		this.application = application;
 		this.application.setClient(this);
