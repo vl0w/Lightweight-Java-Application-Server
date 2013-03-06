@@ -32,7 +32,7 @@ public abstract class SimpleClientToServerTask extends Task {
 	/**
 	 * This method will be performed on the server
 	 */
-	public abstract void perform(ExecutingContext context);
+	public abstract void perform(ExecutingContext context) throws TaskException;
 
 	private class PerformStep extends AbstractTaskStep {
 		private static final long serialVersionUID = 4590685021274585618L;
