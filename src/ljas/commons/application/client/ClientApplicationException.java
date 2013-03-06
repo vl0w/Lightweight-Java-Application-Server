@@ -15,6 +15,10 @@ public class ClientApplicationException extends Exception {
 		super(t);
 	}
 
+	public ClientApplicationException(String message, Throwable t) {
+		super(message, t);
+	}
+
 	public ClientApplicationException(List<TaskException> taskExceptions) {
 		super(buildMessageForMultipleTaskExceptions(taskExceptions));
 	}

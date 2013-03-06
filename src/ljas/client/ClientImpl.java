@@ -168,9 +168,11 @@ public class ClientImpl implements Client {
 			return threadBlocker.block();
 		} catch (RequestTimedOutException e) {
 			throw new ClientApplicationException("Request timed out");
-		} catch (Throwable e) {
+		} catch (ClientApplicationException e) {
+			throw e;
+		} catch (Throwable t) {
 			throw new ClientApplicationException(
-					"Unknown exception while executing request");
+					"Unknown exception while executing request", t);
 		}
 	}
 
