@@ -26,9 +26,4 @@ public abstract class Application {
 		this.name = name;
 		this.version = version;
 	}
-
-	/**
-	 * Gets executed, when the server is starting
-	 */
-	public abstract void start();
 }

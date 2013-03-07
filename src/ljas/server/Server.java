@@ -127,10 +127,6 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState,
 					connectionListener);
 		}
 
-		// Start application
-		getLogger().debug("Starting application");
-		getApplication().start();
-
 		// Finish Process
 		setState(RuntimeEnvironmentState.ONLINE);
 		getLogger().info(this + " has been started");
