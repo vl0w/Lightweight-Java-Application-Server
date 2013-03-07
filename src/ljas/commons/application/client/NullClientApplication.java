@@ -6,8 +6,4 @@ public class NullClientApplication extends ClientApplication {
 		super(name, version);
 	}
 
-	@Override
-	public void start() {
-		// nothing
-	}
 }

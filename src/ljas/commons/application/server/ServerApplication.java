@@ -18,7 +18,7 @@ public abstract class ServerApplication extends Application {
 	 *            The login parameters
 	 * @throws ServerApplicationException
 	 */
-	public abstract void registerUser(Session session,
+	public abstract void onSessionConnect(Session session,
 			LoginParameters parameters) throws ServerApplicationException;
 
 	/**
@@ -29,6 +29,6 @@ public abstract class ServerApplication extends Application {
 	 *            The connection of the user
 	 * @throws ServerApplicationException
 	 */
-	public abstract void removeUser(Session session)
+	public abstract void onSessionDisconnect(Session session)
 			throws ServerApplicationException;
 }

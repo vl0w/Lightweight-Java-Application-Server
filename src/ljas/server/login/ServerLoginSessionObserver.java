@@ -25,7 +25,7 @@ public class ServerLoginSessionObserver implements SessionObserver {
 
 			server.checkClient(parameters);
 			server.addSession(session);
-			server.getApplication().registerUser(session, parameters);
+			server.getApplication().onSessionConnect(session, parameters);
 
 			// Ok
 			server.getLogger().info(

@@ -17,7 +17,7 @@ public class ServerTasksystemSessionObserver extends TaskSystemSessionObserver {
 	public void notifySessionDisconnected(Session session) {
 		// Remove from Application
 		try {
-			server.getApplication().removeUser(session);
+			server.getApplication().onSessionDisconnect(session);
 		} catch (ServerApplicationException e) {
 			server.getLogger().error(
 					"Error while deleting user from application", e);

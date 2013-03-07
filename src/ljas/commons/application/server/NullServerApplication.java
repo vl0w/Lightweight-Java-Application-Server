@@ -10,18 +10,13 @@ public class NullServerApplication extends ServerApplication {
 	}
 
 	@Override
-	public void start() {
-		// nothing
-	}
-
-	@Override
-	public void registerUser(Session session, LoginParameters parameter)
+	public void onSessionConnect(Session session, LoginParameters parameter)
 			throws ServerApplicationException {
 		// nothing
 	}
 
 	@Override
-	public void removeUser(Session session) throws ServerApplicationException {
+	public void onSessionDisconnect(Session session) throws ServerApplicationException {
 		// nothing
 	}
 
