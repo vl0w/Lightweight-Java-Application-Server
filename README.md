@@ -23,4 +23,3 @@ For the sake of education, we didn't want to use existing JEE application server
 * People which are interested in building small client-server based applications in Java
 * People which are **not** interested in J2EE specifications
 * People which are interested in Socket programming in Java
-* People which are interested in something *different*
