@@ -2,11 +2,9 @@
 
 [![Build Status](https://travis-ci.org/vl0w/Lightweight-Java-Application-Server.png?branch=dev)](https://travis-ci.org/vl0w/Lightweight-Java-Application-Server)
 
-Have a look at the [Roadmap](https://github.com/vl0w/Lightweight-Java-Application-Server/wiki/Roadmap) for upcoming releases
-and the [Release Notes](https://github.com/vl0w/Lightweight-Java-Application-Server/wiki/Release-Notes) for past versions.
+Have a look at the [Roadmap](https://github.com/vl0w/Lightweight-Java-Application-Server/wiki/Roadmap) for upcoming releases.
 
 Read the [Getting Started](https://github.com/vl0w/Lightweight-Java-Application-Server/wiki/Getting-Started) document if you want to start writing applications for LJAS.
-For further technical information, read the [Architecture](https://github.com/vl0w/Lightweight-Java-Application-Server/wiki/Architecture) documentation.
 
 ## Overview
 
