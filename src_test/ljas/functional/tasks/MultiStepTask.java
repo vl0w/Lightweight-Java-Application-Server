@@ -32,7 +32,6 @@ public class MultiStepTask extends Task {
 		public void execute(ExecutingContext context) throws TaskException {
 			counter.incrementAndGet();
 		}
-
 	}
 
 	@Override
@@ -42,6 +41,7 @@ public class MultiStepTask extends Task {
 			builder.navigateRemote(targetSession)
 					.perform(new IncrementCounterStep()).sendBack();
 		}
+
 		return builder.build();
 	}
 }
