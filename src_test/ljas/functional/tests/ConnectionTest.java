@@ -12,13 +12,13 @@ import org.junit.Test;
 
 public class ConnectionTest extends ServerTestCase {
 
-	@Test(timeout = 5000)
+	@Test(timeout = TEST_TIMEOUT)
 	public void testOneConnection() throws Exception {
 		Client client = createAndConnectClient();
 		assertTrue(client.isOnline());
 	}
 
-	@Test(timeout = 5000)
+	@Test(timeout = TEST_TIMEOUT)
 	public void testServerFull() throws Exception {
 		createClients();
 

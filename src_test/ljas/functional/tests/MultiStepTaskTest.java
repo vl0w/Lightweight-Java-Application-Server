@@ -30,7 +30,7 @@ public class MultiStepTaskTest extends ServerTestCase implements Serializable {
 		counter = new AtomicInteger();
 	}
 
-	@Test(timeout = 5000)
+	@Test(timeout = TEST_TIMEOUT)
 	public void testClientToServerSeveralTimes() throws Exception {
 		final int howManyTimes = 10;
 
@@ -48,7 +48,7 @@ public class MultiStepTaskTest extends ServerTestCase implements Serializable {
 		assertEquals(howManyTimes, counter.get());
 	}
 
-	@Test(timeout = 5000, expected = ClientApplicationException.class)
+	@Test(timeout = TEST_TIMEOUT, expected = ClientApplicationException.class)
 	public void testOneStepFailsOnSyncTaskExecution() throws Exception {
 		Client client = createAndConnectClient();
 
@@ -65,7 +65,7 @@ public class MultiStepTaskTest extends ServerTestCase implements Serializable {
 		client.runTaskSync(task);
 	}
 
-	@Test(timeout = 5000)
+	@Test(timeout = TEST_TIMEOUT)
 	public void testOneStepFailsOnAsyncTaskExecution() throws Exception {
 		Client client = createAndConnectClient();
 

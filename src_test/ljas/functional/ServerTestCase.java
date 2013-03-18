@@ -21,6 +21,7 @@ import org.junit.After;
 import org.junit.Before;
 
 public class ServerTestCase {
+	public static final int TEST_TIMEOUT = 10000;
 	public static final String APPLICATION_IDENTIFIER = "ljas.testing";
 	public static final String APPLICATION_VERSION = "1.0";
 

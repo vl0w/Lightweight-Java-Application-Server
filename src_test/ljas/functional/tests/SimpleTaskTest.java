@@ -14,7 +14,7 @@ import org.junit.Test;
 
 public class SimpleTaskTest extends ServerTestCase {
 
-	@Test(timeout = 5000)
+	@Test(timeout = TEST_TIMEOUT)
 	public void testSyncTask() throws Exception {
 		Client client = createAndConnectClient();
 
@@ -33,7 +33,7 @@ public class SimpleTaskTest extends ServerTestCase {
 						.getAverageTaskTime(additionTask) != 0);
 	}
 
-	@Test(timeout = 5000)
+	@Test(timeout = TEST_TIMEOUT)
 	public void testAsyncTask() throws Throwable {
 		final ThreadBlocker<Double> blocker = new ThreadBlocker<>(5000);
 
