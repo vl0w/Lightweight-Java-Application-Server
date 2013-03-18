@@ -105,7 +105,7 @@ public class ClientImpl implements Client {
 		}
 	}
 
-	private void sendTask(Task task) throws ClientApplicationException {
+	private void scheduleTask(Task task) throws ClientApplicationException {
 		if (!isOnline()) {
 			throw new ClientApplicationException("Client is not online");
 		}
@@ -162,7 +162,7 @@ public class ClientImpl implements Client {
 			}
 		});
 
-		sendTask(task);
+		scheduleTask(task);
 
 		try {
 			return threadBlocker.block();
@@ -179,7 +179,7 @@ public class ClientImpl implements Client {
 	@Override
 	public void runTaskAsync(Task task) {
 		try {
-			sendTask(task);
+			scheduleTask(task);
 		} catch (ClientApplicationException e) {
 			getLogger().error(e);
 		}
