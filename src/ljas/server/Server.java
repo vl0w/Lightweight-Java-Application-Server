@@ -38,6 +38,20 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState,
 	private TaskSystem taskSystem;
 	private ThreadSystem threadSystem;
 
+	public Server(ServerApplication application,
+			ServerConfiguration configuration) throws IOException {
+		this.configuration = configuration;
+		this.application = application;
+		this.threadSystem = new ThreadSystem(Server.class.getSimpleName(),
+				configuration.getMaxTaskWorkerCount());
+		this.taskSystem = new TaskSystemImpl(threadSystem, this);
+		this.serverState = RuntimeEnvironmentState.OFFLINE;
+		this.sessions = new ArrayList<>();
+
+		// Logging
+		DOMConfigurator.configure(getConfiguration().getLog4JFilePath());
+	}
+
 	@Override
 	public RuntimeEnvironmentState getState() {
 		return serverState;
@@ -48,11 +62,7 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState,
 		serverState = value;
 	}
 
-	protected void setServerSocket(ServerSocket value) {
-		serverSocket = value;
-	}
-
-	public synchronized ServerSocket getServerSocket() {
+	public ServerSocket getServerSocket() {
 		return serverSocket;
 	}
 
@@ -77,19 +87,19 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState,
 		return threadSystem;
 	}
 
-	// CONSTRUCTORS
-	public Server(ServerApplication application,
-			ServerConfiguration configuration) throws IOException {
-		this.configuration = configuration;
-		this.application = application;
-		this.threadSystem = new ThreadSystem(Server.class.getSimpleName(),
-				configuration.getMaxTaskWorkerCount());
-		this.taskSystem = new TaskSystemImpl(threadSystem, this);
-		this.serverState = RuntimeEnvironmentState.OFFLINE;
-		this.sessions = new ArrayList<>();
+	@Override
+	public TaskSystem getTaskSystem() {
+		return taskSystem;
+	}
 
-		// Logging
-		DOMConfigurator.configure(getConfiguration().getLog4JFilePath());
+	@Override
+	public List<Session> getSessions() {
+		return sessions;
+	}
+
+	@Override
+	public void addSession(Session session) {
+		sessions.add(session);
 	}
 
 	public void startup() throws Exception {
@@ -98,38 +108,37 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState,
 		}
 
 		setState(RuntimeEnvironmentState.STARTUP);
+		logServerInfo();
 
-		// Print some information
-		getLogger().info(
-				"Starting " + this + " (v" + SERVER_VERSION
-						+ ") with application " + getApplication().getName()
-						+ " (" + getApplication().getVersion() + ")");
-
-		getLogger().info(
-				"See \"" + PROJECT_HOMEPAGE + "\" for more information");
-		getLogger().info(
-				"This server is hosted by " + getConfiguration().getHostName());
-
-		getLogger().debug("Configuration: " + getConfiguration().toString());
-
-		// Internet connection
 		getLogger().debug("Getting internet connection, starting socket");
+		serverSocket = new ServerSocket(getConfiguration().getPort());
 
-		// Serversocket
-		setServerSocket(new ServerSocket(getConfiguration().getPort()));
+		createConnectionListeners();
 
-		// Tasks
-		for (int i = 0; i < 5; i++) {
-
-			ClientConnectionListener connectionListener = new ClientConnectionListener(
-					this);
-			threadSystem.getThreadFactory().createBackgroundThread(
-					connectionListener);
-		}
-
-		// Finish Process
-		setState(RuntimeEnvironmentState.ONLINE);
 		getLogger().info(this + " has been started");
+		setState(RuntimeEnvironmentState.ONLINE);
+	}
+
+	public void shutdown() {
+		try {
+			getLogger().debug("Closing socket");
+			getServerSocket().close();
+
+			getLogger().info("Closing client sessions");
+			List<Session> sessionsToClose = new ArrayList<>(sessions);
+			for (Session session : sessionsToClose) {
+				session.disconnect();
+			}
+
+			getLogger().debug(
+					"Deactivating " + threadSystem.getClass().getSimpleName());
+			threadSystem.killAll();
+
+			getLogger().info(this + " is offline");
+			setState(RuntimeEnvironmentState.OFFLINE);
+		} catch (Exception e) {
+			getLogger().error(e);
+		}
 	}
 
 	public void checkClient(LoginParameters parameters)
@@ -165,45 +174,32 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState,
 		parameters.check();
 	}
 
-	public void shutdown() {
-		try {
-			getLogger().debug("Closing socket");
-			getServerSocket().close();
-
-			getLogger().info("Closing client sessions");
-			List<Session> sessionsToClose = new ArrayList<>(sessions);
-			for (Session session : sessionsToClose) {
-				session.disconnect();
-			}
-
-			getLogger().debug(
-					"Deactivating " + threadSystem.getClass().getSimpleName());
-			threadSystem.killAll();
-
-			getLogger().info(this + " is offline");
-			setState(RuntimeEnvironmentState.OFFLINE);
-		} catch (Exception e) {
-			getLogger().error(e);
-		}
-	}
-
 	@Override
 	public String toString() {
 		return PROJECT_NAME + "-server";
 	}
 
-	@Override
-	public void addSession(Session session) {
-		sessions.add(session);
+	private void createConnectionListeners() {
+		for (int i = 0; i < 5; i++) {
+
+			ClientConnectionListener connectionListener = new ClientConnectionListener(
+					this);
+			threadSystem.getThreadFactory().createBackgroundThread(
+					connectionListener);
+		}
 	}
 
-	@Override
-	public TaskSystem getTaskSystem() {
-		return taskSystem;
-	}
+	private void logServerInfo() {
+		getLogger().info(
+				"Starting " + this + " (v" + SERVER_VERSION
+						+ ") with application " + getApplication().getName()
+						+ " (" + getApplication().getVersion() + ")");
 
-	@Override
-	public List<Session> getSessions() {
-		return sessions;
+		getLogger().info(
+				"See \"" + PROJECT_HOMEPAGE + "\" for more information");
+		getLogger().info(
+				"This server is hosted by " + getConfiguration().getHostName());
+
+		getLogger().debug("Configuration: " + getConfiguration().toString());
 	}
 }
