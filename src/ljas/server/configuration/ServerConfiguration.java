@@ -2,14 +2,14 @@ package ljas.server.configuration;
 
 public interface ServerConfiguration {
 
-	public abstract int getMaximumClients();
+	int getMaximumClients();
 
-	public abstract int getPort();
+	int getPort();
 
-	public abstract String getHostName();
+	String getHostName();
 
-	public abstract int getMaxTaskWorkerCount();
+	int getMaxTaskWorkerCount();
 
-	public abstract String getLog4JFilePath();
+	String getLog4JFilePath();
 
 }
