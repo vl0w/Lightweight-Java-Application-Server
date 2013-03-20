@@ -5,7 +5,7 @@ import java.net.ConnectException;
 
 import ljas.commons.application.ApplicationEnvironment;
 import ljas.commons.application.LoginParameters;
-import ljas.commons.application.client.ClientApplicationException;
+import ljas.commons.exceptions.ApplicationException;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.exceptions.DisconnectException;
 import ljas.commons.exceptions.SessionException;
@@ -39,8 +39,8 @@ public interface Client extends HasTaskSystem, HasState,
 	 *             Occurs when the server could not be reached
 	 * @throws IOException
 	 */
-	void connect(String ip, int port, LoginParameters parameters)
-			throws ConnectionRefusedException, SessionException;
+	void connect(String ip, int port) throws ConnectionRefusedException,
+			SessionException;
 
 	boolean isOnline();
 
@@ -51,10 +51,11 @@ public interface Client extends HasTaskSystem, HasState,
 	 * @param task
 	 *            The task to execute
 	 * @return The executed task
+	 * @throws ApplicationException
 	 * @throws ClientApplicationException
 	 *             When something went wrong
 	 */
-	Task runTaskSync(Task task) throws ClientApplicationException;
+	Task runTaskSync(Task task) throws ApplicationException;
 
 	/**
 	 * Runs a task asynchroniously on the server. Does not throw an exception in

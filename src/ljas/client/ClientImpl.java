@@ -1,11 +1,12 @@
 package ljas.client;
 
+import java.lang.reflect.Proxy;
 import java.util.List;
 
+import ljas.client.rmi.RemoteMethodInvocationHandler;
 import ljas.commons.application.Application;
 import ljas.commons.application.LoginParameters;
-import ljas.commons.application.client.ClientApplication;
-import ljas.commons.application.client.ClientApplicationException;
+import ljas.commons.exceptions.ApplicationException;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.exceptions.DisconnectException;
 import ljas.commons.exceptions.RequestTimedOutException;
@@ -34,7 +35,7 @@ public class ClientImpl implements Client {
 	private ThreadSystem threadSystem;
 
 	private RuntimeEnvironmentState state;
-	private final ClientApplication application;
+	private Application application;
 
 	@Override
 	public void setState(RuntimeEnvironmentState state) {
@@ -51,20 +52,22 @@ public class ClientImpl implements Client {
 		return taskSystem;
 	}
 
-	public ClientImpl(ClientApplication application) {
+	public ClientImpl(Class<? extends Application> applicationClass) {
 		this.state = RuntimeEnvironmentState.OFFLINE;
 		this.threadSystem = new ThreadSystem("Client", 1);
 		this.taskSystem = new TaskSystemImpl(threadSystem, this);
 
-		this.application = application;
-		this.application.setClient(this);
+		// Application
+		this.application = (Application) Proxy.newProxyInstance(getClass()
+				.getClassLoader(), new Class[] { applicationClass },
+				new RemoteMethodInvocationHandler(this));
 
 		DOMConfigurator.configure("./log4j.xml");
 	}
 
 	@Override
-	public void connect(String ip, int port, LoginParameters parameters)
-			throws ConnectionRefusedException, SessionException {
+	public void connect(String ip, int port) throws ConnectionRefusedException,
+			SessionException {
 		if (isOnline()) {
 			try {
 				disconnect();
@@ -77,8 +80,9 @@ public class ClientImpl implements Client {
 		try {
 			session = SessionFactory.prepareSession(this, threadSystem);
 
+			LoginParameters loginParameters = new LoginParameters(application);
 			ClientLoginHandler loginHandler = new ClientLoginHandler(ip, port,
-					session, parameters);
+					session, loginParameters);
 
 			LoginMessage loginMessage = loginHandler.block();
 
@@ -105,9 +109,9 @@ public class ClientImpl implements Client {
 		}
 	}
 
-	private void scheduleTask(Task task) throws ClientApplicationException {
+	private void scheduleTask(Task task) throws ApplicationException {
 		if (!isOnline()) {
-			throw new ClientApplicationException("Client is not online");
+			throw new ApplicationException("Client is not online");
 		}
 
 		taskSystem.scheduleTask(task);
@@ -142,7 +146,7 @@ public class ClientImpl implements Client {
 	 *             When the task failed or could not be sended
 	 */
 	@Override
-	public Task runTaskSync(Task task) throws ClientApplicationException {
+	public Task runTaskSync(Task task) throws ApplicationException {
 		final ThreadBlocker<Task> threadBlocker = new ThreadBlocker<>(
 				Client.REQUEST_TIMEOUT_MS);
 
@@ -156,7 +160,7 @@ public class ClientImpl implements Client {
 			@Override
 			public void notifyExecutedWithErrors(Task task,
 					List<TaskException> exceptions) {
-				ClientApplicationException exception = new ClientApplicationException(
+				ApplicationException exception = new ApplicationException(
 						exceptions);
 				threadBlocker.release(exception);
 			}
@@ -167,11 +171,11 @@ public class ClientImpl implements Client {
 		try {
 			return threadBlocker.block();
 		} catch (RequestTimedOutException e) {
-			throw new ClientApplicationException("Request timed out");
-		} catch (ClientApplicationException e) {
+			throw new ApplicationException("Request timed out");
+		} catch (ApplicationException e) {
 			throw e;
 		} catch (Throwable t) {
-			throw new ClientApplicationException(
+			throw new ApplicationException(
 					"Unknown exception while executing request", t);
 		}
 	}
@@ -180,7 +184,7 @@ public class ClientImpl implements Client {
 	public void runTaskAsync(Task task) {
 		try {
 			scheduleTask(task);
-		} catch (ClientApplicationException e) {
+		} catch (ApplicationException e) {
 			getLogger().error(e);
 		}
 	}
@@ -193,5 +197,6 @@ public class ClientImpl implements Client {
 	@Override
 	public Application getApplication() {
 		return application;
+
 	}
 }

@@ -2,27 +2,16 @@ package ljas.commons.application;
 
 import java.io.Serializable;
 
-import ljas.commons.exceptions.ConnectionRefusedException;
-
-public abstract class LoginParameters implements Serializable {
+public class LoginParameters implements Serializable {
 	private static final long serialVersionUID = -4540369418091795186L;
 
-	private String applicationVersion;
-	private long applicationId;
+	private Class<? extends Application> applicationClass;
 
 	public LoginParameters(Application application) {
-		applicationVersion = application.getVersion();
-		applicationId = application.getApplicationId();
+		this.applicationClass = application.getClass();
 	}
 
-	public String getApplicationVersion() {
-		return applicationVersion;
+	public Class<? extends Application> getClientApplicationClass() {
+		return applicationClass;
 	}
-
-	public long getApplicationId() {
-		return applicationId;
-	}
-
-	public abstract void check() throws ConnectionRefusedException;
-
 }

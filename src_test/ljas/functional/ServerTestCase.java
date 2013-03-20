@@ -9,12 +9,9 @@ import java.util.List;
 
 import ljas.client.Client;
 import ljas.client.ClientImpl;
-import ljas.commons.application.LoginParameters;
-import ljas.commons.application.NullLoginParameters;
-import ljas.commons.application.client.ClientApplication;
-import ljas.commons.application.client.NullClientApplication;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.exceptions.SessionException;
+import ljas.functional.application.TestApplication;
 import ljas.server.Server;
 
 import org.junit.After;
@@ -48,24 +45,12 @@ public class ServerTestCase {
 
 	public static void connectClient(Client client)
 			throws ConnectionRefusedException, SessionException {
-		LoginParameters parameters = new NullLoginParameters(
-				client.getApplication());
-		client.connect("localhost", 1666, parameters);
+		client.connect("localhost", 1666);
 	}
 
 	public static Client createClient() throws SessionException,
 			ConnectionRefusedException {
-		return createClient(APPLICATION_IDENTIFIER, APPLICATION_VERSION);
-	}
-
-	protected static Client createClient(String applicationIdentifier,
-			String applicationVersion) throws SessionException,
-			ConnectionRefusedException {
-		ClientApplication application = new NullClientApplication(
-				applicationIdentifier, applicationVersion);
-
-		Client client = new ClientImpl(application);
-		return client;
+		return new ClientImpl(TestApplication.class);
 	}
 
 	protected static Client createAndConnectClient(

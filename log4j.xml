@@ -10,12 +10,17 @@
   </appender>
 
   <logger name="ljas.server" additivity="false">
+    <level value="DEBUG" />
+    <appender-ref ref="console" />
+  </logger>
+  
+  <logger name="ljas.commons" additivity="true">
     <level value="ERROR" />
     <appender-ref ref="console" />
   </logger>
   
-    <logger name="ljas.commons" additivity="true">
-    <level value="ERROR" />
+  <logger name="ljas.client" additivity="true">
+    <level value="DEBUG" />
     <appender-ref ref="console" />
   </logger>
 

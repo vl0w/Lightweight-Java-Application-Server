@@ -5,9 +5,12 @@ import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
 
+import ljas.commons.application.Application;
 import ljas.commons.application.ApplicationEnvironment;
+import ljas.commons.application.ApplicationHelper;
 import ljas.commons.application.LoginParameters;
-import ljas.commons.application.server.ServerApplication;
+import ljas.commons.application.annotations.LJASApplication;
+import ljas.commons.exceptions.ApplicationException;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.session.Session;
 import ljas.commons.session.SessionHolder;
@@ -33,13 +36,13 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState,
 	private List<Session> sessions;
 	private RuntimeEnvironmentState serverState;
 	private ServerSocket serverSocket;
-	private ServerApplication application;
+	private Application application;
 	private ServerConfiguration configuration;
 	private TaskSystem taskSystem;
 	private ThreadSystem threadSystem;
 
-	public Server(ServerApplication application,
-			ServerConfiguration configuration) throws IOException {
+	public Server(Application application, ServerConfiguration configuration)
+			throws IOException {
 		this.configuration = configuration;
 		this.application = application;
 		this.threadSystem = new ThreadSystem(Server.class.getSimpleName(),
@@ -75,7 +78,7 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState,
 	}
 
 	@Override
-	public ServerApplication getApplication() {
+	public Application getApplication() {
 		return application;
 	}
 
@@ -105,6 +108,14 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState,
 	public void startup() throws Exception {
 		if (isOnline()) {
 			shutdown();
+		}
+
+		LJASApplication applicationAnnotation = ApplicationHelper
+				.getApplicationAnnotation(application.getClass());
+		if (applicationAnnotation == null) {
+			throw new ApplicationException("Missing annotation '"
+					+ LJASApplication.class.getSimpleName()
+					+ "' on the Server application.");
 		}
 
 		setState(RuntimeEnvironmentState.STARTUP);
@@ -156,22 +167,12 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState,
 					LoginRefusedMessage.SERVER_FULL);
 		}
 
-		// Check application id
-		if (parameters.getApplicationId() != getApplication()
-				.getApplicationId()) {
+		// Check application
+		if (!ApplicationHelper.areApplicationsEqual(
+				parameters.getClientApplicationClass(), application.getClass())) {
 			throw new ConnectionRefusedException(
-					LoginRefusedMessage.WRONG_APPLICATION_ID);
+					LoginRefusedMessage.INVALID_APPLICATION);
 		}
-
-		// Check application version
-		if (!parameters.getApplicationVersion().equals(
-				getApplication().getVersion())) {
-			throw new ConnectionRefusedException(
-					LoginRefusedMessage.WRONG_APPLICATION_VERSION);
-		}
-
-		// Call check on LoginParameters
-		parameters.check();
 	}
 
 	@Override
@@ -190,10 +191,15 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState,
 	}
 
 	private void logServerInfo() {
+		String applicationName = ApplicationHelper
+				.getApplicationName(application.getClass());
+		String applicationVersion = ApplicationHelper
+				.getApplicationVersion(application.getClass());
+
 		getLogger().info(
 				"Starting " + this + " (v" + SERVER_VERSION
-						+ ") with application " + getApplication().getName()
-						+ " (" + getApplication().getVersion() + ")");
+						+ ") with application " + applicationName + " ("
+						+ applicationVersion + ")");
 
 		getLogger().info(
 				"See \"" + PROJECT_HOMEPAGE + "\" for more information");

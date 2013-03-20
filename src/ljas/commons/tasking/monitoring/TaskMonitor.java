@@ -28,6 +28,10 @@ public class TaskMonitor {
 
 	public long getAverageTaskTime(Task task) {
 		Class<? extends Task> clazz = task.getClass();
+		return getAverageTaskTime(clazz);
+	}
+
+	public long getAverageTaskTime(Class<? extends Task> clazz) {
 		if (executionTimeMap.containsKey(clazz)) {
 			Average average = executionTimeMap.get(clazz);
 			return average.asLong();
