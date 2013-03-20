@@ -28,7 +28,7 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState,
 		ApplicationEnvironment {
 	public static final String PROJECT_NAME = "LJAS";
 	public static final String PROJECT_HOMEPAGE = "http://github.com/vl0w/Lightweight-Java-Application-Server";
-	public static final String SERVER_VERSION = "1.1.0-SNAPSHOT";
+	public static final String SERVER_VERSION = "1.1.0";
 
 	private List<Session> sessions;
 	private RuntimeEnvironmentState serverState;
