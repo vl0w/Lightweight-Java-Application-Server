@@ -18,9 +18,14 @@ public class RemoteMethodInvocationTask extends SimpleClientToServerTask {
 
 	public RemoteMethodInvocationTask(Client client, Method method,
 			Object[] args) {
+		this(client, method.getName(), method.getParameterTypes(), args);
+	}
+
+	public RemoteMethodInvocationTask(Client client, String methodName,
+			Class<?>[] parameterTypes, Object[] args) {
 		super(client);
-		this.methodName = method.getName();
-		this.parameterTypes = method.getParameterTypes();
+		this.methodName = methodName;
+		this.parameterTypes = parameterTypes;
 		this.args = args;
 	}
 
