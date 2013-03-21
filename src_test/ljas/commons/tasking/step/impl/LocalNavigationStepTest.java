@@ -32,8 +32,7 @@ public class LocalNavigationStepTest {
 
 	private void executeStep(TaskSystem taskSystem, Task task)
 			throws TaskException {
-		ExecutingContext context = new ExecutingContext(task);
-		context.setTaskSystem(taskSystem);
+		ExecutingContext context = new ExecutingContext(taskSystem, task);
 
 		LocalNavigationStep step = new LocalNavigationStep(task);
 		step.execute(context);

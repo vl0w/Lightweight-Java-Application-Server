@@ -13,6 +13,7 @@ import ljas.commons.session.Session;
 import ljas.commons.session.SessionStore;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.TaskStepResult;
+import ljas.commons.tasking.environment.TaskSystem;
 import ljas.commons.tasking.step.ExecutingContext;
 
 import org.junit.Test;
@@ -65,7 +66,8 @@ public class RemoteNavigationStepTest {
 
 	private RemoteNavigationStep executeStep(Task task, Session session)
 			throws TaskException {
-		ExecutingContext context = new ExecutingContext(task);
+		TaskSystem taskSystem = mock(TaskSystem.class);
+		ExecutingContext context = new ExecutingContext(taskSystem, task);
 		RemoteNavigationStep step = new RemoteNavigationStep(task, session);
 		step.execute(context);
 		return step;

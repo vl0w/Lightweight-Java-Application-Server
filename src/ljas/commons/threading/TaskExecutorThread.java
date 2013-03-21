@@ -106,8 +106,7 @@ public class TaskExecutorThread extends RepetitiveThread {
 	}
 
 	private ExecutingContext createExecutingContext(Task task) {
-		ExecutingContext context = new ExecutingContext(task);
-		context.setTaskSystem(taskSystem);
+		ExecutingContext context = new ExecutingContext(taskSystem, task);
 		return context;
 	}
 }

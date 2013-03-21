@@ -12,6 +12,7 @@ import java.util.List;
 import ljas.commons.exceptions.TaskException;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.TaskStepResult;
+import ljas.commons.tasking.environment.TaskSystem;
 import ljas.commons.tasking.observation.TaskObserver;
 import ljas.commons.tasking.observation.TaskObserverManager;
 import ljas.commons.tasking.step.ExecutingContext;
@@ -110,7 +111,8 @@ public class FinishTaskStepTest {
 	}
 
 	private void executeStep() throws TaskException {
-		ExecutingContext context = new ExecutingContext(task);
+		TaskSystem taskSystem = mock(TaskSystem.class);
+		ExecutingContext context = new ExecutingContext(taskSystem, task);
 		FinishTaskStep step = new FinishTaskStep(task);
 		step.execute(context);
 	}
