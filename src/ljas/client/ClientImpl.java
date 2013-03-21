@@ -53,14 +53,14 @@ public class ClientImpl implements Client {
 	}
 
 	public ClientImpl(Class<? extends Application> applicationClass) {
-		this.state = RuntimeEnvironmentState.OFFLINE;
-		this.threadSystem = new ThreadSystem("Client", 1);
-		this.taskSystem = new TaskSystemImpl(threadSystem, this);
-
 		// Application
 		this.application = (Application) Proxy.newProxyInstance(getClass()
 				.getClassLoader(), new Class[] { applicationClass },
 				new RemoteMethodInvocationHandler(this));
+
+		this.state = RuntimeEnvironmentState.OFFLINE;
+		this.threadSystem = new ThreadSystem("Client", 1);
+		this.taskSystem = new TaskSystemImpl(threadSystem, application);
 
 		DOMConfigurator.configure("./log4j.xml");
 	}

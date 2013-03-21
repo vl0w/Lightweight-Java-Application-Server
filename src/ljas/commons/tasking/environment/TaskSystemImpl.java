@@ -3,7 +3,7 @@ package ljas.commons.tasking.environment;
 import java.util.HashMap;
 import java.util.Map;
 
-import ljas.commons.application.ApplicationEnvironment;
+import ljas.commons.application.Application;
 import ljas.commons.session.Session;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.monitoring.TaskMonitor;
@@ -13,23 +13,21 @@ import ljas.commons.threading.ThreadSystem;
 import org.apache.log4j.Logger;
 
 public class TaskSystemImpl implements TaskSystem {
+	private Application application;
 	private TaskMonitor taskMonitor;
 	private ThreadSystem threadSystem;
 	private Map<Task, Session> taskSenderCache;
-	private ApplicationEnvironment applicationEnvironment;
 
-	public TaskSystemImpl(ThreadSystem threadSystem,
-			ApplicationEnvironment applicationEnvironment) {
-		this(threadSystem, applicationEnvironment, new TaskMonitor());
+	public TaskSystemImpl(ThreadSystem threadSystem, Application application) {
+		this(threadSystem, application, new TaskMonitor());
 	}
 
-	public TaskSystemImpl(ThreadSystem threadSystem,
-			ApplicationEnvironment applicationEnvironment,
+	public TaskSystemImpl(ThreadSystem threadSystem, Application application,
 			TaskMonitor taskMonitor) {
+		this.application = application;
 		this.threadSystem = threadSystem;
 		this.taskMonitor = taskMonitor;
 		this.taskSenderCache = new HashMap<>();
-		this.applicationEnvironment = applicationEnvironment;
 	}
 
 	@Override
@@ -59,7 +57,7 @@ public class TaskSystemImpl implements TaskSystem {
 	}
 
 	@Override
-	public ApplicationEnvironment getApplicationEnvironment() {
-		return applicationEnvironment;
+	public Application getApplication() {
+		return application;
 	}
 }

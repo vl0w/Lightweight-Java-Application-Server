@@ -22,7 +22,7 @@ public class ExecutingContext {
 	}
 
 	public Application getApplication() {
-		return taskSystem.getApplicationEnvironment().getApplication();
+		return taskSystem.getApplication();
 	}
 
 	public Session getSenderSession() {

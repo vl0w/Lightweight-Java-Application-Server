@@ -2,7 +2,7 @@ package ljas.commons.tasking.environment;
 
 import java.util.Map;
 
-import ljas.commons.application.ApplicationEnvironment;
+import ljas.commons.application.Application;
 import ljas.commons.session.Session;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.monitoring.TaskMonitor;
@@ -16,5 +16,5 @@ public interface TaskSystem {
 
 	Map<Task, Session> getSenderCache();
 
-	ApplicationEnvironment getApplicationEnvironment();
+	Application getApplication();
 }
