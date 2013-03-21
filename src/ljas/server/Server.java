@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ljas.commons.application.Application;
-import ljas.commons.application.ApplicationHelper;
+import ljas.commons.application.ApplicationAnalyzer;
 import ljas.commons.application.LoginParameters;
 import ljas.commons.application.annotations.LJASApplication;
 import ljas.commons.exceptions.ApplicationException;
@@ -107,7 +107,7 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState {
 			shutdown();
 		}
 
-		LJASApplication applicationAnnotation = ApplicationHelper
+		LJASApplication applicationAnnotation = ApplicationAnalyzer
 				.getApplicationAnnotation(application.getClass());
 		if (applicationAnnotation == null) {
 			throw new ApplicationException("Missing annotation '"
@@ -165,7 +165,7 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState {
 		}
 
 		// Check application
-		if (!ApplicationHelper.areApplicationsEqual(
+		if (!ApplicationAnalyzer.areApplicationsEqual(
 				parameters.getClientApplicationClass(), application.getClass())) {
 			throw new ConnectionRefusedException(
 					LoginRefusedMessage.INVALID_APPLICATION);
@@ -188,9 +188,9 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState {
 	}
 
 	private void logServerInfo() {
-		String applicationName = ApplicationHelper
+		String applicationName = ApplicationAnalyzer
 				.getApplicationName(application.getClass());
-		String applicationVersion = ApplicationHelper
+		String applicationVersion = ApplicationAnalyzer
 				.getApplicationVersion(application.getClass());
 
 		getLogger().info(

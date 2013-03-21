@@ -2,7 +2,13 @@ package ljas.commons.application;
 
 import ljas.commons.application.annotations.LJASApplication;
 
-public class ApplicationHelper {
+/**
+ * Helper class for analyzing annotations of an {@link Application} interface.
+ * 
+ * @author jonashansen
+ * 
+ */
+public class ApplicationAnalyzer {
 	public static LJASApplication getApplicationAnnotation(
 			Class<? extends Application> appClass) {
 		Class<?> applicationInterface = findApplicationInterface(appClass);
