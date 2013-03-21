@@ -15,6 +15,7 @@ import ljas.commons.tasking.step.TaskStep;
 public class TaskExecutorThread extends RepetitiveThread {
 	private Queue<Task> taskQueue;
 	private TaskSystem taskSystem;
+	private ExecutingContext currentExecutingContext;
 
 	public TaskExecutorThread(ThreadSystem threadSystem, TaskSystem taskSystem) {
 		super(threadSystem);
@@ -25,6 +26,10 @@ public class TaskExecutorThread extends RepetitiveThread {
 
 	public Queue<Task> getTaskQueue() {
 		return taskQueue;
+	}
+
+	public ExecutingContext getCurrentExecutingContext() {
+		return currentExecutingContext;
 	}
 
 	@Override
@@ -55,24 +60,6 @@ public class TaskExecutorThread extends RepetitiveThread {
 		}
 	}
 
-	private void executeStep(Task task, TaskStep step) {
-
-		ExecutingContext context = getExecutingContext(task);
-
-		try {
-			step.execute(context);
-		} catch (TaskException e) {
-			step.setResult(TaskStepResult.ERROR);
-			step.setException(e);
-		}
-
-		if (step.getResult() == TaskStepResult.NONE) {
-			step.setResult(TaskStepResult.SUCCESS);
-		}
-
-		task.getStepHistory().add(step);
-	}
-
 	/**
 	 * Schedules the task
 	 * 
@@ -85,6 +72,24 @@ public class TaskExecutorThread extends RepetitiveThread {
 			return false;
 		}
 		return getTaskQueue().add(task);
+	}
+
+	private void executeStep(Task task, TaskStep step) {
+
+		currentExecutingContext = createExecutingContext(task);
+
+		try {
+			step.execute(currentExecutingContext);
+		} catch (TaskException e) {
+			step.setResult(TaskStepResult.ERROR);
+			step.setException(e);
+		}
+
+		if (step.getResult() == TaskStepResult.NONE) {
+			step.setResult(TaskStepResult.SUCCESS);
+		}
+
+		task.getStepHistory().add(step);
 	}
 
 	/**
@@ -100,9 +105,8 @@ public class TaskExecutorThread extends RepetitiveThread {
 		}
 	}
 
-	private ExecutingContext getExecutingContext(Task task) {
-		ExecutingContext context = new ExecutingContext(task);
-		context.setTaskSystem(taskSystem);
+	private ExecutingContext createExecutingContext(Task task) {
+		ExecutingContext context = new ExecutingContext(taskSystem, task);
 		return context;
 	}
 }

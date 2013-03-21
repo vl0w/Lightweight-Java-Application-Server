@@ -1,6 +1,6 @@
 package ljas.server;
 
-import ljas.commons.application.server.ServerApplicationException;
+import ljas.commons.exceptions.ApplicationException;
 import ljas.commons.session.Session;
 import ljas.commons.tasking.environment.TaskSystemSessionObserver;
 
@@ -18,7 +18,7 @@ public class ServerTasksystemSessionObserver extends TaskSystemSessionObserver {
 		// Remove from Application
 		try {
 			server.getApplication().onSessionDisconnect(session);
-		} catch (ServerApplicationException e) {
+		} catch (ApplicationException e) {
 			server.getLogger().error(
 					"Error while deleting user from application", e);
 		}

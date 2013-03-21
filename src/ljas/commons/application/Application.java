@@ -1,29 +1,28 @@
 package ljas.commons.application;
 
-import org.apache.log4j.Logger;
+import ljas.commons.exceptions.ApplicationException;
+import ljas.commons.session.Session;
 
-public abstract class Application {
-	private final String version;
-	private final String name;
+public interface Application {
+	/**
+	 * Gets called, when a user connects to the server
+	 * 
+	 * @param connection
+	 *            The connection to the user
+	 * @param parameters
+	 *            The login parameters
+	 * @throws ApplicationException
+	 */
+	void onSessionConnect(Session session, LoginParameters parameters)
+			throws ApplicationException;
 
-	public String getVersion() {
-		return version;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public Logger getLogger() {
-		return Logger.getLogger(this.getClass());
-	}
-
-	public long getApplicationId() {
-		return name.hashCode();
-	}
-
-	public Application(String name, String version) {
-		this.name = name;
-		this.version = version;
-	}
+	/**
+	 * Gets called, when a user closed the server connection or the server lost
+	 * the connection
+	 * 
+	 * @param connection
+	 *            The connection of the user
+	 * @throws ApplicationException
+	 */
+	void onSessionDisconnect(Session session) throws ApplicationException;
 }

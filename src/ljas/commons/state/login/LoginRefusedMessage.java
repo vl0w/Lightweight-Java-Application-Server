@@ -7,10 +7,8 @@ public class LoginRefusedMessage implements LoginMessage {
 			"Server is full");
 	public static LoginRefusedMessage ILLEGAL_STATE = new LoginRefusedMessage(
 			"Server has illegal state");
-	public static LoginRefusedMessage WRONG_APPLICATION_VERSION = new LoginRefusedMessage(
-			"Client has not same application version as server");
-	public static LoginRefusedMessage WRONG_APPLICATION_ID = new LoginRefusedMessage(
-			"Client has not same application as server");
+	public static LoginRefusedMessage INVALID_APPLICATION = new LoginRefusedMessage(
+			"Client does not use the same application as the server");
 	public static LoginRefusedMessage UNKNOWN_EXCEPTION_OCCURED = new LoginRefusedMessage(
 			"Unknown server exception occured");
 

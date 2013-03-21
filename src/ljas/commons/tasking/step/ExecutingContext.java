@@ -9,11 +9,8 @@ public class ExecutingContext {
 	private TaskSystem taskSystem;
 	private Task task;
 
-	public ExecutingContext(Task task) {
+	public ExecutingContext(TaskSystem taskSystem, Task task) {
 		this.task = task;
-	}
-
-	public void setTaskSystem(TaskSystem taskSystem) {
 		this.taskSystem = taskSystem;
 	}
 
@@ -22,7 +19,7 @@ public class ExecutingContext {
 	}
 
 	public Application getApplication() {
-		return taskSystem.getApplicationEnvironment().getApplication();
+		return taskSystem.getApplication();
 	}
 
 	public Session getSenderSession() {

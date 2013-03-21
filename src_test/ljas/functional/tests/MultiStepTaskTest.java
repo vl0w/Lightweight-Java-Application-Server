@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import ljas.client.Client;
-import ljas.commons.application.client.ClientApplicationException;
+import ljas.commons.exceptions.ApplicationException;
 import ljas.commons.exceptions.TaskException;
 import ljas.commons.tasking.Task;
 import ljas.commons.tasking.flow.TaskFlow;
@@ -48,7 +48,7 @@ public class MultiStepTaskTest extends ServerTestCase implements Serializable {
 		assertEquals(howManyTimes, counter.get());
 	}
 
-	@Test(timeout = TEST_TIMEOUT, expected = ClientApplicationException.class)
+	@Test(timeout = TEST_TIMEOUT, expected = ApplicationException.class)
 	public void testOneStepFailsOnSyncTaskExecution() throws Exception {
 		Client client = createAndConnectClient();
 
