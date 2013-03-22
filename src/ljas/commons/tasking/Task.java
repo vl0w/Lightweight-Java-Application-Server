@@ -37,11 +37,11 @@ public abstract class Task implements Serializable {
 		return taskFlow;
 	}
 
-	public void addObserver(TaskObserver observer) {
+	public void addObserver(TaskObserver<?> observer) {
 		TaskObserverManager.getInstance().add(this, observer);
 	}
 
-	public void removeObserver(TaskObserver observer) {
+	public void removeObserver(TaskObserver<?> observer) {
 		TaskObserverManager.getInstance().remove(this, observer);
 	}
 

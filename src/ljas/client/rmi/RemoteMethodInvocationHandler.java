@@ -19,8 +19,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler {
 
 		RemoteMethodInvocationTask task = new RemoteMethodInvocationTask(
 				client, method, args);
-		RemoteMethodInvocationTask invokedTask = (RemoteMethodInvocationTask) client
-				.runTaskSync(task);
+		RemoteMethodInvocationTask invokedTask = client.runTaskSync(task);
 
 		return invokedTask.getReturnValue();
 	}

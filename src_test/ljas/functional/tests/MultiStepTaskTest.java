@@ -81,26 +81,26 @@ public class MultiStepTaskTest extends ServerTestCase implements Serializable {
 		builder.navigateRemote(client.getServerSession())
 				.perform(new IncrementCounterStep()).sendBack();
 
-		task.addObserver(new TaskObserver() {
+		task.addObserver(new TaskObserver<InstantiableTask>() {
 
 			@Override
-			public void notifyExecutedWithWarnings(Task task) {
+			public void notifyExecutedWithWarnings(InstantiableTask task) {
 				fail("Task is expected to be failed");
 			}
 
 			@Override
-			public void notifyExecutedWithSuccess(Task task) {
+			public void notifyExecutedWithSuccess(InstantiableTask task) {
 				fail("Task is expected to be failed");
 			}
 
 			@Override
-			public void notifyExecutedWithErrors(Task task,
+			public void notifyExecutedWithErrors(InstantiableTask task,
 					List<TaskException> exceptions) {
 				assertEquals(3, counter.get());
 			}
 
 			@Override
-			public void notifyExecuted(Task task) {
+			public void notifyExecuted(InstantiableTask task) {
 				assertEquals(3, counter.get());
 			}
 		});

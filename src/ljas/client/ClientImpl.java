@@ -146,19 +146,19 @@ public class ClientImpl implements Client {
 	 *             When the task failed or could not be sended
 	 */
 	@Override
-	public Task runTaskSync(Task task) throws ApplicationException {
-		final ThreadBlocker<Task> threadBlocker = new ThreadBlocker<>(
+	public <V extends Task> V runTaskSync(V task) throws ApplicationException {
+		final ThreadBlocker<V> threadBlocker = new ThreadBlocker<>(
 				Client.REQUEST_TIMEOUT_MS);
 
-		task.addObserver(new NullTaskObserver() {
+		task.addObserver(new NullTaskObserver<V>() {
 
 			@Override
-			public void notifyExecuted(Task task) {
+			public void notifyExecuted(V task) {
 				threadBlocker.release(task);
 			}
 
 			@Override
-			public void notifyExecutedWithErrors(Task task,
+			public void notifyExecutedWithErrors(V task,
 					List<TaskException> exceptions) {
 				ApplicationException exception = new ApplicationException(
 						exceptions);

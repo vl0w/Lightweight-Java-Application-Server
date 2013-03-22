@@ -205,7 +205,7 @@ public class TestingConsole {
 		for (int i = 0; i < amount; i++) {
 			Task task = new SleepTask(client, ms);
 
-			task.addObserver(new NullTaskObserver() {
+			task.addObserver(new NullTaskObserver<Task>() {
 				@Override
 				public void notifyExecuted(Task task) {
 					if (log) {

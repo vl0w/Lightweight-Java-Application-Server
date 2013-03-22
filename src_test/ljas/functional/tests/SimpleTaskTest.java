@@ -3,7 +3,6 @@ package ljas.functional.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import ljas.client.Client;
-import ljas.commons.tasking.Task;
 import ljas.commons.tasking.observation.NullTaskObserver;
 import ljas.commons.threading.ThreadBlocker;
 import ljas.functional.ServerManager;
@@ -19,7 +18,7 @@ public class SimpleTaskTest extends ServerTestCase {
 		Client client = createAndConnectClient();
 
 		AdditionTask additionTask = new AdditionTask(client, 5, 10);
-		int sum = ((AdditionTask) client.runTaskSync(additionTask)).sum;
+		int sum = client.runTaskSync(additionTask).sum;
 
 		assertEquals(15, sum);
 
@@ -37,10 +36,10 @@ public class SimpleTaskTest extends ServerTestCase {
 		Client client = createAndConnectClient();
 
 		AdditionTask task = new AdditionTask(client, 5, 10);
-		task.addObserver(new NullTaskObserver() {
+		task.addObserver(new NullTaskObserver<AdditionTask>() {
 			@Override
-			public void notifyExecuted(Task task) {
-				int sum = ((AdditionTask) task).sum;
+			public void notifyExecuted(AdditionTask task) {
+				int sum = task.sum;
 				blocker.release(new Integer(sum));
 			}
 		});
