@@ -124,7 +124,6 @@ public class ServerTest {
 		assertTrue(server.getServerSocket().isClosed());
 		verify(session1).disconnect();
 		verify(session2).disconnect();
-		assertTrue(server.getSessions().isEmpty());
 		assertTrue(server.getThreadSystem().getThreads().isEmpty());
 		assertEquals(RuntimeEnvironmentState.OFFLINE, server.getState());
 	}
