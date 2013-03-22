@@ -71,30 +71,30 @@ public class FinishTaskStep extends AbstractTaskStep {
 	}
 
 	private void notifyFail() {
-		List<TaskObserver> observers = getObservers();
+		List<TaskObserver<Task>> observers = getObservers();
 		List<TaskException> exceptions = collectAllExceptions();
-		for (TaskObserver observer : observers) {
+		for (TaskObserver<Task> observer : observers) {
 			observer.notifyExecutedWithErrors(task, exceptions);
 		}
 	}
 
 	private void notifyWarning() {
-		List<TaskObserver> observers = getObservers();
-		for (TaskObserver observer : observers) {
+		List<TaskObserver<Task>> observers = getObservers();
+		for (TaskObserver<Task> observer : observers) {
 			observer.notifyExecutedWithWarnings(task);
 		}
 	}
 
 	private void notifySuccess() {
-		List<TaskObserver> observers = getObservers();
-		for (TaskObserver observer : observers) {
+		List<TaskObserver<Task>> observers = getObservers();
+		for (TaskObserver<Task> observer : observers) {
 			observer.notifyExecutedWithSuccess(task);
 		}
 	}
 
 	private void notifyExecuted() {
-		List<TaskObserver> observers = getObservers();
-		for (TaskObserver observer : observers) {
+		List<TaskObserver<Task>> observers = getObservers();
+		for (TaskObserver<Task> observer : observers) {
 			observer.notifyExecuted(task);
 		}
 	}
@@ -112,7 +112,8 @@ public class FinishTaskStep extends AbstractTaskStep {
 		return exceptions;
 	}
 
-	private List<TaskObserver> getObservers() {
-		return TaskObserverManager.getInstance().getTaskObservers(task);
+	private List<TaskObserver<Task>> getObservers() {
+		return TaskObserverManager.getInstance().getObservers(task)
+				.castTo(Task.class);
 	}
 }

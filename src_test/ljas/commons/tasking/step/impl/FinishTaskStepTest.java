@@ -26,9 +26,10 @@ public class FinishTaskStepTest {
 	private Task task;
 	private List<TaskStep> executedSteps;
 	private List<TaskException> exceptions;
-	private TaskObserver observer;
+	private TaskObserver<Task> observer;
 
 	@Before
+	@SuppressWarnings("unchecked")
 	public void setUp() {
 		executedSteps = new ArrayList<>();
 		exceptions = new ArrayList<>();

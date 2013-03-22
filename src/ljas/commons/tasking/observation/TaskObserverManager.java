@@ -1,37 +1,34 @@
 package ljas.commons.tasking.observation;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import ljas.commons.tasking.Task;
 
 public class TaskObserverManager {
 	private static TaskObserverManager instance;
-	private Map<Task, List<TaskObserver>> observerMap;
+	private Map<Task, ObserverList> observerMap;
 
 	public static TaskObserverManager getInstance() {
 		if (instance == null) {
 			instance = new TaskObserverManager();
 		}
-
 		return instance;
 	}
 
 	private TaskObserverManager() {
-		observerMap = new HashMap<Task, List<TaskObserver>>();
+		observerMap = new HashMap<>();
 	}
 
-	public void add(Task task, TaskObserver observer) {
-		List<TaskObserver> observers = getTaskObservers(task);
+	public void add(Task task, TaskObserver<?> observer) {
+		ObserverList observers = getObservers(task);
 		observers.add(observer);
 		observerMap.put(task, observers);
 	}
 
-	public void remove(Task task, TaskObserver observer) {
+	public void remove(Task task, TaskObserver<?> observer) {
 		if (observerMap.containsKey(task)) {
-			List<TaskObserver> observers = observerMap.get(task);
+			ObserverList observers = observerMap.get(task);
 
 			if (observers.contains(observer)) {
 				observers.remove(observers.indexOf(observer));
@@ -39,10 +36,10 @@ public class TaskObserverManager {
 		}
 	}
 
-	public List<TaskObserver> getTaskObservers(Task task) {
+	public ObserverList getObservers(Task task) {
 		if (observerMap.containsKey(task)) {
 			return observerMap.get(task);
 		}
-		return new ArrayList<>();
+		return new ObserverList();
 	}
 }
