@@ -9,10 +9,6 @@ import org.apache.log4j.Logger;
 public class TaskSystemSessionObserver implements SessionObserver {
 	private TaskSystem taskSystem;
 
-	public TaskSystemSessionObserver(HasTaskSystem taskSystemProvider) {
-		this(taskSystemProvider.getTaskSystem());
-	}
-
 	public TaskSystemSessionObserver(TaskSystem taskSystem) {
 		this.taskSystem = taskSystem;
 	}

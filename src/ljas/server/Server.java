@@ -13,10 +13,8 @@ import ljas.commons.exceptions.ApplicationException;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.session.Session;
 import ljas.commons.session.SessionHolder;
-import ljas.commons.state.HasState;
-import ljas.commons.state.RuntimeEnvironmentState;
+import ljas.commons.state.SystemAvailabilityState;
 import ljas.commons.state.login.LoginRefusedMessage;
-import ljas.commons.tasking.environment.HasTaskSystem;
 import ljas.commons.tasking.environment.TaskSystem;
 import ljas.commons.tasking.environment.TaskSystemImpl;
 import ljas.commons.threading.ThreadSystem;
@@ -26,13 +24,17 @@ import ljas.server.login.ClientConnectionListener;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
-public final class Server implements HasTaskSystem, SessionHolder, HasState {
+public final class Server implements SessionHolder {
 	public static final String PROJECT_NAME = "LJAS";
 	public static final String PROJECT_HOMEPAGE = "http://github.com/vl0w/Lightweight-Java-Application-Server";
+<<<<<<< HEAD
 	public static final String SERVER_VERSION = "1.1.0";
+=======
+	public static final String SERVER_VERSION = "1.2.0-SNAPSHOT";
+>>>>>>> Merge branch 'separating-layers' into dev
 
 	private List<Session> sessions;
-	private RuntimeEnvironmentState serverState;
+	private SystemAvailabilityState state;
 	private ServerSocket serverSocket;
 	private Application application;
 	private ServerConfiguration configuration;
@@ -46,21 +48,11 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState {
 		this.threadSystem = new ThreadSystem(Server.class.getSimpleName(),
 				configuration.getMaxTaskWorkerCount());
 		this.taskSystem = new TaskSystemImpl(threadSystem, application);
-		this.serverState = RuntimeEnvironmentState.OFFLINE;
+		this.state = SystemAvailabilityState.OFFLINE;
 		this.sessions = new ArrayList<>();
 
 		// Logging
 		DOMConfigurator.configure(getConfiguration().getLog4JFilePath());
-	}
-
-	@Override
-	public RuntimeEnvironmentState getState() {
-		return serverState;
-	}
-
-	@Override
-	public void setState(RuntimeEnvironmentState value) {
-		serverState = value;
 	}
 
 	public ServerSocket getServerSocket() {
@@ -68,7 +60,7 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState {
 	}
 
 	public boolean isOnline() {
-		return getState() == RuntimeEnvironmentState.ONLINE;
+		return state == SystemAvailabilityState.ONLINE;
 	}
 
 	public Logger getLogger() {
@@ -87,7 +79,6 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState {
 		return threadSystem;
 	}
 
-	@Override
 	public TaskSystem getTaskSystem() {
 		return taskSystem;
 	}
@@ -115,7 +106,7 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState {
 					+ "' on the Server application.");
 		}
 
-		setState(RuntimeEnvironmentState.STARTUP);
+		state = SystemAvailabilityState.STARTUP;
 		logServerInfo();
 
 		getLogger().debug("Getting internet connection, starting socket");
@@ -124,7 +115,7 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState {
 		createConnectionListeners();
 
 		getLogger().info(this + " has been started");
-		setState(RuntimeEnvironmentState.ONLINE);
+		state = SystemAvailabilityState.ONLINE;
 	}
 
 	public void shutdown() {
@@ -143,7 +134,7 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState {
 			threadSystem.killAll();
 
 			getLogger().info(this + " is offline");
-			setState(RuntimeEnvironmentState.OFFLINE);
+			state = SystemAvailabilityState.OFFLINE;
 		} catch (Exception e) {
 			getLogger().error(e);
 		}

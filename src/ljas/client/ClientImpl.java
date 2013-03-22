@@ -14,7 +14,7 @@ import ljas.commons.exceptions.SessionException;
 import ljas.commons.exceptions.TaskException;
 import ljas.commons.session.Session;
 import ljas.commons.session.SessionFactory;
-import ljas.commons.state.RuntimeEnvironmentState;
+import ljas.commons.state.SystemAvailabilityState;
 import ljas.commons.state.login.LoginAcceptedMessage;
 import ljas.commons.state.login.LoginMessage;
 import ljas.commons.state.login.LoginRefusedMessage;
@@ -34,23 +34,8 @@ public class ClientImpl implements Client {
 	private TaskSystem taskSystem;
 	private ThreadSystem threadSystem;
 
-	private RuntimeEnvironmentState state;
+	private SystemAvailabilityState state;
 	private Application application;
-
-	@Override
-	public void setState(RuntimeEnvironmentState state) {
-		this.state = state;
-	}
-
-	@Override
-	public RuntimeEnvironmentState getState() {
-		return state;
-	}
-
-	@Override
-	public TaskSystem getTaskSystem() {
-		return taskSystem;
-	}
 
 	public ClientImpl(Class<? extends Application> applicationClass) {
 		// Application
@@ -58,7 +43,7 @@ public class ClientImpl implements Client {
 				.getClassLoader(), new Class[] { applicationClass },
 				new RemoteMethodInvocationHandler(this));
 
-		this.state = RuntimeEnvironmentState.OFFLINE;
+		this.state = SystemAvailabilityState.OFFLINE;
 		this.threadSystem = new ThreadSystem("Client", 1);
 		this.taskSystem = new TaskSystemImpl(threadSystem, application);
 
@@ -75,7 +60,7 @@ public class ClientImpl implements Client {
 				getLogger().error("Unable to disconnect client.", e);
 			}
 		}
-		setState(RuntimeEnvironmentState.STARTUP);
+		state = SystemAvailabilityState.STARTUP;
 
 		try {
 			session = SessionFactory.prepareSession(this, threadSystem);
@@ -87,19 +72,19 @@ public class ClientImpl implements Client {
 			LoginMessage loginMessage = loginHandler.block();
 
 			if (loginMessage instanceof LoginAcceptedMessage) {
-				setState(RuntimeEnvironmentState.ONLINE);
+				state = SystemAvailabilityState.ONLINE;
 				TaskSystemSessionObserver observer = new TaskSystemSessionObserver(
-						this);
+						taskSystem);
 				session.setObserver(observer);
 
 			} else if (loginMessage instanceof LoginRefusedMessage) {
-				setState(RuntimeEnvironmentState.OFFLINE);
+				state = SystemAvailabilityState.OFFLINE;
 				LoginRefusedMessage message = (LoginRefusedMessage) loginMessage;
 				throw new ConnectionRefusedException(message);
 			}
 
 		} catch (Throwable t) {
-			setState(RuntimeEnvironmentState.OFFLINE);
+			state = SystemAvailabilityState.OFFLINE;
 			if (ConnectionRefusedException.class.getName().equals(
 					t.getClass().getName())) {
 				throw (ConnectionRefusedException) t;
@@ -119,7 +104,7 @@ public class ClientImpl implements Client {
 
 	@Override
 	public boolean isOnline() {
-		return getState() == RuntimeEnvironmentState.ONLINE && session != null
+		return state == SystemAvailabilityState.ONLINE && session != null
 				&& session.isConnected();
 	}
 
@@ -128,7 +113,7 @@ public class ClientImpl implements Client {
 		if (isOnline()) {
 			session.disconnect();
 			threadSystem.killAll();
-			setState(RuntimeEnvironmentState.OFFLINE);
+			state = SystemAvailabilityState.OFFLINE;
 		}
 	}
 

@@ -1,5 +1,5 @@
 package ljas.commons.state;
 
-public enum RuntimeEnvironmentState {
+public enum SystemAvailabilityState {
 	ONLINE, OFFLINE, STARTUP
 }

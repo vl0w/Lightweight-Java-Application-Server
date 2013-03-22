@@ -11,12 +11,10 @@ import ljas.commons.exceptions.DisconnectException;
 import ljas.commons.exceptions.SessionException;
 import ljas.commons.session.Disconnectable;
 import ljas.commons.session.Session;
-import ljas.commons.state.HasState;
 import ljas.commons.tasking.Task;
-import ljas.commons.tasking.environment.HasTaskSystem;
 import ljas.commons.tasking.observation.TaskObserver;
 
-public interface Client extends HasTaskSystem, HasState, Disconnectable {
+public interface Client extends Disconnectable {
 	/**
 	 * The default time after a server request timeout occurs
 	 */
