@@ -83,6 +83,14 @@ public final class Server implements SessionHolder {
 		return taskSystem;
 	}
 
+	public SystemAvailabilityState getState() {
+		return state;
+	}
+
+	public void setState(SystemAvailabilityState state) {
+		this.state = state;
+	}
+
 	@Override
 	public List<Session> getSessions() {
 		return sessions;

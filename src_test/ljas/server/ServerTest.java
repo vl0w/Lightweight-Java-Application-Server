@@ -16,7 +16,7 @@ import ljas.commons.application.annotations.LJASApplication;
 import ljas.commons.exceptions.ApplicationException;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.session.Session;
-import ljas.commons.state.RuntimeEnvironmentState;
+import ljas.commons.state.SystemAvailabilityState;
 import ljas.commons.state.login.LoginRefusedMessage;
 import ljas.commons.threading.BackgroundThread;
 import ljas.server.configuration.ServerConfiguration;
@@ -52,7 +52,7 @@ public class ServerTest {
 		LoginParameters parameters = new LoginParameters(application);
 
 		Server server = new Server(application, configuration);
-		server.setState(RuntimeEnvironmentState.ONLINE);
+		server.setState(SystemAvailabilityState.ONLINE);
 
 		server.addSession(mock(Session.class));
 		server.addSession(mock(Session.class));
@@ -73,7 +73,7 @@ public class ServerTest {
 		LoginParameters parameters = new LoginParameters(mock(App2.class));
 
 		Server server = new Server(application, configuration);
-		server.setState(RuntimeEnvironmentState.ONLINE);
+		server.setState(SystemAvailabilityState.ONLINE);
 
 		try {
 			server.checkClient(parameters);
@@ -105,7 +105,7 @@ public class ServerTest {
 		assertEquals(5,
 				server.getThreadSystem().getThreads(BackgroundThread.class)
 						.size());
-		assertEquals(RuntimeEnvironmentState.ONLINE, server.getState());
+		assertEquals(SystemAvailabilityState.ONLINE, server.getState());
 	}
 
 	@Test
@@ -125,7 +125,7 @@ public class ServerTest {
 		verify(session1).disconnect();
 		verify(session2).disconnect();
 		assertTrue(server.getThreadSystem().getThreads().isEmpty());
-		assertEquals(RuntimeEnvironmentState.OFFLINE, server.getState());
+		assertEquals(SystemAvailabilityState.OFFLINE, server.getState());
 	}
 
 	@LJASApplication(name = "App1", version = "1.0")
