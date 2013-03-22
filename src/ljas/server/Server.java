@@ -102,7 +102,7 @@ public final class Server implements HasTaskSystem, SessionHolder, HasState {
 		sessions.add(session);
 	}
 
-	public void startup() throws Exception {
+	public void startup() throws ApplicationException, IOException {
 		if (isOnline()) {
 			shutdown();
 		}
