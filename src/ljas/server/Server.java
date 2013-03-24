@@ -27,11 +27,7 @@ import org.apache.log4j.xml.DOMConfigurator;
 public final class Server implements SessionHolder {
 	public static final String PROJECT_NAME = "LJAS";
 	public static final String PROJECT_HOMEPAGE = "http://github.com/vl0w/Lightweight-Java-Application-Server";
-<<<<<<< HEAD
-	public static final String SERVER_VERSION = "1.1.0";
-=======
 	public static final String SERVER_VERSION = "1.2.0-SNAPSHOT";
->>>>>>> Merge branch 'separating-layers' into dev
 
 	private List<Session> sessions;
 	private SystemAvailabilityState state;
