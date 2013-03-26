@@ -1,5 +1,7 @@
 package ljas.commons.application;
 
+import ljas.commons.exceptions.ApplicationException;
+import ljas.commons.session.Session;
 import ljas.commons.tasking.executors.TaskThread;
 import ljas.commons.tasking.step.ExecutingContext;
 
@@ -9,7 +11,7 @@ import ljas.commons.tasking.step.ExecutingContext;
  * @author jonashansen
  * 
  */
-public class ApplicationImplementation {
+public class ApplicationImplementation implements Application {
 
 	/**
 	 * 
@@ -27,4 +29,15 @@ public class ApplicationImplementation {
 		return thread.getExecutingContext();
 	}
 
+	@Override
+	public void onSessionConnect(Session session, LoginParameters parameters)
+			throws ApplicationException {
+		// nothing
+	}
+
+	@Override
+	public void onSessionDisconnect(Session session)
+			throws ApplicationException {
+		// nothing
+	}
 }
