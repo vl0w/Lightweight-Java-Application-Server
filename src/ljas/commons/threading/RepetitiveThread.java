@@ -42,6 +42,7 @@ public abstract class RepetitiveThread extends Thread {
 
 	public void kill() {
 		pause();
+		interrupt();
 		isKilled = true;
 		threadSystem.unregisterThread(this);
 	}

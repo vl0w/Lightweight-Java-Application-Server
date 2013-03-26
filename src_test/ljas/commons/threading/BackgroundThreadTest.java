@@ -3,9 +3,23 @@ package ljas.commons.threading;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class BackgroundThreadTest {
+
+	private ThreadSystem threadSystem;
+
+	@Before
+	public void setUpThreadSystem() {
+		threadSystem = new ThreadSystem();
+	}
+
+	@After
+	public void killThreads() {
+		threadSystem.killAll();
+	}
 
 	@Test
 	public void testRunCycle_TaskPerformed() throws Exception {
@@ -20,7 +34,6 @@ public class BackgroundThreadTest {
 	}
 
 	private BackgroundThread createBackgroundThread(Runnable runnable) {
-		ThreadSystem threadSystem = new ThreadSystem(0);
 		return new BackgroundThread(threadSystem, runnable);
 	}
 }
