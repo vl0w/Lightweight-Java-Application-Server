@@ -13,17 +13,15 @@ public class ThreadSystem {
 
 	private Set<RepetitiveThread> threads;
 	private ThreadFactory threadFactory;
-	private int maximumTaskWorkers;
 	private String executingEnvDescription;
 
-	public ThreadSystem(int maximumTaskWorkers) {
-		this("Unknown", maximumTaskWorkers);
+	public ThreadSystem() {
+		this("Unknown");
 	}
 
-	public ThreadSystem(String executingEnvDescription, int maximumTaskWorkers) {
+	public ThreadSystem(String executingEnvDescription) {
 		this.threads = new CopyOnWriteArraySet<>();
 		this.threadFactory = new ThreadFactory(this);
-		this.maximumTaskWorkers = maximumTaskWorkers;
 		this.executingEnvDescription = executingEnvDescription;
 	}
 
@@ -48,14 +46,6 @@ public class ThreadSystem {
 
 	public Collection<RepetitiveThread> getThreads() {
 		return threads;
-	}
-
-	public int getMaximumTaskWorkers() {
-		return maximumTaskWorkers;
-	}
-
-	public void setMaximumTaskWorkers(int maximumTaskWorkers) {
-		this.maximumTaskWorkers = maximumTaskWorkers;
 	}
 
 	@SuppressWarnings("unchecked")

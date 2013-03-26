@@ -41,9 +41,6 @@ public final class Server implements SessionHolder {
 			throws IOException {
 		this.configuration = configuration;
 		this.application = application;
-		this.threadSystem = new ThreadSystem(Server.class.getSimpleName(),
-				configuration.getMaxTaskWorkerCount());
-		this.taskSystem = new TaskSystemImpl(threadSystem, application);
 		this.state = SystemAvailabilityState.OFFLINE;
 		this.sessions = new ArrayList<>();
 
@@ -102,6 +99,13 @@ public final class Server implements SessionHolder {
 			shutdown();
 		}
 
+		state = SystemAvailabilityState.STARTUP;
+
+		// Initialize systems
+		threadSystem = new ThreadSystem(Server.class.getSimpleName());
+		taskSystem = new TaskSystemImpl(application);
+
+		// Check application
 		LJASApplication applicationAnnotation = ApplicationAnalyzer
 				.getApplicationAnnotation(application.getClass());
 		if (applicationAnnotation == null) {
@@ -110,7 +114,6 @@ public final class Server implements SessionHolder {
 					+ "' on the Server application.");
 		}
 
-		state = SystemAvailabilityState.STARTUP;
 		logServerInfo();
 
 		getLogger().debug("Getting internet connection, starting socket");
@@ -133,9 +136,11 @@ public final class Server implements SessionHolder {
 				session.disconnect();
 			}
 
-			getLogger().debug(
-					"Deactivating " + threadSystem.getClass().getSimpleName());
+			getLogger().debug("Killing threads");
 			threadSystem.killAll();
+
+			getLogger().debug("Shutdown executors");
+			taskSystem.shutdown();
 
 			getLogger().info(this + " is offline");
 			state = SystemAvailabilityState.OFFLINE;

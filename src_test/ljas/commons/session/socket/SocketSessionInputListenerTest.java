@@ -33,7 +33,7 @@ public class SocketSessionInputListenerTest {
 		when(session.getObserver()).thenReturn(observer);
 
 		// Run
-		ThreadSystem threadSystem = new ThreadSystem(0);
+		ThreadSystem threadSystem = new ThreadSystem();
 		SocketSessionInputListener listener = new SocketSessionInputListener(
 				threadSystem);
 		listener.setSession(session);
@@ -57,7 +57,7 @@ public class SocketSessionInputListenerTest {
 		when(socket.getInputStream()).thenThrow(new IOException());
 
 		// Run
-		ThreadSystem threadSystem = new ThreadSystem(0);
+		ThreadSystem threadSystem = new ThreadSystem();
 		SocketSessionInputListener listener = new SocketSessionInputListener(
 				threadSystem);
 		listener.setSession(session);

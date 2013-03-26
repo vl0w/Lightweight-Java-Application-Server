@@ -1,7 +1,7 @@
 package ljas.commons.application;
 
+import ljas.commons.tasking.executors.TaskThread;
 import ljas.commons.tasking.step.ExecutingContext;
-import ljas.commons.threading.TaskExecutorThread;
 
 /**
  * Provides helper methods for the application implementation of a server
@@ -23,8 +23,8 @@ public class ApplicationImplementation {
 	 *         </ul>
 	 */
 	protected ExecutingContext getExecutingContext() {
-		TaskExecutorThread thread = (TaskExecutorThread) Thread.currentThread();
-		return thread.getCurrentExecutingContext();
+		TaskThread thread = (TaskThread) Thread.currentThread();
+		return thread.getExecutingContext();
 	}
 
 }

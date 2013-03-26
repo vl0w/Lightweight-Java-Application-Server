@@ -44,8 +44,8 @@ public class ClientImpl implements Client {
 				new RemoteMethodInvocationHandler(this));
 
 		this.state = SystemAvailabilityState.OFFLINE;
-		this.threadSystem = new ThreadSystem("Client", 1);
-		this.taskSystem = new TaskSystemImpl(threadSystem, application);
+		this.threadSystem = new ThreadSystem("Client");
+		this.taskSystem = new TaskSystemImpl(application);
 
 		DOMConfigurator.configure("./log4j.xml");
 	}

@@ -14,7 +14,7 @@ public class ThreadSystemTest {
 
 	@Before
 	public void setUpThreadSystem() {
-		threadSystem = new ThreadSystem(0);
+		threadSystem = new ThreadSystem();
 	}
 
 	@After

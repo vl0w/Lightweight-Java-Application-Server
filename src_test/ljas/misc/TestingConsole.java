@@ -1,20 +1,15 @@
 package ljas.misc;
 
-import java.io.IOException;
 import java.net.ConnectException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 import ljas.client.Client;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.tasking.Task;
-import ljas.commons.tasking.monitoring.TaskMonitor;
 import ljas.commons.tasking.observation.NullTaskObserver;
-import ljas.commons.threading.TaskExecutorThread;
-import ljas.commons.tools.QueueUtils;
 import ljas.functional.ServerManager;
 import ljas.functional.ServerTestCase;
 import ljas.functional.tasks.SleepTask;
@@ -89,10 +84,6 @@ public class TestingConsole {
 				sendSleep(askUserFor("Amount?", 1), askUserFor("MS?", 100),
 						true);
 				break;
-			case "workload":
-			case "wl":
-				printWorkload();
-				break;
 			case "exit":
 				System.out.println("Bye");
 				break;
@@ -143,22 +134,6 @@ public class TestingConsole {
 			_clientMap.remove(clientIdentifier);
 		} else {
 			System.out.println("No such client found");
-		}
-	}
-
-	private static void printWorkload() throws IOException {
-		TaskMonitor taskMonitor = ServerManager.getServer().getTaskSystem()
-				.getTaskMonitor();
-
-		List<TaskExecutorThread> workerList = ServerManager.getServer()
-				.getThreadSystem().getThreads(TaskExecutorThread.class);
-		for (TaskExecutorThread threads : workerList) {
-			List<Task> taskList = QueueUtils.toList(threads.getTaskQueue());
-			long estimatedExecutionTime = taskMonitor
-					.getEstimatedExecutionTime(taskList);
-			int taskCount = taskList.size();
-			System.out.println(threads + ": " + taskCount + " tasks / "
-					+ estimatedExecutionTime + "ms");
 		}
 	}
 
