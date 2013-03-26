@@ -17,9 +17,6 @@ For the sake of education, we didn't want to use existing JEE application server
 
 ## Short Introduction
 
-Let me introduce myself and show the general architecture of me.
-
-
 **Define an application interface:**
 
 ```java
