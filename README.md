@@ -93,7 +93,8 @@ public class MyClient {
 }
 ```
 
-**Results when invoking the logic: **
+**Result (as console output): **
+
 ![image](https://api.monosnap.com/image/download?id=0SZFlBXVGChAApBZJHfrclGcv)
 
 ![image](https://api.monosnap.com/image/download?id=5IE4LluZ2WbsD7SC6mBH7a1ck)
