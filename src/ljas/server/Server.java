@@ -201,8 +201,6 @@ public final class Server implements SessionHolder {
 
 		getLogger().info(
 				"See \"" + PROJECT_HOMEPAGE + "\" for more information");
-		getLogger().info(
-				"This server is hosted by " + getConfiguration().getHostName());
 
 		getLogger().debug("Configuration: " + getConfiguration().toString());
 	}

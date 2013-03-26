@@ -34,8 +34,7 @@ public class ServerLoginSessionObserver implements SessionObserver {
 							+ " connection(s) overall");
 
 			// Create welcome-message
-			LoginAcceptedMessage welcome = new LoginAcceptedMessage(server
-					.getConfiguration().getHostName());
+			LoginAcceptedMessage welcome = new LoginAcceptedMessage();
 
 			// Send answer
 			session.sendObject(welcome);

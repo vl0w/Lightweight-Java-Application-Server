@@ -20,11 +20,6 @@ public class PropertyServerConfiguration implements ServerConfiguration {
 	}
 
 	@Override
-	public String getHostName() {
-		return properties.getProperty("HostName");
-	}
-
-	@Override
 	public String getLog4JFilePath() {
 		return properties.getProperty("Log4j");
 	}

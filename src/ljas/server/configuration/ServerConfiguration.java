@@ -6,8 +6,6 @@ public interface ServerConfiguration {
 
 	int getPort();
 
-	String getHostName();
-
 	String getLog4JFilePath();
 
 }
