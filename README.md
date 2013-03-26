@@ -2,8 +2,6 @@
 
 [![Build Status](https://travis-ci.org/vl0w/Lightweight-Java-Application-Server.png?branch=dev)](https://travis-ci.org/vl0w/Lightweight-Java-Application-Server)
 
-Read the [Getting Started](https://github.com/vl0w/Lightweight-Java-Application-Server/wiki/Getting-Started) document if you want to start writing applications for LJAS.
-
 ## Overview
 
 LJAS is a small Java application server.
@@ -17,7 +15,7 @@ For the sake of education, we didn't want to use existing JEE application server
 
 ## Short Introduction
 
-**Define an application interface:**
+**Define an application interface**
 
 ```java
 
@@ -25,10 +23,9 @@ For the sake of education, we didn't want to use existing JEE application server
 public interface MyApplication extends Application {
 	String upperCase(String thizz);
 }
-
 ```
 
-**Implement it (this gets executed on the server):**
+**Implement it (this gets executed on the server)**
 
 ```java
 
@@ -93,7 +90,7 @@ public class MyClient {
 }
 ```
 
-**Result (as console output): **
+**Result (as console output)**
 
 ![image](https://api.monosnap.com/image/download?id=0SZFlBXVGChAApBZJHfrclGcv)
 
