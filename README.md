@@ -76,7 +76,7 @@ public class MyServer {
 
 ```
 
-**Make a client invoke the logic**
+**Connect a client**
 
 ```java
 
