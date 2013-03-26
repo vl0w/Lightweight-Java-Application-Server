@@ -50,7 +50,6 @@ public class StartupShutdownTest extends ServerTestCase {
 		Server server = ServerManager.getServer();
 		assertTrue(server.isOnline());
 		assertFalse(server.getServerSocket().isClosed());
-		assertFalse(server.getThreadSystem().getThreads().isEmpty());
 
 		assertClientInteractionsPossible();
 	}
@@ -59,7 +58,6 @@ public class StartupShutdownTest extends ServerTestCase {
 		Server server = ServerManager.getServer();
 		assertFalse(server.isOnline());
 		assertTrue(server.getServerSocket().isClosed());
-		assertTrue(server.getThreadSystem().getThreads().isEmpty());
 		assertTrue(server.getSessions().isEmpty());
 		assertClientInteractionsImpossible();
 	}

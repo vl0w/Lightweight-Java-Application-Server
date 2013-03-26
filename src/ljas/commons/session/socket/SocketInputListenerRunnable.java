@@ -6,22 +6,20 @@ import java.net.Socket;
 
 import ljas.commons.exceptions.DisconnectException;
 import ljas.commons.session.Disconnectable;
-import ljas.commons.threading.RepetitiveThread;
-import ljas.commons.threading.ThreadSystem;
+import ljas.commons.threading.RepeatingRunnable;
 
-public class SocketSessionInputListener extends RepetitiveThread {
+import org.apache.log4j.Logger;
+
+class SocketInputListenerRunnable extends RepeatingRunnable {
 
 	private SocketSession session;
 	private Disconnectable disconnectable;
 
-	public SocketSessionInputListener(ThreadSystem threadSystem,
-			Disconnectable disconnectable) {
-		super(threadSystem);
-		this.disconnectable = disconnectable;
+	public SocketInputListenerRunnable() {
 	}
 
-	public SocketSessionInputListener(ThreadSystem threadSystem) {
-		this(threadSystem, null);
+	public SocketInputListenerRunnable(Disconnectable disconnectable) {
+		this.disconnectable = disconnectable;
 	}
 
 	public void setSession(SocketSession session) {
@@ -51,8 +49,8 @@ public class SocketSessionInputListener extends RepetitiveThread {
 		if (disconnectable != null) {
 			try {
 				disconnectable.disconnect();
-			} catch (DisconnectException e1) {
-				getLogger().error("Unable to disconnect " + disconnectable, e1);
+			} catch (DisconnectException e) {
+				getLogger().error("Unable to disconnect " + disconnectable, e);
 			}
 		} else {
 			getLogger()
@@ -72,5 +70,9 @@ public class SocketSessionInputListener extends RepetitiveThread {
 		if (receivedObject != null) {
 			session.getObserver().notiyObjectReceived(session, receivedObject);
 		}
+	}
+
+	private Logger getLogger() {
+		return Logger.getLogger(getClass());
 	}
 }

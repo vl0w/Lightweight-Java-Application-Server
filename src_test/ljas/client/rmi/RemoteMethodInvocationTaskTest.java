@@ -11,7 +11,6 @@ import ljas.commons.session.Session;
 import ljas.commons.tasking.environment.TaskSystem;
 import ljas.commons.tasking.environment.TaskSystemImpl;
 import ljas.commons.tasking.step.ExecutingContext;
-import ljas.commons.threading.ThreadSystem;
 
 import org.junit.Test;
 
@@ -60,7 +59,7 @@ public class RemoteMethodInvocationTaskTest {
 	}
 
 	private TaskSystem createTaskSystem() {
-		return new TaskSystemImpl(new ThreadSystem(0), new App());
+		return new TaskSystemImpl(new App());
 	}
 
 	@SuppressWarnings("unused")

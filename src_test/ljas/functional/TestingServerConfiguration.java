@@ -26,7 +26,7 @@ public class TestingServerConfiguration implements ServerConfiguration {
 
 	@Override
 	public String getLog4JFilePath() {
-		return "./log4j.xml";
+		return "./log4j-tests.xml";
 	}
 
 }

@@ -1,86 +1,59 @@
 package ljas.commons.tasking.environment;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
-import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import ljas.commons.application.Application;
 import ljas.commons.session.Session;
 import ljas.commons.tasking.Task;
-import ljas.commons.threading.TaskExecutorThread;
-import ljas.commons.threading.ThreadSystem;
+import ljas.commons.tasking.TaskRunnable;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 public class TaskSystemImplTest {
 
-	private ThreadSystem threadSystem;
-
-	@Before
-	public void setUpThreadSystem() {
-		threadSystem = new ThreadSystem(1);
-	}
-
-	@After
-	public void tearDownThreadSystem() {
-		threadSystem.killAll();
-	}
-
 	@Test
 	public void testScheduleTask_NoSession_DelegateTaskToThreadSystem() {
-		// Initialization
 		Task task = mock(Task.class);
 		Application application = mock(Application.class);
-		TaskSystem taskSystem = new TaskSystemImpl(threadSystem, application);
+		ExecutorService executorService = mock(ExecutorService.class);
 
-		// Pause threads
-		threadSystem.getThreadFactory().createTaskThread(taskSystem);
-		threadSystem.pauseAll();
-
-		// Run test
+		TaskSystem taskSystem = new TaskSystemImpl(application, executorService);
 		taskSystem.scheduleTask(task);
 
-		// Asserts
-		List<TaskExecutorThread> taskExecutors = threadSystem
-				.getThreads(TaskExecutorThread.class);
-		assertEquals(1, taskExecutors.size());
-		assertEquals(1, taskExecutors.get(0).getTaskQueue().size());
-		assertEquals(task, taskExecutors.get(0).getTaskQueue().remove());
+		verify(executorService).submit(any(TaskRunnable.class));
 	}
 
 	@Test
 	public void testScheduleTask_WithSession_PutSessionToSenderCache() {
-		// Initialization
 		Session session = mock(Session.class);
 		Task task = mock(Task.class);
 		Application application = mock(Application.class);
-		TaskSystem taskSystem = new TaskSystemImpl(threadSystem, application);
+		ExecutorService executorService = mock(ExecutorService.class);
 
-		// Run test
+		TaskSystem taskSystem = new TaskSystemImpl(application, executorService);
 		taskSystem.scheduleTask(task, session);
 
-		// Asserts
 		assertEquals(session, taskSystem.getSenderCache().remove(task));
+		verify(executorService).submit(any(TaskRunnable.class));
 	}
 
 	@Test
-	public void testAddBackgroundTask_DelegateTaskToThreadSystem() {
-		// Initialization
-		Task task = mock(Task.class);
+	public void testShutdown_ShutdownExecutorService()
+			throws InterruptedException {
 		Application application = mock(Application.class);
-		TaskSystem taskSystem = new TaskSystemImpl(threadSystem, application);
+		ExecutorService executorService = mock(ExecutorService.class);
 
-		// Run test
-		taskSystem.scheduleTask(task);
+		TaskSystem taskSystem = new TaskSystemImpl(application, executorService);
+		taskSystem.shutdown();
 
-		// Asserts
-		List<TaskExecutorThread> taskExecutors = threadSystem
-				.getThreads(TaskExecutorThread.class);
-		assertEquals(1, taskExecutors.size());
-		assertEquals(1, taskExecutors.get(0).getTaskQueue().size());
-		assertEquals(task, taskExecutors.get(0).getTaskQueue().remove());
+		verify(executorService).shutdown();
+		verify(executorService).awaitTermination(10, TimeUnit.SECONDS);
 	}
+
 }

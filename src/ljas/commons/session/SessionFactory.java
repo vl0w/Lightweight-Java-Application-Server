@@ -4,29 +4,14 @@ import java.net.Socket;
 
 import ljas.client.Client;
 import ljas.commons.session.socket.SocketSession;
-import ljas.commons.session.socket.SocketSessionInputListener;
-import ljas.commons.threading.ThreadSystem;
 
 public final class SessionFactory {
-	public static Session prepareSession(Client client,
-			ThreadSystem threadSystem) {
-		SocketSessionInputListener listener = new SocketSessionInputListener(
-				threadSystem, client);
-		SocketSession socketSession = new SocketSession(listener);
-		listener.setSession(socketSession);
-		return socketSession;
+	public static Session prepareSession(Client client) {
+		return new SocketSession(client);
 	}
 
-	public static Session createSocketSession(ThreadSystem threadSystem,
-			Socket socket, SessionObserver observer) {
-		SocketSessionInputListener listener = new SocketSessionInputListener(
-				threadSystem);
-		SocketSession socketSession = new SocketSession(listener, socket);
-		listener.setSession(socketSession);
-		listener.setDisconnectable(socketSession);
-		listener.start();
-		socketSession.setObserver(observer);
-		return socketSession;
+	public static Session createSocketSession(Socket socket) {
+		return new SocketSession(socket);
 	}
 
 }

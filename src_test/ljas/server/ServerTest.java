@@ -1,6 +1,7 @@
 package ljas.server;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -18,7 +19,6 @@ import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.session.Session;
 import ljas.commons.state.SystemAvailabilityState;
 import ljas.commons.state.login.LoginRefusedMessage;
-import ljas.commons.threading.BackgroundThread;
 import ljas.server.configuration.ServerConfiguration;
 
 import org.junit.Test;
@@ -102,9 +102,7 @@ public class ServerTest {
 		server.startup();
 
 		assertNotNull(server.getServerSocket());
-		assertEquals(5,
-				server.getThreadSystem().getThreads(BackgroundThread.class)
-						.size());
+		assertFalse(server.getClientConnectionListenerService().isShutdown());
 		assertEquals(SystemAvailabilityState.ONLINE, server.getState());
 	}
 
@@ -124,7 +122,7 @@ public class ServerTest {
 		assertTrue(server.getServerSocket().isClosed());
 		verify(session1).disconnect();
 		verify(session2).disconnect();
-		assertTrue(server.getThreadSystem().getThreads().isEmpty());
+		assertTrue(server.getClientConnectionListenerService().isShutdown());
 		assertEquals(SystemAvailabilityState.OFFLINE, server.getState());
 	}
 

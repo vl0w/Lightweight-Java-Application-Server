@@ -5,16 +5,15 @@ import java.util.Map;
 import ljas.commons.application.Application;
 import ljas.commons.session.Session;
 import ljas.commons.tasking.Task;
-import ljas.commons.tasking.monitoring.TaskMonitor;
 
 public interface TaskSystem {
 	void scheduleTask(Task task);
 
 	void scheduleTask(Task task, Session session);
 
-	TaskMonitor getTaskMonitor();
-
 	Map<Task, Session> getSenderCache();
 
 	Application getApplication();
+
+	void shutdown();
 }

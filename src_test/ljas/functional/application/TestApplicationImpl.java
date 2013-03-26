@@ -1,7 +1,7 @@
 package ljas.functional.application;
 
-import ljas.commons.application.LoginParameters;
 import ljas.commons.application.ApplicationImplementation;
+import ljas.commons.application.LoginParameters;
 import ljas.commons.exceptions.ApplicationException;
 import ljas.commons.session.Session;
 
@@ -11,14 +11,12 @@ public class TestApplicationImpl extends ApplicationImplementation implements
 	@Override
 	public void onSessionConnect(Session session, LoginParameters parameters)
 			throws ApplicationException {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void onSessionDisconnect(Session session)
 			throws ApplicationException {
-		// TODO Auto-generated method stub
 
 	}
 

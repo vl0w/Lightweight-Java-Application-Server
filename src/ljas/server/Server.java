@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ljas.commons.application.Application;
 import ljas.commons.application.ApplicationAnalyzer;
@@ -17,9 +19,8 @@ import ljas.commons.state.SystemAvailabilityState;
 import ljas.commons.state.login.LoginRefusedMessage;
 import ljas.commons.tasking.environment.TaskSystem;
 import ljas.commons.tasking.environment.TaskSystemImpl;
-import ljas.commons.threading.ThreadSystem;
 import ljas.server.configuration.ServerConfiguration;
-import ljas.server.login.ClientConnectionListener;
+import ljas.server.login.ClientConnectionListenerRunnable;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
@@ -35,15 +36,12 @@ public final class Server implements SessionHolder {
 	private Application application;
 	private ServerConfiguration configuration;
 	private TaskSystem taskSystem;
-	private ThreadSystem threadSystem;
+	private ExecutorService clientConnectionListenerService;
 
 	public Server(Application application, ServerConfiguration configuration)
 			throws IOException {
 		this.configuration = configuration;
 		this.application = application;
-		this.threadSystem = new ThreadSystem(Server.class.getSimpleName(),
-				configuration.getMaxTaskWorkerCount());
-		this.taskSystem = new TaskSystemImpl(threadSystem, application);
 		this.state = SystemAvailabilityState.OFFLINE;
 		this.sessions = new ArrayList<>();
 
@@ -69,10 +67,6 @@ public final class Server implements SessionHolder {
 
 	public ServerConfiguration getConfiguration() {
 		return configuration;
-	}
-
-	public ThreadSystem getThreadSystem() {
-		return threadSystem;
 	}
 
 	public TaskSystem getTaskSystem() {
@@ -102,6 +96,13 @@ public final class Server implements SessionHolder {
 			shutdown();
 		}
 
+		state = SystemAvailabilityState.STARTUP;
+
+		// Initialize systems
+		clientConnectionListenerService = Executors.newFixedThreadPool(5);
+		taskSystem = new TaskSystemImpl(application);
+
+		// Check application
 		LJASApplication applicationAnnotation = ApplicationAnalyzer
 				.getApplicationAnnotation(application.getClass());
 		if (applicationAnnotation == null) {
@@ -110,7 +111,6 @@ public final class Server implements SessionHolder {
 					+ "' on the Server application.");
 		}
 
-		state = SystemAvailabilityState.STARTUP;
 		logServerInfo();
 
 		getLogger().debug("Getting internet connection, starting socket");
@@ -133,9 +133,11 @@ public final class Server implements SessionHolder {
 				session.disconnect();
 			}
 
-			getLogger().debug(
-					"Deactivating " + threadSystem.getClass().getSimpleName());
-			threadSystem.killAll();
+			getLogger().debug("Killing threads");
+			clientConnectionListenerService.shutdownNow();
+
+			getLogger().debug("Shutdown executors");
+			taskSystem.shutdown();
 
 			getLogger().info(this + " is offline");
 			state = SystemAvailabilityState.OFFLINE;
@@ -172,13 +174,17 @@ public final class Server implements SessionHolder {
 		return PROJECT_NAME + "-server";
 	}
 
+	ExecutorService getClientConnectionListenerService() {
+		return clientConnectionListenerService;
+	}
+
 	private void createConnectionListeners() {
 		for (int i = 0; i < 5; i++) {
 
-			ClientConnectionListener connectionListener = new ClientConnectionListener(
+			ClientConnectionListenerRunnable connectionListenerRunnable = new ClientConnectionListenerRunnable(
 					this);
-			threadSystem.getThreadFactory().createBackgroundThread(
-					connectionListener);
+
+			clientConnectionListenerService.submit(connectionListenerRunnable);
 		}
 	}
 

@@ -6,6 +6,7 @@ import java.net.Socket;
 
 import javax.net.SocketFactory;
 
+import ljas.client.Client;
 import ljas.commons.exceptions.SessionException;
 import ljas.commons.session.Session;
 import ljas.commons.session.SessionObserver;
@@ -16,18 +17,31 @@ public class SocketSession implements Session {
 
 	private Socket socket;
 	private SessionObserver observer;
-	private SocketSessionInputListener listener;
+	private SocketInputListenerRunnable inputListenerRunnable;
 	private SocketFactory socketFactory;
+	private Thread inputListenerThread;
 
-	public SocketSession(SocketSessionInputListener listener) {
-		this.listener = listener;
+	public SocketSession() {
+		this.socket = null;
+		this.observer = null;
 		this.socketFactory = new SimpleSocketFactory();
+		this.inputListenerRunnable = new SocketInputListenerRunnable();
 	}
 
-	public SocketSession(SocketSessionInputListener listener, Socket socket) {
+	public SocketSession(Client client) {
+		this();
+		this.inputListenerRunnable = new SocketInputListenerRunnable(client);
+	}
+
+	public SocketSession(Socket socket) {
+		this();
 		this.socket = socket;
-		this.socketFactory = new SimpleSocketFactory();
-		this.listener = listener;
+		DisconnectableSocket disconnectableSocket = new DisconnectableSocket(
+				socket);
+		this.inputListenerRunnable = new SocketInputListenerRunnable(
+				disconnectableSocket);
+
+		getInputListenerThread().start();
 	}
 
 	@Override
@@ -43,9 +57,7 @@ public class SocketSession implements Session {
 			throw new SessionException(e);
 		}
 
-		if (!listener.isRunning()) {
-			listener.start();
-		}
+		getInputListenerThread().start();
 	}
 
 	@Override
@@ -58,7 +70,9 @@ public class SocketSession implements Session {
 				getLogger().error("Error while disconnecting session " + this,
 						e);
 			}
-			listener.kill();
+
+			getInputListenerThread().interrupt();
+			inputListenerThread = null;
 
 			if (observer != null) {
 				observer.notifySessionDisconnected(this);
@@ -107,14 +121,6 @@ public class SocketSession implements Session {
 		return sb.toString();
 	}
 
-	void setSocketFactory(SocketFactory socketFactory) {
-		this.socketFactory = socketFactory;
-	}
-
-	void setSocket(Socket socket) {
-		this.socket = socket;
-	}
-
 	Socket getSocket() {
 		return socket;
 	}
@@ -123,8 +129,19 @@ public class SocketSession implements Session {
 		return observer;
 	}
 
+	void setSocketFactory(SocketFactory socketFactory) {
+		this.socketFactory = socketFactory;
+	}
+
+	Thread getInputListenerThread() {
+		if (inputListenerThread == null) {
+			inputListenerRunnable.setSession(this);
+			inputListenerThread = new Thread(inputListenerRunnable);
+		}
+		return inputListenerThread;
+	}
+
 	private Logger getLogger() {
 		return Logger.getLogger(getClass());
 	}
-
 }

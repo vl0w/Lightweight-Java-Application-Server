@@ -2,37 +2,35 @@ package ljas.commons.tasking.environment;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import ljas.commons.application.Application;
 import ljas.commons.session.Session;
 import ljas.commons.tasking.Task;
-import ljas.commons.tasking.monitoring.TaskMonitor;
-import ljas.commons.threading.TaskExecutorThread;
-import ljas.commons.threading.ThreadSystem;
+import ljas.commons.tasking.TaskRunnable;
+import ljas.commons.tasking.executors.TaskThreadFactory;
 
 import org.apache.log4j.Logger;
 
 public class TaskSystemImpl implements TaskSystem {
 	private Application application;
-	private TaskMonitor taskMonitor;
-	private ThreadSystem threadSystem;
 	private Map<Task, Session> taskSenderCache;
+	private ExecutorService executorService;
 
-	public TaskSystemImpl(ThreadSystem threadSystem, Application application) {
-		this(threadSystem, application, new TaskMonitor());
-	}
-
-	public TaskSystemImpl(ThreadSystem threadSystem, Application application,
-			TaskMonitor taskMonitor) {
+	public TaskSystemImpl(Application application) {
 		this.application = application;
-		this.threadSystem = threadSystem;
-		this.taskMonitor = taskMonitor;
 		this.taskSenderCache = new HashMap<>();
+		this.executorService = Executors
+				.newCachedThreadPool(new TaskThreadFactory());
 	}
 
-	@Override
-	public TaskMonitor getTaskMonitor() {
-		return taskMonitor;
+	public TaskSystemImpl(Application application,
+			ExecutorService executorService) {
+		this.application = application;
+		this.taskSenderCache = new HashMap<>();
+		this.executorService = executorService;
 	}
 
 	@Override
@@ -41,23 +39,30 @@ public class TaskSystemImpl implements TaskSystem {
 	}
 
 	@Override
-	public void scheduleTask(Task task) {
-		Logger.getLogger(getClass()).debug("Scheduled task '" + task + "'");
-
-		TaskExecutorThread thread;
-		do {
-			thread = threadSystem.getThreadFactory().createTaskThread(this);
-		} while (!thread.scheduleTask(task));
+	public Application getApplication() {
+		return application;
 	}
 
 	@Override
-	public void scheduleTask(Task task, Session senderSession) {
-		getSenderCache().put(task, senderSession);
+	public void scheduleTask(Task task) {
+		Logger.getLogger(getClass()).debug("Scheduled task '" + task + "'");
+		TaskRunnable taskRunnable = new TaskRunnable(task, this);
+		executorService.submit(taskRunnable);
+	}
+
+	@Override
+	public void scheduleTask(Task task, Session session) {
+		getSenderCache().put(task, session);
 		scheduleTask(task);
 	}
 
 	@Override
-	public Application getApplication() {
-		return application;
+	public void shutdown() {
+		executorService.shutdown();
+		try {
+			executorService.awaitTermination(10, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			Logger.getLogger(getClass()).warn(e);
+		}
 	}
 }

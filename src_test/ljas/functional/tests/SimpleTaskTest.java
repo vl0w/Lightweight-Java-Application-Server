@@ -1,11 +1,9 @@
 package ljas.functional.tests;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import ljas.client.Client;
 import ljas.commons.tasking.observation.NullTaskObserver;
 import ljas.commons.threading.ThreadBlocker;
-import ljas.functional.ServerManager;
 import ljas.functional.ServerTestCase;
 import ljas.functional.tasks.AdditionTask;
 
@@ -21,12 +19,6 @@ public class SimpleTaskTest extends ServerTestCase {
 		int sum = client.runTaskSync(additionTask).sum;
 
 		assertEquals(15, sum);
-
-		// Ensure that the task has been executed on the server
-		assertTrue(
-				"The task was expected to be executed on the server. As the TaskMonitor of the server does not have any statistics of the task, it might not have been there for some reason.",
-				ServerManager.getServer().getTaskSystem().getTaskMonitor()
-						.getAverageTaskTime(additionTask) != 0);
 	}
 
 	@Test(timeout = TEST_TIMEOUT)

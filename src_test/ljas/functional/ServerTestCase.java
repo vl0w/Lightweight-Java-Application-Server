@@ -34,7 +34,6 @@ public class ServerTestCase {
 		ServerManager.shutdownServer();
 		Server server = ServerManager.getServer();
 		assertFalse("Server is still online!", server.isOnline());
-		assertTrue(server.getThreadSystem().getThreads().isEmpty());
 	}
 
 	public static Client createAndConnectClient()
