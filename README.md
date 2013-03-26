@@ -41,8 +41,6 @@ public class MyApplicationImpl extends ApplicationImplementation implements
 		return thizz.toUpperCase();
 	}
 }
-
-
 ```
 
 **Startup the server**
@@ -93,8 +91,6 @@ public class MyClient {
 	}
 
 }
-
-
 ```
 
 **Results when invoking the logic: **
