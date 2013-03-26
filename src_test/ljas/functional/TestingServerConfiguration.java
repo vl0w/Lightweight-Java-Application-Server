@@ -20,11 +20,6 @@ public class TestingServerConfiguration implements ServerConfiguration {
 	}
 
 	@Override
-	public int getMaxTaskWorkerCount() {
-		return 10;
-	}
-
-	@Override
 	public String getLog4JFilePath() {
 		return "./log4j-tests.xml";
 	}

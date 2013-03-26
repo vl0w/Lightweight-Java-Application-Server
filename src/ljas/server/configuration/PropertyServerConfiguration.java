@@ -25,11 +25,6 @@ public class PropertyServerConfiguration implements ServerConfiguration {
 	}
 
 	@Override
-	public int getMaxTaskWorkerCount() {
-		return Integer.valueOf(properties.getProperty("MaxTaskWorkers"));
-	}
-
-	@Override
 	public String getLog4JFilePath() {
 		return properties.getProperty("Log4j");
 	}

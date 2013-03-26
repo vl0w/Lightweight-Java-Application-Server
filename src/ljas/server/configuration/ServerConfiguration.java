@@ -8,8 +8,6 @@ public interface ServerConfiguration {
 
 	String getHostName();
 
-	int getMaxTaskWorkerCount();
-
 	String getLog4JFilePath();
 
 }
