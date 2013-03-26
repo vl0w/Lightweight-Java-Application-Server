@@ -9,11 +9,11 @@ import ljas.commons.session.SessionFactory;
 import ljas.commons.threading.RepeatingRunnable;
 import ljas.server.Server;
 
-public class ClientConnectionListener extends RepeatingRunnable {
+public class ClientConnectionListenerRunnable extends RepeatingRunnable {
 
 	private Server server;
 
-	public ClientConnectionListener(Server server) {
+	public ClientConnectionListenerRunnable(Server server) {
 		this.server = server;
 	}
 

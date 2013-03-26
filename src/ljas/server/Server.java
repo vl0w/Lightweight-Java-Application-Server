@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ljas.commons.application.Application;
 import ljas.commons.application.ApplicationAnalyzer;
@@ -18,7 +20,7 @@ import ljas.commons.state.login.LoginRefusedMessage;
 import ljas.commons.tasking.environment.TaskSystem;
 import ljas.commons.tasking.environment.TaskSystemImpl;
 import ljas.server.configuration.ServerConfiguration;
-import ljas.server.login.ClientConnectionListener;
+import ljas.server.login.ClientConnectionListenerRunnable;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
@@ -34,7 +36,7 @@ public final class Server implements SessionHolder {
 	private Application application;
 	private ServerConfiguration configuration;
 	private TaskSystem taskSystem;
-	private ThreadGroup clientConnectionListenerThreads;
+	private ExecutorService clientConnectionListenerService;
 
 	public Server(Application application, ServerConfiguration configuration)
 			throws IOException {
@@ -97,8 +99,7 @@ public final class Server implements SessionHolder {
 		state = SystemAvailabilityState.STARTUP;
 
 		// Initialize systems
-		clientConnectionListenerThreads = new ThreadGroup(
-				"Client Connection Listeners");
+		clientConnectionListenerService = Executors.newFixedThreadPool(5);
 		taskSystem = new TaskSystemImpl(application);
 
 		// Check application
@@ -133,7 +134,7 @@ public final class Server implements SessionHolder {
 			}
 
 			getLogger().debug("Killing threads");
-			clientConnectionListenerThreads.interrupt();
+			clientConnectionListenerService.shutdownNow();
 
 			getLogger().debug("Shutdown executors");
 			taskSystem.shutdown();
@@ -173,19 +174,17 @@ public final class Server implements SessionHolder {
 		return PROJECT_NAME + "-server";
 	}
 
-	ThreadGroup getClientConnectionListenerThreads() {
-		return clientConnectionListenerThreads;
+	ExecutorService getClientConnectionListenerService() {
+		return clientConnectionListenerService;
 	}
 
 	private void createConnectionListeners() {
 		for (int i = 0; i < 5; i++) {
 
-			ClientConnectionListener connectionListener = new ClientConnectionListener(
+			ClientConnectionListenerRunnable connectionListenerRunnable = new ClientConnectionListenerRunnable(
 					this);
 
-			Thread thread = new Thread(clientConnectionListenerThreads,
-					connectionListener);
-			thread.start();
+			clientConnectionListenerService.submit(connectionListenerRunnable);
 		}
 	}
 
