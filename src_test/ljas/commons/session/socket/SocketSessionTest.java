@@ -23,22 +23,20 @@ public class SocketSessionTest {
 	public void testDisconnect() throws IOException {
 		// Mocking & Stubbing
 		Socket socket = mock(Socket.class);
-		SocketSessionInputListener socketInputListener = mock(SocketSessionInputListener.class);
 		SessionObserver sessionObserver = mock(SessionObserver.class);
 
 		// Run
-		SocketSession session = createSession(socket, socketInputListener,
-				sessionObserver);
+		SocketSession session = createSession(socket, sessionObserver);
 		session.disconnect();
 
 		// Verifications
 		verify(socket).close();
-		verify(socketInputListener).kill();
 		verify(sessionObserver).notifySessionDisconnected(session);
 
 		// Asserts
 		assertFalse(session.isConnected());
 		assertNull(session.getSocket());
+		assertFalse(session.getInputListenerThread().isAlive());
 	}
 
 	@Test
@@ -51,19 +49,16 @@ public class SocketSessionTest {
 		// Mocking & Stubbing
 		Socket socket = mock(Socket.class);
 		SimpleSocketFactory socketFactory = mock(SimpleSocketFactory.class);
-		SocketSessionInputListener socketInputListener = mock(SocketSessionInputListener.class);
 		SessionObserver sessionObserver = mock(SessionObserver.class);
 
 		when(socketFactory.createSocket(ip, port)).thenReturn(socket);
 
 		// Run
-		SocketSession session = createSession(socketInputListener,
-				sessionObserver);
+		SocketSession session = createSession(sessionObserver);
 		session.setSocketFactory(socketFactory);
 		session.connect(ip, port);
 
 		// Verifications
-		verify(socketInputListener).start();
 		verify(socketFactory).createSocket(ip, port);
 
 		// Asserts
@@ -81,24 +76,20 @@ public class SocketSessionTest {
 		// Mocking & Stubbing
 		Socket socket = mock(Socket.class);
 		SimpleSocketFactory socketFactory = mock(SimpleSocketFactory.class);
-		SocketSessionInputListener socketInputListener = mock(SocketSessionInputListener.class);
 		SessionObserver sessionObserver = mock(SessionObserver.class);
 
 		when(socketFactory.createSocket(ip, port)).thenReturn(socket);
 
 		// Run
-		SocketSession session = createSession(socket, socketInputListener,
-				sessionObserver);
+		SocketSession session = createSession(socket, sessionObserver);
 		session.setSocketFactory(socketFactory);
 		session.connect(ip, port);
 
 		// Verifications: Disconnected
 		verify(socket).close();
-		verify(socketInputListener).kill();
 		verify(sessionObserver).notifySessionDisconnected(session);
 
 		// Verifications: Connected
-		verify(socketInputListener).start();
 		verify(socketFactory).createSocket(ip, port);
 
 		// Asserts
@@ -107,18 +98,15 @@ public class SocketSessionTest {
 	}
 
 	private SocketSession createSession(Socket socket,
-			SocketSessionInputListener socketInputListener,
-			SessionObserver observer) {
-		SocketSession socketSession = new SocketSession(socketInputListener,
-				socket);
+
+	SessionObserver observer) {
+		SocketSession socketSession = new SocketSession(socket);
 		socketSession.setObserver(observer);
 		return socketSession;
 	}
 
-	private SocketSession createSession(
-			SocketSessionInputListener socketInputListener,
-			SessionObserver observer) {
-		SocketSession socketSession = new SocketSession(socketInputListener);
+	private SocketSession createSession(SessionObserver observer) {
+		SocketSession socketSession = new SocketSession();
 		socketSession.setObserver(observer);
 		return socketSession;
 	}

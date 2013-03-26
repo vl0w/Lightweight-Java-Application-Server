@@ -24,7 +24,6 @@ import ljas.commons.tasking.environment.TaskSystemImpl;
 import ljas.commons.tasking.environment.TaskSystemSessionObserver;
 import ljas.commons.tasking.observation.NullTaskObserver;
 import ljas.commons.threading.ThreadBlocker;
-import ljas.commons.threading.ThreadSystem;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
@@ -32,7 +31,6 @@ import org.apache.log4j.xml.DOMConfigurator;
 public class ClientImpl implements Client {
 	private Session session;
 	private TaskSystem taskSystem;
-	private ThreadSystem threadSystem;
 
 	private SystemAvailabilityState state;
 	private Application application;
@@ -44,7 +42,6 @@ public class ClientImpl implements Client {
 				new RemoteMethodInvocationHandler(this));
 
 		this.state = SystemAvailabilityState.OFFLINE;
-		this.threadSystem = new ThreadSystem("Client");
 		this.taskSystem = new TaskSystemImpl(application);
 
 		DOMConfigurator.configure("./log4j.xml");
@@ -63,7 +60,7 @@ public class ClientImpl implements Client {
 		state = SystemAvailabilityState.STARTUP;
 
 		try {
-			session = SessionFactory.prepareSession(this, threadSystem);
+			session = SessionFactory.prepareSession(this);
 
 			LoginParameters loginParameters = new LoginParameters(application);
 			ClientLoginHandler loginHandler = new ClientLoginHandler(ip, port,
@@ -112,7 +109,6 @@ public class ClientImpl implements Client {
 	public void disconnect() throws DisconnectException {
 		if (isOnline()) {
 			session.disconnect();
-			threadSystem.killAll();
 			state = SystemAvailabilityState.OFFLINE;
 		}
 	}

@@ -11,11 +11,10 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import ljas.commons.session.SessionObserver;
-import ljas.commons.threading.ThreadSystem;
 
 import org.junit.Test;
 
-public class SocketSessionInputListenerTest {
+public class SocketInputListenerRunnableTest {
 
 	@Test
 	public void testRunCycle_ObjectReceived_NotifyObservers() throws Exception {
@@ -33,17 +32,13 @@ public class SocketSessionInputListenerTest {
 		when(session.getObserver()).thenReturn(observer);
 
 		// Run
-		ThreadSystem threadSystem = new ThreadSystem();
-		SocketSessionInputListener listener = new SocketSessionInputListener(
-				threadSystem);
+		SocketInputListenerRunnable listener = new SocketInputListenerRunnable();
 		listener.setSession(session);
 		listener.runCycle();
 
 		// Verifications
 		verify(observer).notiyObjectReceived(session, expectedObject);
 
-		// TODO: ASDF
-		threadSystem.killAll();
 	}
 
 	@Test
@@ -57,18 +52,13 @@ public class SocketSessionInputListenerTest {
 		when(socket.getInputStream()).thenThrow(new IOException());
 
 		// Run
-		ThreadSystem threadSystem = new ThreadSystem();
-		SocketSessionInputListener listener = new SocketSessionInputListener(
-				threadSystem);
+		SocketInputListenerRunnable listener = new SocketInputListenerRunnable();
 		listener.setSession(session);
 		listener.setDisconnectable(session);
 		listener.runCycle();
 
 		// Verifications
 		verify(session).disconnect();
-
-		// TODO: ASDF
-		threadSystem.killAll();
 	}
 
 	private class FakedInputStream extends InputStream {

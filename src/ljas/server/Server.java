@@ -17,7 +17,6 @@ import ljas.commons.state.SystemAvailabilityState;
 import ljas.commons.state.login.LoginRefusedMessage;
 import ljas.commons.tasking.environment.TaskSystem;
 import ljas.commons.tasking.environment.TaskSystemImpl;
-import ljas.commons.threading.ThreadSystem;
 import ljas.server.configuration.ServerConfiguration;
 import ljas.server.login.ClientConnectionListener;
 
@@ -35,7 +34,7 @@ public final class Server implements SessionHolder {
 	private Application application;
 	private ServerConfiguration configuration;
 	private TaskSystem taskSystem;
-	private ThreadSystem threadSystem;
+	private ThreadGroup clientConnectionListenerThreads;
 
 	public Server(Application application, ServerConfiguration configuration)
 			throws IOException {
@@ -68,10 +67,6 @@ public final class Server implements SessionHolder {
 		return configuration;
 	}
 
-	public ThreadSystem getThreadSystem() {
-		return threadSystem;
-	}
-
 	public TaskSystem getTaskSystem() {
 		return taskSystem;
 	}
@@ -102,7 +97,8 @@ public final class Server implements SessionHolder {
 		state = SystemAvailabilityState.STARTUP;
 
 		// Initialize systems
-		threadSystem = new ThreadSystem(Server.class.getSimpleName());
+		clientConnectionListenerThreads = new ThreadGroup(
+				"Client Connection Listeners");
 		taskSystem = new TaskSystemImpl(application);
 
 		// Check application
@@ -137,7 +133,7 @@ public final class Server implements SessionHolder {
 			}
 
 			getLogger().debug("Killing threads");
-			threadSystem.killAll();
+			clientConnectionListenerThreads.interrupt();
 
 			getLogger().debug("Shutdown executors");
 			taskSystem.shutdown();
@@ -177,13 +173,19 @@ public final class Server implements SessionHolder {
 		return PROJECT_NAME + "-server";
 	}
 
+	ThreadGroup getClientConnectionListenerThreads() {
+		return clientConnectionListenerThreads;
+	}
+
 	private void createConnectionListeners() {
 		for (int i = 0; i < 5; i++) {
 
 			ClientConnectionListener connectionListener = new ClientConnectionListener(
 					this);
-			threadSystem.getThreadFactory().createBackgroundThread(
+
+			Thread thread = new Thread(clientConnectionListenerThreads,
 					connectionListener);
+			thread.start();
 		}
 	}
 
