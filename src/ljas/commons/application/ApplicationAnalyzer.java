@@ -1,5 +1,8 @@
 package ljas.commons.application;
 
+import java.util.Arrays;
+
+import ljas.commons.application.annotations.AttachToEverySession;
 import ljas.commons.application.annotations.LJASApplication;
 
 /**
@@ -31,6 +34,19 @@ public class ApplicationAnalyzer {
 	public static String getApplicationVersion(
 			Class<? extends Application> appClass) {
 		return getApplicationAnnotation(appClass).version();
+	}
+
+	public static AttachToEverySession getAttachToEverySessionAnnotation(
+			Class<? extends Application> appClass) {
+		return findApplicationInterface(appClass).getAnnotation(
+				AttachToEverySession.class);
+	}
+
+	public static boolean hasSessionObject(
+			Class<? extends Application> appClass, Class<?> clazz) {
+		AttachToEverySession annotation = getAttachToEverySessionAnnotation(appClass);
+		return annotation != null
+				&& Arrays.asList(annotation.objectClasses()).contains(clazz);
 	}
 
 	private static Class<?> findApplicationInterface(Class<?> clazz) {

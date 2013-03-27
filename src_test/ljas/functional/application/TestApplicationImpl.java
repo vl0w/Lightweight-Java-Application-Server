@@ -8,6 +8,10 @@ import ljas.commons.session.Session;
 public class TestApplicationImpl extends ApplicationImplementation implements
 		TestApplication {
 
+	public TestApplicationImpl() {
+		super(TestApplication.class);
+	}
+
 	@Override
 	public void onSessionConnect(Session session, LoginParameters parameters)
 			throws ApplicationException {

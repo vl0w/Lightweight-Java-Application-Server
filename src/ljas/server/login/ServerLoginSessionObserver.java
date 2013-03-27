@@ -1,6 +1,7 @@
 package ljas.server.login;
 
 import ljas.commons.application.LoginParameters;
+import ljas.commons.exceptions.ApplicationException;
 import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.exceptions.SessionException;
 import ljas.commons.session.Session;
@@ -48,6 +49,13 @@ public class ServerLoginSessionObserver implements SessionObserver {
 					"New connection refused (" + session + "), "
 							+ cre.getRefusedMessage().getReason());
 			sendErrorAnswer(session, cre.getRefusedMessage());
+		} catch (ApplicationException e) {
+			server.getLogger().error(
+					"New connection refused (" + session
+							+ ") due to error in application");
+			server.getLogger().error(e);
+			sendErrorAnswer(session,
+					LoginRefusedMessage.UNKNOWN_EXCEPTION_OCCURED);
 		} catch (Exception e) {
 			server.getLogger().info("New connection refused (" + session + ")");
 			sendErrorAnswer(session,

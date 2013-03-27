@@ -2,9 +2,9 @@ package ljas.functional;
 
 import java.io.IOException;
 
-import ljas.commons.application.Application;
 import ljas.functional.application.TestApplicationImpl;
 import ljas.server.Server;
+import ljas.server.configuration.Property;
 
 public abstract class ServerManager {
 	private static Server server = null;
@@ -17,24 +17,27 @@ public abstract class ServerManager {
 	}
 
 	public static Server createServer() throws IOException {
-		Application serverApplication = new TestApplicationImpl();
-		return new Server(serverApplication, new TestingServerConfiguration());
+		return new Server(new TestApplicationImpl());
 	}
 
-	// TODO exception handling
 	public static void startupServer() throws Exception {
 		Server server = getServer();
 		if (server.isOnline()) {
 			server.shutdown();
 		}
+
+		// Set properties
+		server.getProperties().set(Property.LOG4J_PATH, "./log4j-tests.xml");
+		server.getProperties().set(Property.MAXIMUM_CLIENTS, 5);
+
 		server.startup();
 	}
 
-	// TODO exception handling
 	public static void shutdownServer() throws IOException {
 		Server server = getServer();
 		if (server.isOnline()) {
 			server.shutdown();
+			server.getProperties().reset();
 		}
 	}
 }
