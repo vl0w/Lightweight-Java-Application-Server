@@ -70,27 +70,8 @@ For the sake of education, we didn't want to use existing JEE application server
 
     <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ConnectionRefusedException</span><span class="o">,</span>
             <span class="n">Exception</span> <span class="o">{</span>
-        <span class="n">Server</span> <span class="n">server</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Server</span><span class="o">(</span><span class="k">new</span> <span class="n">MyApplicationImpl</span><span class="o">(),</span> <span class="k">new</span> <span class="n">ServerConf</span><span class="o">());</span>
+        <span class="n">Server</span> <span class="n">server</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Server</span><span class="o">(</span><span class="k">new</span> <span class="n">MyApplicationImpl</span><span class="o">());</span>
         <span class="n">server</span><span class="o">.</span><span class="na">startup</span><span class="o">();</span>
-    <span class="o">}</span>
-
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">ServerConf</span> <span class="kd">implements</span> <span class="n">ServerConfiguration</span> <span class="o">{</span>
-
-        <span class="nd">@Override</span>
-        <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getMaximumClients</span><span class="o">()</span> <span class="o">{</span>
-            <span class="k">return</span> <span class="mi">10000</span><span class="o">;</span>
-        <span class="o">}</span>
-
-        <span class="nd">@Override</span>
-        <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getPort</span><span class="o">()</span> <span class="o">{</span>
-            <span class="k">return</span> <span class="mi">1337</span><span class="o">;</span>
-        <span class="o">}</span>
-
-        <span class="nd">@Override</span>
-        <span class="kd">public</span> <span class="n">String</span> <span class="nf">getLog4JFilePath</span><span class="o">()</span> <span class="o">{</span>
-            <span class="k">return</span> <span class="s">"./log4j.xml"</span><span class="o">;</span>
-        <span class="o">}</span>
-
     <span class="o">}</span>
 <span class="o">}</span>
 
@@ -103,7 +84,7 @@ For the sake of education, we didn't want to use existing JEE application server
 
     <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
         <span class="n">Client</span> <span class="n">client</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ClientImpl</span><span class="o">(</span><span class="n">MyApplication</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-        <span class="n">client</span><span class="o">.</span><span class="na">connect</span><span class="o">(</span><span class="s">"localhost"</span><span class="o">,</span> <span class="mi">1337</span><span class="o">);</span>
+        <span class="n">client</span><span class="o">.</span><span class="na">connect</span><span class="o">(</span><span class="s">"localhost"</span><span class="o">,</span> <span class="mi">7755</span><span class="o">);</span>
 
         <span class="n">MyApplication</span> <span class="n">application</span> <span class="o">=</span> <span class="o">(</span><span class="n">MyApplication</span><span class="o">)</span> <span class="n">client</span><span class="o">.</span><span class="na">getApplication</span><span class="o">();</span>
         <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">application</span><span class="o">.</span><span class="na">upperCase</span><span class="o">(</span><span class="s">"Hello World"</span><span class="o">));</span>
