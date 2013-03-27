@@ -29,7 +29,7 @@ public class StartupShutdownTest extends ServerTestCase {
 	}
 
 	@Test(timeout = TEST_TIMEOUT)
-	public void testMultipleStartupShutdown_CheckINteractions()
+	public void testMultipleStartupShutdown_CheckInteractions()
 			throws Exception {
 		Server server = ServerManager.getServer();
 
