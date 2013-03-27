@@ -1,5 +1,3 @@
-# Lightweight Java Application Server
-
 [![Build Status](https://travis-ci.org/vl0w/Lightweight-Java-Application-Server.png?branch=dev)](https://travis-ci.org/vl0w/Lightweight-Java-Application-Server)
 
 ## Overview
@@ -47,27 +45,8 @@ public class MyServer {
 
 	public static void main(String[] args) throws ConnectionRefusedException,
 			Exception {
-		Server server = new Server(new MyApplicationImpl(), new ServerConf());
+		Server server = new Server(new MyApplicationImpl());
 		server.startup();
-	}
-
-	private static class ServerConf implements ServerConfiguration {
-
-		@Override
-		public int getMaximumClients() {
-			return 10000;
-		}
-
-		@Override
-		public int getPort() {
-			return 1337;
-		}
-
-		@Override
-		public String getLog4JFilePath() {
-			return "./log4j.xml";
-		}
-
 	}
 }
 
@@ -81,7 +60,7 @@ public class MyClient {
 
 	public static void main(String[] args) throws Exception {
 		Client client = new ClientImpl(MyApplication.class);
-		client.connect("localhost", 1337);
+		client.connect("localhost", 7755);
 
 		MyApplication application = (MyApplication) client.getApplication();
 		System.out.println(application.upperCase("Hello World"));
