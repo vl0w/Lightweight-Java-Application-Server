@@ -31,7 +31,10 @@ public class ApplicationImplementation implements Application {
 	@Override
 	public void onSessionConnect(Session session, LoginParameters parameters)
 			throws ApplicationException {
-		addSessionObjects(session);
+		if (ApplicationAnalyzer
+				.getAttachToEverySessionAnnotation(applicationClass) != null) {
+			addSessionObjects(session);
+		}
 	}
 
 	@Override
@@ -90,25 +93,22 @@ public class ApplicationImplementation implements Application {
 	}
 
 	private void addSessionObjects(Session session) throws ApplicationException {
-		if (ApplicationAnalyzer.hasSessionObject(applicationClass,
-				applicationClass)) {
-			AttachToEverySession objToAttach = ApplicationAnalyzer
-					.getAttachToEverySessionAnnotation(applicationClass);
+		AttachToEverySession objToAttach = ApplicationAnalyzer
+				.getAttachToEverySessionAnnotation(applicationClass);
 
-			for (Class<?> clazz : objToAttach.objectClasses()) {
-				try {
-					Object obj = clazz.getConstructor().newInstance();
+		for (Class<?> clazz : objToAttach.classes()) {
+			try {
+				Object obj = clazz.getConstructor().newInstance();
 
-					if (!sessionObjects.containsKey(session)) {
-						sessionObjects.put(session,
-								new HashMap<Class<?>, Object>());
-					}
-
-					Map<Class<?>, Object> objects = sessionObjects.get(session);
-					objects.put(clazz, obj);
-				} catch (Exception e) {
-					throw new ApplicationException(e);
+				if (!sessionObjects.containsKey(session)) {
+					sessionObjects
+							.put(session, new HashMap<Class<?>, Object>());
 				}
+
+				Map<Class<?>, Object> objects = sessionObjects.get(session);
+				objects.put(clazz, obj);
+			} catch (Exception e) {
+				throw new ApplicationException(e);
 			}
 		}
 	}
