@@ -1,5 +1,3 @@
-# Lightweight Java Application Server
-
 [![Build Status](https://travis-ci.org/vl0w/Lightweight-Java-Application-Server.png?branch=dev)](https://travis-ci.org/vl0w/Lightweight-Java-Application-Server)
 
 ## Overview
@@ -47,7 +45,7 @@ public class MyServer {
 
 	public static void main(String[] args) throws ConnectionRefusedException,
 			Exception {
-		Server server = new Server(new MyApplicationImpl(), new ServerConf());
+		Server server = new Server(new MyApplicationImpl());
 		server.startup();
 	}
 }
