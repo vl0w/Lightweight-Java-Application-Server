@@ -54,7 +54,7 @@ public interface Client extends HasTaskSystem, HasState, Disconnectable {
 	 * @throws ClientApplicationException
 	 *             When something went wrong
 	 */
-	<V extends Task> V runTaskSync(V task) throws ApplicationException;
+	<T extends Task> T runTaskSync(T task) throws ApplicationException;
 
 	/**
 	 * Runs a task asynchroniously on the server. Does not throw an exception in
