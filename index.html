@@ -86,7 +86,7 @@ For the sake of education, we didn't want to use existing JEE application server
         <span class="n">Client</span> <span class="n">client</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ClientImpl</span><span class="o">(</span><span class="n">MyApplication</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
         <span class="n">client</span><span class="o">.</span><span class="na">connect</span><span class="o">(</span><span class="s">"localhost"</span><span class="o">,</span> <span class="mi">7755</span><span class="o">);</span>
 
-        <span class="n">MyApplication</span> <span class="n">application</span> <span class="o">=</span> <span class="o">(</span><span class="n">MyApplication</span><span class="o">)</span> <span class="n">client</span><span class="o">.</span><span class="na">getApplication</span><span class="o">();</span>
+        <span class="n">MyApplication</span> <span class="n">application</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">getApplication</span><span class="o">();</span>
         <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">application</span><span class="o">.</span><span class="na">upperCase</span><span class="o">(</span><span class="s">"Hello World"</span><span class="o">));</span>
     <span class="o">}</span>
 
