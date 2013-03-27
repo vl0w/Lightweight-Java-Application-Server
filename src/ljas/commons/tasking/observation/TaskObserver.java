@@ -25,14 +25,14 @@ import ljas.commons.tasking.step.impl.FinishTaskStep;
  * @see TaskStepResult
  * 
  */
-public interface TaskObserver<V extends Task> {
+public interface TaskObserver<T extends Task> {
 	/**
 	 * When a task has been executed with any result.
 	 * 
 	 * @param task
 	 *            The executed task
 	 */
-	void notifyExecuted(V task);
+	void notifyExecuted(T task);
 
 	/**
 	 * When a task has been executed with errors.
@@ -40,7 +40,7 @@ public interface TaskObserver<V extends Task> {
 	 * @param task
 	 *            The executed task
 	 */
-	void notifyExecutedWithErrors(V task, List<TaskException> exceptions);
+	void notifyExecutedWithErrors(T task, List<TaskException> exceptions);
 
 	/**
 	 * When a task has been executed with <b>no</b> errors.
@@ -48,7 +48,7 @@ public interface TaskObserver<V extends Task> {
 	 * @param task
 	 *            The executed task
 	 */
-	void notifyExecutedWithSuccess(V task);
+	void notifyExecutedWithSuccess(T task);
 
 	/**
 	 * When a task has been executed and has warnings.
@@ -56,5 +56,6 @@ public interface TaskObserver<V extends Task> {
 	 * @param task
 	 *            The executed task
 	 */
-	void notifyExecutedWithWarnings(V task);
+	void notifyExecutedWithWarnings(T task);
+
 }

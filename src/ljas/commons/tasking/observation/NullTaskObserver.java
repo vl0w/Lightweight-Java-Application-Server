@@ -5,25 +5,25 @@ import java.util.List;
 import ljas.commons.exceptions.TaskException;
 import ljas.commons.tasking.Task;
 
-public class NullTaskObserver<V extends Task> implements TaskObserver<V> {
+public class NullTaskObserver<T extends Task> implements TaskObserver<T> {
 
 	@Override
-	public void notifyExecuted(V task) {
+	public void notifyExecuted(T task) {
 		// nothing
 	}
 
 	@Override
-	public void notifyExecutedWithErrors(V task, List<TaskException> exceptions) {
+	public void notifyExecutedWithErrors(T task, List<TaskException> exceptions) {
 		// nothing
 	}
 
 	@Override
-	public void notifyExecutedWithSuccess(V task) {
+	public void notifyExecutedWithSuccess(T task) {
 		// nothing
 	}
 
 	@Override
-	public void notifyExecutedWithWarnings(V task) {
+	public void notifyExecutedWithWarnings(T task) {
 		// nothing
 	}
 
