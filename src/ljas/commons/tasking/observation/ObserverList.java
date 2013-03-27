@@ -10,11 +10,11 @@ public class ObserverList extends ArrayList<TaskObserver<?>> {
 	private static final long serialVersionUID = -1131708384107967191L;
 
 	@SuppressWarnings("unchecked")
-	public <V extends Task> List<TaskObserver<V>> castTo(Class<V> taskClass) {
-		List<TaskObserver<V>> observers = new ArrayList<>();
+	public <T extends Task> List<TaskObserver<T>> castTo(Class<T> taskClass) {
+		List<TaskObserver<T>> observers = new ArrayList<>();
 
 		for (TaskObserver<?> observer : this) {
-			observers.add((TaskObserver<V>) observer);
+			observers.add((TaskObserver<T>) observer);
 		}
 
 		return observers;
