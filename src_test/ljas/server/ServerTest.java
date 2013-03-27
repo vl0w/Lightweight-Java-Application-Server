@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 
@@ -19,17 +18,17 @@ import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.session.Session;
 import ljas.commons.state.SystemAvailabilityState;
 import ljas.commons.state.login.LoginRefusedMessage;
-import ljas.server.configuration.ServerConfiguration;
+import ljas.server.configuration.Property;
 
 import org.junit.Test;
 
 public class ServerTest {
+
 	@Test
 	public void testCheckClient_ServerIsNotOnline_ConnectionReRefused()
 			throws IOException {
 		Application application = mock(Application.class);
-		ServerConfiguration configuration = mock(ServerConfiguration.class);
-		Server server = new Server(application, configuration);
+		Server server = new Server(application);
 
 		LoginParameters parameters = new LoginParameters(application);
 
@@ -46,12 +45,11 @@ public class ServerTest {
 	public void testCheckClient_ServerFull_ConnectionRefused()
 			throws IOException {
 		Application application = mock(Application.class);
-		ServerConfiguration configuration = mock(ServerConfiguration.class);
-		when(configuration.getMaximumClients()).thenReturn(Integer.valueOf(2));
 
 		LoginParameters parameters = new LoginParameters(application);
 
-		Server server = new Server(application, configuration);
+		Server server = new Server(application);
+		server.getProperties().set(Property.MAXIMUM_CLIENTS, 2);
 		server.setState(SystemAvailabilityState.ONLINE);
 
 		server.addSession(mock(Session.class));
@@ -68,11 +66,10 @@ public class ServerTest {
 	public void testCheckClient_ApplicationsNotEqual_ConnectionRefused()
 			throws IOException {
 		Application application = mock(App1.class);
-		ServerConfiguration configuration = mock(ServerConfiguration.class);
-		when(configuration.getMaximumClients()).thenReturn(Integer.valueOf(2));
 		LoginParameters parameters = new LoginParameters(mock(App2.class));
 
-		Server server = new Server(application, configuration);
+		Server server = new Server(application);
+		server.getProperties().set(Property.MAXIMUM_CLIENTS, 2);
 		server.setState(SystemAvailabilityState.ONLINE);
 
 		try {
@@ -87,29 +84,32 @@ public class ServerTest {
 	@Test(expected = ApplicationException.class)
 	public void testStartup_ApplicationHasNoAnnotation_ThrowException()
 			throws Exception {
-		ServerConfiguration configuration = mock(ServerConfiguration.class);
-		Server server = new Server(mock(AppWithNoAnnotation.class),
-				configuration);
-
-		server.startup();
+		Server server = new Server(mock(AppWithNoAnnotation.class));
+		try {
+			server.startup();
+		} finally {
+			server.shutdown();
+		}
 	}
 
 	@Test
 	public void testStartup() throws IOException, ApplicationException {
-		ServerConfiguration configuration = mock(ServerConfiguration.class);
-		Server server = new Server(mock(App1.class), configuration);
+		Server server = new Server(mock(App1.class));
+		try {
+			server.startup();
 
-		server.startup();
-
-		assertNotNull(server.getServerSocket());
-		assertFalse(server.getClientConnectionListenerService().isShutdown());
-		assertEquals(SystemAvailabilityState.ONLINE, server.getState());
+			assertNotNull(server.getServerSocket());
+			assertFalse(server.getClientConnectionListenerService()
+					.isShutdown());
+			assertEquals(SystemAvailabilityState.ONLINE, server.getState());
+		} finally {
+			server.shutdown();
+		}
 	}
 
 	@Test
 	public void testShutdown() throws Exception {
-		ServerConfiguration configuration = mock(ServerConfiguration.class);
-		Server server = new Server(mock(App1.class), configuration);
+		Server server = new Server(mock(App1.class));
 
 		Session session1 = mock(Session.class);
 		Session session2 = mock(Session.class);

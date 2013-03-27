@@ -1,5 +1,11 @@
 package ljas.commons.application;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import ljas.commons.application.annotations.AttachToEverySession;
 import ljas.commons.exceptions.ApplicationException;
 import ljas.commons.session.Session;
 import ljas.commons.tasking.executors.TaskThread;
@@ -12,6 +18,27 @@ import ljas.commons.tasking.step.ExecutingContext;
  * 
  */
 public class ApplicationImplementation implements Application {
+
+	Map<Session, Map<Class<?>, Object>> sessionObjects;
+	private Class<? extends Application> applicationClass;
+
+	public ApplicationImplementation(
+			Class<? extends Application> applicationClass) {
+		this.applicationClass = applicationClass;
+		sessionObjects = new HashMap<>();
+	}
+
+	@Override
+	public void onSessionConnect(Session session, LoginParameters parameters)
+			throws ApplicationException {
+		addSessionObjects(session);
+	}
+
+	@Override
+	public void onSessionDisconnect(Session session)
+			throws ApplicationException {
+		sessionObjects.remove(session);
+	}
 
 	/**
 	 * 
@@ -29,15 +56,61 @@ public class ApplicationImplementation implements Application {
 		return thread.getExecutingContext();
 	}
 
-	@Override
-	public void onSessionConnect(Session session, LoginParameters parameters)
+	protected <V> V getObjectForCurrentSession(Class<V> clazz)
 			throws ApplicationException {
-		// nothing
+		Session session = getExecutingContext().getSenderSession();
+		return getSessionObject(session, clazz);
 	}
 
-	@Override
-	public void onSessionDisconnect(Session session)
+	@SuppressWarnings("unchecked")
+	protected <V> V getSessionObject(Session session, Class<V> clazz)
 			throws ApplicationException {
-		// nothing
+		if (!ApplicationAnalyzer.hasSessionObject(applicationClass, clazz)) {
+			throw new ApplicationException("The object type " + clazz
+					+ " has not been annotated and attached do a session");
+		}
+
+		return (V) sessionObjects.get(session).get(clazz);
 	}
+
+	protected <V> Collection<V> getAllSessionObjects(Class<V> clazz)
+			throws ApplicationException {
+		Collection<V> objects = new ArrayList<>();
+
+		for (Session session : sessionObjects.keySet()) {
+			V sessionObject = getSessionObject(session, clazz);
+			objects.add(sessionObject);
+		}
+
+		return objects;
+	}
+
+	protected Collection<Session> getConnectedSessions() {
+		return sessionObjects.keySet();
+	}
+
+	private void addSessionObjects(Session session) throws ApplicationException {
+		if (ApplicationAnalyzer.hasSessionObject(applicationClass,
+				applicationClass)) {
+			AttachToEverySession objToAttach = ApplicationAnalyzer
+					.getAttachToEverySessionAnnotation(applicationClass);
+
+			for (Class<?> clazz : objToAttach.objectClasses()) {
+				try {
+					Object obj = clazz.getConstructor().newInstance();
+
+					if (!sessionObjects.containsKey(session)) {
+						sessionObjects.put(session,
+								new HashMap<Class<?>, Object>());
+					}
+
+					Map<Class<?>, Object> objects = sessionObjects.get(session);
+					objects.put(clazz, obj);
+				} catch (Exception e) {
+					throw new ApplicationException(e);
+				}
+			}
+		}
+	}
+
 }

@@ -19,7 +19,8 @@ import ljas.commons.state.SystemAvailabilityState;
 import ljas.commons.state.login.LoginRefusedMessage;
 import ljas.commons.tasking.environment.TaskSystem;
 import ljas.commons.tasking.environment.TaskSystemImpl;
-import ljas.server.configuration.ServerConfiguration;
+import ljas.server.configuration.Property;
+import ljas.server.configuration.ServerProperties;
 import ljas.server.login.ClientConnectionListenerRunnable;
 
 import org.apache.log4j.Logger;
@@ -34,19 +35,19 @@ public final class Server implements SessionHolder {
 	private SystemAvailabilityState state;
 	private ServerSocket serverSocket;
 	private Application application;
-	private ServerConfiguration configuration;
 	private TaskSystem taskSystem;
 	private ExecutorService clientConnectionListenerService;
+	private ServerProperties properties;
 
-	public Server(Application application, ServerConfiguration configuration)
-			throws IOException {
-		this.configuration = configuration;
+	public Server(Application application) throws IOException {
 		this.application = application;
 		this.state = SystemAvailabilityState.OFFLINE;
 		this.sessions = new ArrayList<>();
+		this.properties = new ServerProperties();
+	}
 
-		// Logging
-		DOMConfigurator.configure(getConfiguration().getLog4JFilePath());
+	public ServerProperties getProperties() {
+		return properties;
 	}
 
 	public ServerSocket getServerSocket() {
@@ -63,10 +64,6 @@ public final class Server implements SessionHolder {
 
 	public Application getApplication() {
 		return application;
-	}
-
-	public ServerConfiguration getConfiguration() {
-		return configuration;
 	}
 
 	public TaskSystem getTaskSystem() {
@@ -98,6 +95,12 @@ public final class Server implements SessionHolder {
 
 		state = SystemAvailabilityState.STARTUP;
 
+		// Logging
+		if (properties.isSet(Property.LOG4J_PATH)) {
+			DOMConfigurator.configure(properties.get(Property.LOG4J_PATH)
+					.toString());
+		}
+
 		// Initialize systems
 		clientConnectionListenerService = Executors.newFixedThreadPool(5);
 		taskSystem = new TaskSystemImpl(application);
@@ -114,7 +117,8 @@ public final class Server implements SessionHolder {
 		logServerInfo();
 
 		getLogger().debug("Getting internet connection, starting socket");
-		serverSocket = new ServerSocket(getConfiguration().getPort());
+		int port = Integer.valueOf(properties.get(Property.PORT).toString());
+		serverSocket = new ServerSocket(port);
 
 		createConnectionListeners();
 
@@ -156,7 +160,9 @@ public final class Server implements SessionHolder {
 		}
 
 		// Check server full
-		if (getSessions().size() >= getConfiguration().getMaximumClients()) {
+		int maximumClients = Integer.valueOf(properties.get(
+				Property.MAXIMUM_CLIENTS).toString());
+		if (getSessions().size() >= maximumClients) {
 			throw new ConnectionRefusedException(
 					LoginRefusedMessage.SERVER_FULL);
 		}
@@ -202,6 +208,6 @@ public final class Server implements SessionHolder {
 		getLogger().info(
 				"See \"" + PROJECT_HOMEPAGE + "\" for more information");
 
-		getLogger().debug("Configuration: " + getConfiguration().toString());
+		getLogger().debug("Configuration: " + properties);
 	}
 }

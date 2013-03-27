@@ -13,6 +13,7 @@ import ljas.commons.exceptions.ConnectionRefusedException;
 import ljas.commons.exceptions.SessionException;
 import ljas.functional.application.TestApplication;
 import ljas.server.Server;
+import ljas.server.configuration.Property;
 
 import org.junit.After;
 import org.junit.Before;
@@ -44,7 +45,7 @@ public class ServerTestCase {
 
 	public static void connectClient(Client client)
 			throws ConnectionRefusedException, SessionException {
-		client.connect("localhost", 1666);
+		client.connect("localhost", 7755);
 	}
 
 	public static Client createClient() throws SessionException,
@@ -62,8 +63,8 @@ public class ServerTestCase {
 
 	protected List<Client> createClients() throws ConnectionRefusedException,
 			SessionException, IOException {
-		int maximumClients = ServerManager.getServer().getConfiguration()
-				.getMaximumClients();
+		int maximumClients = ServerManager.getServer().getProperties()
+				.get(Property.MAXIMUM_CLIENTS);
 		return createClients(maximumClients);
 	}
 
