@@ -11,7 +11,7 @@ public class ApplicationTest extends ServerTestCase {
 	@Test
 	public void testApplication() throws Exception {
 		Client client = createAndConnectClient();
-		TestApplication application = (TestApplication) client.getApplication();
+		TestApplication application = client.getApplication();
 		assertEquals(15, application.getSum(10, 5));
 	}
 }
