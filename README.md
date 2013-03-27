@@ -62,7 +62,7 @@ public class MyClient {
 		Client client = new ClientImpl(MyApplication.class);
 		client.connect("localhost", 7755);
 
-		MyApplication application = (MyApplication) client.getApplication();
+		MyApplication application = client.getApplication();
 		System.out.println(application.upperCase("Hello World"));
 	}
 
