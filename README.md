@@ -50,25 +50,6 @@ public class MyServer {
 		Server server = new Server(new MyApplicationImpl(), new ServerConf());
 		server.startup();
 	}
-
-	private static class ServerConf implements ServerConfiguration {
-
-		@Override
-		public int getMaximumClients() {
-			return 10000;
-		}
-
-		@Override
-		public int getPort() {
-			return 1337;
-		}
-
-		@Override
-		public String getLog4JFilePath() {
-			return "./log4j.xml";
-		}
-
-	}
 }
 
 ```
@@ -81,7 +62,7 @@ public class MyClient {
 
 	public static void main(String[] args) throws Exception {
 		Client client = new ClientImpl(MyApplication.class);
-		client.connect("localhost", 1337);
+		client.connect("localhost", 7755);
 
 		MyApplication application = (MyApplication) client.getApplication();
 		System.out.println(application.upperCase("Hello World"));
