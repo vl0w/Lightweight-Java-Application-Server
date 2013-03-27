@@ -195,8 +195,9 @@ public class ClientImpl implements Client {
 	}
 
 	@Override
-	public Application getApplication() {
-		return application;
+	@SuppressWarnings("unchecked")
+	public <A extends Application> A getApplication() {
+		return (A) application;
 
 	}
 }

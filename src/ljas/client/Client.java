@@ -68,5 +68,5 @@ public interface Client extends HasTaskSystem, HasState, Disconnectable {
 
 	Session getServerSession();
 
-	Application getApplication();
+	<A extends Application> A getApplication();
 }
