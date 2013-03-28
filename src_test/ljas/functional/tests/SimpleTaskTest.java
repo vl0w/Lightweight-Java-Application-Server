@@ -2,10 +2,10 @@ package ljas.functional.tests;
 
 import static org.junit.Assert.assertEquals;
 import ljas.client.Client;
-import ljas.commons.tasking.observation.NullTaskObserver;
-import ljas.commons.threading.ThreadBlocker;
 import ljas.functional.ServerTestCase;
 import ljas.functional.tasks.AdditionTask;
+import ljas.tasking.observation.NullTaskObserver;
+import ljas.threading.ThreadBlocker;
 
 import org.junit.Test;
 

@@ -1,9 +1,9 @@
 package ljas.client;
 
-import ljas.commons.session.Session;
-import ljas.commons.session.SessionObserver;
-import ljas.commons.state.login.LoginMessage;
-import ljas.commons.state.login.LoginRefusedMessage;
+import ljas.session.Session;
+import ljas.session.SessionObserver;
+import ljas.state.login.LoginMessage;
+import ljas.state.login.LoginRefusedMessage;
 
 public class ClientLoginSessionObserver implements SessionObserver {
 

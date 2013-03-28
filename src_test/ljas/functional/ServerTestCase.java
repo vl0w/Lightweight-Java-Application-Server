@@ -9,8 +9,8 @@ import java.util.List;
 
 import ljas.client.Client;
 import ljas.client.ClientImpl;
-import ljas.commons.exceptions.ConnectionRefusedException;
-import ljas.commons.exceptions.SessionException;
+import ljas.exception.ConnectionRefusedException;
+import ljas.exception.SessionException;
 import ljas.functional.application.TestApplication;
 import ljas.server.Server;
 import ljas.server.configuration.Property;

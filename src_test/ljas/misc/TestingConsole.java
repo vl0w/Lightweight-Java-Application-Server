@@ -7,12 +7,12 @@ import java.util.Map;
 import java.util.Scanner;
 
 import ljas.client.Client;
-import ljas.commons.exceptions.ConnectionRefusedException;
-import ljas.commons.tasking.Task;
-import ljas.commons.tasking.observation.NullTaskObserver;
+import ljas.exception.ConnectionRefusedException;
 import ljas.functional.ServerManager;
 import ljas.functional.ServerTestCase;
 import ljas.functional.tasks.SleepTask;
+import ljas.tasking.Task;
+import ljas.tasking.observation.NullTaskObserver;
 
 /**
  * Quick and dirty

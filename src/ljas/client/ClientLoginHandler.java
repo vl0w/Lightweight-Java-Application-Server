@@ -1,9 +1,9 @@
 package ljas.client;
 
-import ljas.commons.application.LoginParameters;
-import ljas.commons.session.Session;
-import ljas.commons.state.login.LoginMessage;
-import ljas.commons.threading.ThreadBlocker;
+import ljas.application.LoginParameters;
+import ljas.session.Session;
+import ljas.state.login.LoginMessage;
+import ljas.threading.ThreadBlocker;
 
 public class ClientLoginHandler extends ThreadBlocker<LoginMessage> {
 	private LoginParameters loginParameters;

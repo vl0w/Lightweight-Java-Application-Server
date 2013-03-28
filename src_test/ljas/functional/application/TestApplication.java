@@ -1,7 +1,7 @@
 package ljas.functional.application;
 
-import ljas.commons.application.Application;
-import ljas.commons.application.annotations.LJASApplication;
+import ljas.application.Application;
+import ljas.application.annotations.LJASApplication;
 
 @LJASApplication(name = "ljas.testing", version = "1.0")
 public interface TestApplication extends Application {

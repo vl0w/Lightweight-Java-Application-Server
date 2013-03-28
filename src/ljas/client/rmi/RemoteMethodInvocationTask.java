@@ -2,11 +2,11 @@ package ljas.client.rmi;
 
 import java.lang.reflect.Method;
 
+import ljas.application.Application;
 import ljas.client.Client;
-import ljas.commons.application.Application;
-import ljas.commons.exceptions.TaskException;
-import ljas.commons.tasking.facades.SimpleClientToServerTask;
-import ljas.commons.tasking.step.ExecutingContext;
+import ljas.exception.TaskException;
+import ljas.tasking.facades.SimpleClientToServerTask;
+import ljas.tasking.step.ExecutingContext;
 
 public class RemoteMethodInvocationTask extends SimpleClientToServerTask {
 	private static final long serialVersionUID = -4357127019879896820L;

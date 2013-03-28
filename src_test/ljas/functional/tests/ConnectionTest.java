@@ -4,9 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import ljas.client.Client;
-import ljas.commons.exceptions.ConnectionRefusedException;
-import ljas.commons.state.login.LoginRefusedMessage;
+import ljas.exception.ConnectionRefusedException;
 import ljas.functional.ServerTestCase;
+import ljas.state.login.LoginRefusedMessage;
 
 import org.junit.Test;
 

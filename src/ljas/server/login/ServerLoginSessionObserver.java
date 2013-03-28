@@ -1,15 +1,15 @@
 package ljas.server.login;
 
-import ljas.commons.application.LoginParameters;
-import ljas.commons.exceptions.ApplicationException;
-import ljas.commons.exceptions.ConnectionRefusedException;
-import ljas.commons.exceptions.SessionException;
-import ljas.commons.session.Session;
-import ljas.commons.session.SessionObserver;
-import ljas.commons.state.login.LoginAcceptedMessage;
-import ljas.commons.state.login.LoginRefusedMessage;
+import ljas.application.LoginParameters;
+import ljas.exception.ApplicationException;
+import ljas.exception.ConnectionRefusedException;
+import ljas.exception.SessionException;
 import ljas.server.Server;
 import ljas.server.ServerTasksystemSessionObserver;
+import ljas.session.Session;
+import ljas.session.SessionObserver;
+import ljas.state.login.LoginAcceptedMessage;
+import ljas.state.login.LoginRefusedMessage;
 
 public class ServerLoginSessionObserver implements SessionObserver {
 	private Server server;

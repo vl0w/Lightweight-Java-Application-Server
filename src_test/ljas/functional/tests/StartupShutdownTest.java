@@ -5,7 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import ljas.client.Client;
-import ljas.commons.exceptions.SessionException;
+import ljas.exception.SessionException;
 import ljas.functional.ServerManager;
 import ljas.functional.ServerTestCase;
 import ljas.functional.tasks.AdditionTask;
