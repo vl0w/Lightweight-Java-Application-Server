@@ -46,10 +46,14 @@ public class ApplicationAnalyzer {
 			Class<? extends Application> appClass, Class<?> clazz) {
 		AttachToEverySession annotation = getAttachToEverySessionAnnotation(appClass);
 		return annotation != null
-				&& Arrays.asList(annotation.objectClasses()).contains(clazz);
+				&& Arrays.asList(annotation.classes()).contains(clazz);
 	}
 
 	private static Class<?> findApplicationInterface(Class<?> clazz) {
+		if (clazz.isInterface() && Application.class.isAssignableFrom(clazz)) {
+			return clazz;
+		}
+
 		for (Class<?> interfacee : clazz.getInterfaces()) {
 			if (Application.class.isAssignableFrom(interfacee)) {
 				return interfacee;
