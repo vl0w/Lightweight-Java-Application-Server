@@ -7,10 +7,12 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 
 import ljas.application.Application;
+import ljas.application.ApplicationInfo;
 import ljas.application.LoginParameters;
 import ljas.application.annotations.LJASApplication;
 import ljas.exception.ApplicationException;
@@ -30,7 +32,7 @@ public class ServerTest {
 		Application application = mock(Application.class);
 		Server server = new Server(application);
 
-		LoginParameters parameters = new LoginParameters(application);
+		LoginParameters parameters = new LoginParameters(application.getClass());
 
 		try {
 			server.checkClient(parameters);
@@ -46,7 +48,7 @@ public class ServerTest {
 			throws IOException {
 		Application application = mock(Application.class);
 
-		LoginParameters parameters = new LoginParameters(application);
+		LoginParameters parameters = new LoginParameters(application.getClass());
 
 		Server server = new Server(application);
 		server.getProperties().set(Property.MAXIMUM_CLIENTS, 2);
@@ -65,8 +67,8 @@ public class ServerTest {
 	@Test
 	public void testCheckClient_ApplicationsNotEqual_ConnectionRefused()
 			throws IOException {
-		Application application = mock(App1.class);
-		LoginParameters parameters = new LoginParameters(mock(App2.class));
+		Application application = mockApp(App1.class);
+		LoginParameters parameters = new LoginParameters(App2.class);
 
 		Server server = new Server(application);
 		server.getProperties().set(Property.MAXIMUM_CLIENTS, 2);
@@ -84,7 +86,7 @@ public class ServerTest {
 	@Test(expected = ApplicationException.class)
 	public void testStartup_ApplicationHasNoAnnotation_ThrowException()
 			throws Exception {
-		Server server = new Server(mock(AppWithNoAnnotation.class));
+		Server server = new Server(mockApp(AppWithNoAnnotation.class));
 		try {
 			server.startup();
 		} finally {
@@ -94,7 +96,7 @@ public class ServerTest {
 
 	@Test
 	public void testStartup() throws IOException, ApplicationException {
-		Server server = new Server(mock(App1.class));
+		Server server = new Server(mockApp(App1.class));
 		try {
 			server.startup();
 
@@ -109,7 +111,7 @@ public class ServerTest {
 
 	@Test
 	public void testShutdown() throws Exception {
-		Server server = new Server(mock(App1.class));
+		Server server = new Server(mockApp(App1.class));
 
 		Session session1 = mock(Session.class);
 		Session session2 = mock(Session.class);
@@ -124,6 +126,12 @@ public class ServerTest {
 		verify(session2).disconnect();
 		assertTrue(server.getClientConnectionListenerService().isShutdown());
 		assertEquals(SystemAvailabilityState.OFFLINE, server.getState());
+	}
+
+	private Application mockApp(Class<? extends Application> appClass) {
+		Application application = mock(appClass);
+		when(application.getInfo()).thenReturn(new ApplicationInfo(appClass));
+		return application;
 	}
 
 	@LJASApplication(name = "App1", version = "1.0")

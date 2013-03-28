@@ -3,6 +3,7 @@ package ljas.client.rmi;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import ljas.application.Application;
+import ljas.application.ApplicationImplementation;
 import ljas.application.LoginParameters;
 import ljas.client.Client;
 import ljas.exception.ApplicationException;
@@ -63,7 +64,11 @@ public class RemoteMethodInvocationTaskTest {
 	}
 
 	@SuppressWarnings("unused")
-	private class App implements Application {
+	private class App extends ApplicationImplementation implements Application {
+
+		public App() {
+			super(Application.class);
+		}
 
 		@Override
 		public void onSessionConnect(Session session, LoginParameters parameters)

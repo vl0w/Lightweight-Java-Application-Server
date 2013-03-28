@@ -7,11 +7,11 @@ public class LoginParameters implements Serializable {
 
 	private Class<? extends Application> applicationClass;
 
-	public LoginParameters(Application application) {
-		this.applicationClass = application.getClass();
+	public LoginParameters(Class<? extends Application> applicationClass) {
+		this.applicationClass = applicationClass;
 	}
 
-	public Class<? extends Application> getClientApplicationClass() {
+	public Class<? extends Application> getApplicationClass() {
 		return applicationClass;
 	}
 }

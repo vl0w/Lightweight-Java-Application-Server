@@ -62,7 +62,8 @@ public class ClientImpl implements Client {
 		try {
 			session = SessionFactory.prepareSession(this);
 
-			LoginParameters loginParameters = new LoginParameters(application);
+			LoginParameters loginParameters = new LoginParameters(
+					application.getClass());
 			ClientLoginHandler loginHandler = new ClientLoginHandler(ip, port,
 					session, loginParameters);
 

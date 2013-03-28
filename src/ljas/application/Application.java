@@ -25,4 +25,6 @@ public interface Application {
 	 * @throws ApplicationException
 	 */
 	void onSessionDisconnect(Session session) throws ApplicationException;
+
+	ApplicationInfo getInfo();
 }

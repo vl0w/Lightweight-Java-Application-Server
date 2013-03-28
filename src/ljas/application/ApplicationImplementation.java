@@ -20,19 +20,18 @@ import ljas.tasking.step.ExecutingContext;
 public class ApplicationImplementation implements Application {
 
 	Map<Session, Map<Class<?>, Object>> sessionObjects;
-	private Class<? extends Application> applicationClass;
+	private ApplicationInfo info;
 
 	public ApplicationImplementation(
 			Class<? extends Application> applicationClass) {
-		this.applicationClass = applicationClass;
 		sessionObjects = new HashMap<>();
+		info = new ApplicationInfo(applicationClass);
 	}
 
 	@Override
 	public void onSessionConnect(Session session, LoginParameters parameters)
 			throws ApplicationException {
-		if (ApplicationAnalyzer
-				.getAttachToEverySessionAnnotation(applicationClass) != null) {
+		if (info.getAttachToEverySessionAnnotation() != null) {
 			addSessionObjects(session);
 		}
 	}
@@ -59,7 +58,7 @@ public class ApplicationImplementation implements Application {
 		return thread.getExecutingContext();
 	}
 
-	protected <V> V getObjectForCurrentSession(Class<V> clazz)
+	protected <V> V getSessionObject(Class<V> clazz)
 			throws ApplicationException {
 		Session session = getExecutingContext().getSenderSession();
 		return getSessionObject(session, clazz);
@@ -68,7 +67,7 @@ public class ApplicationImplementation implements Application {
 	@SuppressWarnings("unchecked")
 	protected <V> V getSessionObject(Session session, Class<V> clazz)
 			throws ApplicationException {
-		if (!ApplicationAnalyzer.hasSessionObject(applicationClass, clazz)) {
+		if (!info.hasSessionObject(clazz)) {
 			throw new ApplicationException("The object type " + clazz
 					+ " has not been annotated and attached do a session");
 		}
@@ -93,8 +92,8 @@ public class ApplicationImplementation implements Application {
 	}
 
 	private void addSessionObjects(Session session) throws ApplicationException {
-		AttachToEverySession objToAttach = ApplicationAnalyzer
-				.getAttachToEverySessionAnnotation(applicationClass);
+		AttachToEverySession objToAttach = info
+				.getAttachToEverySessionAnnotation();
 
 		for (Class<?> clazz : objToAttach.classes()) {
 			try {
@@ -113,4 +112,8 @@ public class ApplicationImplementation implements Application {
 		}
 	}
 
+	@Override
+	public ApplicationInfo getInfo() {
+		return info;
+	}
 }

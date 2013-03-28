@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import ljas.application.Application;
-import ljas.application.ApplicationAnalyzer;
 import ljas.application.LoginParameters;
 import ljas.application.annotations.LJASApplication;
 import ljas.exception.ApplicationException;
@@ -106,8 +105,9 @@ public final class Server implements SessionHolder {
 		taskSystem = new TaskSystemImpl(application);
 
 		// Check application
-		LJASApplication applicationAnnotation = ApplicationAnalyzer
-				.getApplicationAnnotation(application.getClass());
+
+		LJASApplication applicationAnnotation = application.getInfo()
+				.getApplicationAnnotation();
 		if (applicationAnnotation == null) {
 			throw new ApplicationException("Missing annotation '"
 					+ LJASApplication.class.getSimpleName()
@@ -168,8 +168,7 @@ public final class Server implements SessionHolder {
 		}
 
 		// Check application
-		if (!ApplicationAnalyzer.areApplicationsEqual(
-				parameters.getClientApplicationClass(), application.getClass())) {
+		if (!application.getInfo().equals((parameters.getApplicationClass()))) {
 			throw new ConnectionRefusedException(
 					LoginRefusedMessage.INVALID_APPLICATION);
 		}
@@ -195,10 +194,9 @@ public final class Server implements SessionHolder {
 	}
 
 	private void logServerInfo() {
-		String applicationName = ApplicationAnalyzer
-				.getApplicationName(application.getClass());
-		String applicationVersion = ApplicationAnalyzer
-				.getApplicationVersion(application.getClass());
+		String applicationName = application.getInfo().getApplicationName();
+		String applicationVersion = application.getInfo()
+				.getApplicationVersion();
 
 		getLogger().info(
 				"Starting " + this + " (v" + SERVER_VERSION
