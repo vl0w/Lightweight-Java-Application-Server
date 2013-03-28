@@ -2,15 +2,15 @@ package ljas.client.rmi;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import ljas.application.Application;
+import ljas.application.LoginParameters;
 import ljas.client.Client;
-import ljas.commons.application.Application;
-import ljas.commons.application.LoginParameters;
-import ljas.commons.exceptions.ApplicationException;
-import ljas.commons.exceptions.TaskException;
-import ljas.commons.session.Session;
-import ljas.commons.tasking.environment.TaskSystem;
-import ljas.commons.tasking.environment.TaskSystemImpl;
-import ljas.commons.tasking.step.ExecutingContext;
+import ljas.exception.ApplicationException;
+import ljas.exception.TaskException;
+import ljas.session.Session;
+import ljas.tasking.environment.TaskSystem;
+import ljas.tasking.environment.TaskSystemImpl;
+import ljas.tasking.step.ExecutingContext;
 
 import org.junit.Test;
 

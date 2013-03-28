@@ -10,15 +10,15 @@ import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 
-import ljas.commons.application.Application;
-import ljas.commons.application.LoginParameters;
-import ljas.commons.application.annotations.LJASApplication;
-import ljas.commons.exceptions.ApplicationException;
-import ljas.commons.exceptions.ConnectionRefusedException;
-import ljas.commons.session.Session;
-import ljas.commons.state.SystemAvailabilityState;
-import ljas.commons.state.login.LoginRefusedMessage;
+import ljas.application.Application;
+import ljas.application.LoginParameters;
+import ljas.application.annotations.LJASApplication;
+import ljas.exception.ApplicationException;
+import ljas.exception.ConnectionRefusedException;
 import ljas.server.configuration.Property;
+import ljas.session.Session;
+import ljas.state.SystemAvailabilityState;
+import ljas.state.login.LoginRefusedMessage;
 
 import org.junit.Test;
 

@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
-import ljas.commons.session.Session;
-import ljas.commons.session.SessionFactory;
-import ljas.commons.threading.RepeatingRunnable;
 import ljas.server.Server;
+import ljas.session.Session;
+import ljas.session.SessionFactory;
+import ljas.threading.RepeatingRunnable;
 
 public class ClientConnectionListenerRunnable extends RepeatingRunnable {
 

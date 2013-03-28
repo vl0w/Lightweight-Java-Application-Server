@@ -1,8 +1,8 @@
 package ljas.server;
 
-import ljas.commons.exceptions.ApplicationException;
-import ljas.commons.session.Session;
-import ljas.commons.tasking.environment.TaskSystemSessionObserver;
+import ljas.exception.ApplicationException;
+import ljas.session.Session;
+import ljas.tasking.environment.TaskSystemSessionObserver;
 
 public class ServerTasksystemSessionObserver extends TaskSystemSessionObserver {
 

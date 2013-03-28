@@ -1,8 +1,8 @@
 package ljas.functional.tasks;
 
 import ljas.client.Client;
-import ljas.commons.tasking.facades.SimpleClientToServerTask;
-import ljas.commons.tasking.step.ExecutingContext;
+import ljas.tasking.facades.SimpleClientToServerTask;
+import ljas.tasking.step.ExecutingContext;
 
 public class SleepTask extends SimpleClientToServerTask {
 

@@ -8,15 +8,15 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import ljas.client.Client;
-import ljas.commons.exceptions.ApplicationException;
-import ljas.commons.exceptions.TaskException;
-import ljas.commons.tasking.Task;
-import ljas.commons.tasking.flow.TaskFlow;
-import ljas.commons.tasking.flow.TaskFlowBuilder;
-import ljas.commons.tasking.observation.TaskObserver;
-import ljas.commons.tasking.step.AbstractTaskStep;
-import ljas.commons.tasking.step.ExecutingContext;
+import ljas.exception.ApplicationException;
+import ljas.exception.TaskException;
 import ljas.functional.ServerTestCase;
+import ljas.tasking.Task;
+import ljas.tasking.flow.TaskFlow;
+import ljas.tasking.flow.TaskFlowBuilder;
+import ljas.tasking.observation.TaskObserver;
+import ljas.tasking.step.AbstractTaskStep;
+import ljas.tasking.step.ExecutingContext;
 
 import org.junit.Before;
 import org.junit.Test;

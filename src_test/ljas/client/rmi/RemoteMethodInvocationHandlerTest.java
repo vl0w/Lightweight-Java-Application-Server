@@ -5,8 +5,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import ljas.client.Client;
-import ljas.commons.exceptions.ApplicationException;
-import ljas.commons.tasking.Task;
+import ljas.exception.ApplicationException;
+import ljas.tasking.Task;
 
 import org.junit.Test;
 

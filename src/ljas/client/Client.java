@@ -3,16 +3,16 @@ package ljas.client;
 import java.io.IOException;
 import java.net.ConnectException;
 
-import ljas.commons.application.Application;
-import ljas.commons.application.LoginParameters;
-import ljas.commons.exceptions.ApplicationException;
-import ljas.commons.exceptions.ConnectionRefusedException;
-import ljas.commons.exceptions.DisconnectException;
-import ljas.commons.exceptions.SessionException;
-import ljas.commons.session.Disconnectable;
-import ljas.commons.session.Session;
-import ljas.commons.tasking.Task;
-import ljas.commons.tasking.observation.TaskObserver;
+import ljas.application.Application;
+import ljas.application.LoginParameters;
+import ljas.exception.ApplicationException;
+import ljas.exception.ConnectionRefusedException;
+import ljas.exception.DisconnectException;
+import ljas.exception.SessionException;
+import ljas.session.Disconnectable;
+import ljas.session.Session;
+import ljas.tasking.Task;
+import ljas.tasking.observation.TaskObserver;
 
 public interface Client extends Disconnectable {
 	/**

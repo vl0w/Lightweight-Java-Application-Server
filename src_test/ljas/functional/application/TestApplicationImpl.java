@@ -1,9 +1,9 @@
 package ljas.functional.application;
 
-import ljas.commons.application.ApplicationImplementation;
-import ljas.commons.application.LoginParameters;
-import ljas.commons.exceptions.ApplicationException;
-import ljas.commons.session.Session;
+import ljas.application.ApplicationImplementation;
+import ljas.application.LoginParameters;
+import ljas.exception.ApplicationException;
+import ljas.session.Session;
 
 public class TestApplicationImpl extends ApplicationImplementation implements
 		TestApplication {
