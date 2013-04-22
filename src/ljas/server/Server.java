@@ -116,6 +116,9 @@ public final class Server implements SessionHolder {
 
 		logServerInfo();
 
+		getLogger().debug("Initializing application");
+		getApplication().init();
+
 		getLogger().debug("Getting internet connection, starting socket");
 		int port = Integer.valueOf(properties.get(Property.PORT).toString());
 		serverSocket = new ServerSocket(port);

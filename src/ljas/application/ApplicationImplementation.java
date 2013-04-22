@@ -17,7 +17,7 @@ import ljas.tasking.step.ExecutingContext;
  * @author jonashansen
  * 
  */
-public class ApplicationImplementation implements Application {
+public abstract class ApplicationImplementation implements Application {
 
 	Map<Session, Map<Class<?>, Object>> sessionObjects;
 	private Class<? extends Application> applicationClass;

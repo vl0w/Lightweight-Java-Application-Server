@@ -75,6 +75,10 @@ public class RemoteMethodInvocationTaskTest {
 				throws ApplicationException {
 		}
 
+		@Override
+		public void init() throws ApplicationException {
+		}
+
 		public String fixValue() {
 			return FIXVALUE;
 		}
