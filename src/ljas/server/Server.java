@@ -23,6 +23,7 @@ import ljas.state.login.LoginRefusedMessage;
 import ljas.tasking.environment.TaskSystem;
 import ljas.tasking.environment.TaskSystemImpl;
 
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
@@ -99,6 +100,8 @@ public final class Server implements SessionHolder {
 		if (properties.isSet(Property.LOG4J_PATH)) {
 			DOMConfigurator.configure(properties.get(Property.LOG4J_PATH)
 					.toString());
+		} else {
+			BasicConfigurator.configure();
 		}
 
 		// Initialize systems
