@@ -11,6 +11,8 @@ import ljas.session.Session;
 import ljas.tasking.executors.TaskThread;
 import ljas.tasking.step.ExecutingContext;
 
+import org.apache.log4j.Logger;
+
 /**
  * Provides helper methods for the application implementation of a server
  * 
@@ -90,6 +92,14 @@ public abstract class ApplicationImplementation implements Application {
 
 	protected Collection<Session> getConnectedSessions() {
 		return sessionObjects.keySet();
+	}
+
+	protected void log(Object message) {
+		getLogger().info(message);
+	}
+
+	private Logger getLogger() {
+		return Logger.getLogger(applicationClass);
 	}
 
 	private void addSessionObjects(Session session) throws ApplicationException {
