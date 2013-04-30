@@ -1,5 +1,7 @@
 package ljas.tasking;
 
+import java.lang.reflect.InvocationTargetException;
+
 import ljas.exception.TaskException;
 import ljas.tasking.environment.TaskSystem;
 import ljas.tasking.executors.TaskThread;
@@ -43,7 +45,7 @@ public class TaskRunnable implements Runnable {
 			step.execute(context);
 		} catch (TaskException e) {
 			step.setResult(TaskStepResult.ERROR);
-			step.setException(e);
+			step.setException(unwrapInvocationTargetException(e));
 		}
 
 		if (step.getResult() == TaskStepResult.NONE) {
@@ -53,4 +55,11 @@ public class TaskRunnable implements Runnable {
 		task.getStepHistory().add(step);
 	}
 
+	private TaskException unwrapInvocationTargetException(TaskException e) {
+		if (e.getCause().getClass().equals(InvocationTargetException.class)) {
+			return new TaskException(e.getCause().getCause());
+		} else {
+			return e;
+		}
+	}
 }
