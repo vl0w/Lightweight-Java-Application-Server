@@ -1,5 +1,6 @@
 package ljas.client;
 
+import java.io.File;
 import java.lang.reflect.Proxy;
 import java.util.List;
 
@@ -44,7 +45,10 @@ public class ClientImpl implements Client {
 		this.state = SystemAvailabilityState.OFFLINE;
 		this.taskSystem = new TaskSystemImpl(application);
 
-		DOMConfigurator.configure("./log4j.xml");
+		File logFile = new File("./log4j.xml");
+		if (logFile.exists()) {
+			DOMConfigurator.configure("./log4j.xml");
+		}
 	}
 
 	@Override
