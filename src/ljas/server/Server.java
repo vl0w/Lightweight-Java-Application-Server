@@ -2,6 +2,7 @@ package ljas.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -98,8 +99,9 @@ public final class Server implements SessionHolder {
 
 		// Logging
 		if (properties.isSet(Property.LOG4J_PATH)) {
-			DOMConfigurator.configure(properties.get(Property.LOG4J_PATH)
-					.toString());
+			String path = properties.get(Property.LOG4J_PATH).toString();
+			URL url = getClass().getClassLoader().getResource(path);
+			DOMConfigurator.configure(url);
 		} else {
 			BasicConfigurator.configure();
 		}
