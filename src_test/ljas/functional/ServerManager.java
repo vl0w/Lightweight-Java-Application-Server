@@ -27,7 +27,8 @@ public abstract class ServerManager {
 		}
 
 		// Set properties
-		server.getProperties().set(Property.LOG4J_PATH, "./log4j-tests.xml");
+		server.getProperties().set(Property.LOG4J_PATH,
+				"ljas/functional/log4j-tests.xml");
 		server.getProperties().set(Property.MAXIMUM_CLIENTS, 5);
 
 		server.startup();

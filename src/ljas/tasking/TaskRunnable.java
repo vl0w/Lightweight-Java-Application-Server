@@ -56,7 +56,9 @@ public class TaskRunnable implements Runnable {
 	}
 
 	private TaskException unwrapInvocationTargetException(TaskException e) {
-		if (e.getCause().getClass().equals(InvocationTargetException.class)) {
+		Throwable cause = e.getCause();
+		if (cause != null
+				&& cause.getClass().equals(InvocationTargetException.class)) {
 			return new TaskException(e.getCause().getCause());
 		} else {
 			return e;
