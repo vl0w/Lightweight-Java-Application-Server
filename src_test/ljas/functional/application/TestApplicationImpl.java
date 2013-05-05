@@ -1,6 +1,7 @@
 package ljas.functional.application;
 
 import ljas.application.ApplicationImplementation;
+import ljas.application.annotations.Cached;
 import ljas.exception.ApplicationException;
 
 public class TestApplicationImpl extends ApplicationImplementation implements
@@ -23,6 +24,12 @@ public class TestApplicationImpl extends ApplicationImplementation implements
 	@Override
 	public int getSum(int numOne, int numTwo) {
 		return numOne + numTwo;
+	}
+
+	@Override
+	@Cached
+	public int getSumCached(int numOne, int numTwo) {
+		return getSum(numOne, numTwo);
 	}
 
 	@Override

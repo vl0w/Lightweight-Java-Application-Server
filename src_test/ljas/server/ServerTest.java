@@ -81,17 +81,6 @@ public class ServerTest {
 		}
 	}
 
-	@Test(expected = ApplicationException.class)
-	public void testStartup_ApplicationHasNoAnnotation_ThrowException()
-			throws Exception {
-		Server server = new Server(mock(AppWithNoAnnotation.class));
-		try {
-			server.startup();
-		} finally {
-			server.shutdown();
-		}
-	}
-
 	@Test
 	public void testStartup() throws IOException, ApplicationException {
 		Server server = new Server(mock(App1.class));
@@ -133,10 +122,6 @@ public class ServerTest {
 
 	@LJASApplication(name = "App2", version = "1.0")
 	private interface App2 extends Application {
-
-	}
-
-	private interface AppWithNoAnnotation extends Application {
 
 	}
 

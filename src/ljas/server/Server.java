@@ -11,7 +11,6 @@ import java.util.concurrent.Executors;
 import ljas.application.Application;
 import ljas.application.ApplicationAnalyzer;
 import ljas.application.LoginParameters;
-import ljas.application.annotations.LJASApplication;
 import ljas.exception.ApplicationException;
 import ljas.exception.ConnectionRefusedException;
 import ljas.server.configuration.Property;
@@ -111,13 +110,7 @@ public final class Server implements SessionHolder {
 		taskSystem = new TaskSystemImpl(application);
 
 		// Check application
-		LJASApplication applicationAnnotation = ApplicationAnalyzer
-				.getApplicationAnnotation(application.getClass());
-		if (applicationAnnotation == null) {
-			throw new ApplicationException("Missing annotation '"
-					+ LJASApplication.class.getSimpleName()
-					+ "' on the Server application.");
-		}
+		ApplicationAnalyzer.validateApplication(application.getClass());
 
 		logServerInfo();
 
