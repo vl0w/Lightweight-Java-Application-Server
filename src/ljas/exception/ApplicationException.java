@@ -26,14 +26,14 @@ public class ApplicationException extends TaskException {
 		if (taskExceptions.size() == 1) {
 			return taskExceptions.get(0).getMessage();
 		} else {
-			final String LB = "\n";
+			final String lineSeparator = System.getProperty("line.separator");
 			StringBuilder sb = new StringBuilder();
 
 			sb.append("The following exceptions occured while executing a task:");
-			sb.append(LB);
+			sb.append(lineSeparator);
 			for (TaskException taskException : taskExceptions) {
 				sb.append(taskException.getMessage());
-				sb.append(LB);
+				sb.append(lineSeparator);
 			}
 
 			return sb.toString();
