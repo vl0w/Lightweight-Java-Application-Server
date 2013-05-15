@@ -5,7 +5,7 @@ import java.util.Map;
 
 import ljas.tasking.Task;
 
-public class TaskObserverManager {
+public final class TaskObserverManager {
 	private static TaskObserverManager instance;
 	private Map<Task, ObserverList> observerMap;
 
@@ -14,10 +14,6 @@ public class TaskObserverManager {
 			instance = new TaskObserverManager();
 		}
 		return instance;
-	}
-
-	private TaskObserverManager() {
-		observerMap = new HashMap<>();
 	}
 
 	public void add(Task task, TaskObserver<?> observer) {
@@ -41,5 +37,9 @@ public class TaskObserverManager {
 			return observerMap.get(task);
 		}
 		return new ObserverList();
+	}
+
+	private TaskObserverManager() {
+		observerMap = new HashMap<>();
 	}
 }

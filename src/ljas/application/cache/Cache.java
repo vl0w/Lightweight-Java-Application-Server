@@ -3,7 +3,7 @@ package ljas.application.cache;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Cache {
+public final class Cache {
 
 	private static Cache instance;
 	private Map<CacheKey, Object> cache;
