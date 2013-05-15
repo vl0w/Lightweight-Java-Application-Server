@@ -16,13 +16,13 @@ import ljas.exception.RequestTimedOutException;
 public class ThreadBlocker<V> {
 	private long expirationTimeInMS;
 	private boolean isReleased;
-	private Throwable throwable;
+	private Exception exception;
 	private V returnValue;
 
 	public ThreadBlocker(long expirationTimeInMS) {
 		this.expirationTimeInMS = expirationTimeInMS;
 		this.isReleased = false;
-		this.throwable = null;
+		this.exception = null;
 		this.returnValue = null;
 	}
 
@@ -43,7 +43,7 @@ public class ThreadBlocker<V> {
 	 * @see {@link ThreadBlocker#release(Object)}
 	 * @see {@link ThreadBlocker#release(Throwable)}
 	 */
-	public V block() throws Throwable, RequestTimedOutException {
+	public V block() throws Exception, RequestTimedOutException {
 		isReleased = false;
 		int timeCounter = 0;
 		while (!isReleased) {
@@ -56,13 +56,13 @@ public class ThreadBlocker<V> {
 					throw new RequestTimedOutException();
 				}
 			} catch (InterruptedException e) {
-				throwable = e;
+				exception = e;
 			}
 		}
 
 		// The blocker has been released
-		if (throwable != null) {
-			throw throwable;
+		if (exception != null) {
+			throw exception;
 		}
 		return returnValue;
 	}
@@ -82,8 +82,8 @@ public class ThreadBlocker<V> {
 	 * 
 	 * @param t
 	 */
-	public void release(Throwable t) {
+	public void release(Exception t) {
 		isReleased = true;
-		throwable = t;
+		exception = t;
 	}
 }

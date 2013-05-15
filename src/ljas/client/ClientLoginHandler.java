@@ -29,7 +29,7 @@ public class ClientLoginHandler extends ThreadBlocker<LoginMessage> {
 	}
 
 	@Override
-	public LoginMessage block() throws Throwable {
+	public LoginMessage block() throws Exception {
 		ClientLoginSessionObserver loginObserver = new ClientLoginSessionObserver(
 				this);
 		serverSession.setObserver(loginObserver);

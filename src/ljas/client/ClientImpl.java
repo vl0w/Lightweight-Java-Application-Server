@@ -84,7 +84,7 @@ public class ClientImpl implements Client {
 				throw new ConnectionRefusedException(message);
 			}
 
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			state = SystemAvailabilityState.OFFLINE;
 			if (ConnectionRefusedException.class.getName().equals(
 					t.getClass().getName())) {
@@ -159,7 +159,7 @@ public class ClientImpl implements Client {
 			throw new ApplicationException("Request timed out");
 		} catch (ApplicationException e) {
 			throw e;
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			throw new ApplicationException(
 					"Unknown exception while executing request", t);
 		}
