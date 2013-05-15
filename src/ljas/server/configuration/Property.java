@@ -5,6 +5,17 @@ public enum Property {
 	MAXIMUM_CLIENTS(Integer.class, Integer.MAX_VALUE), //
 	LOG4J_PATH(String.class);
 
+	private Class<?> valueClass;
+	private Object defaultValue;
+
+	public Class<?> getValueClass() {
+		return valueClass;
+	}
+
+	public Object getDefaultValue() {
+		return defaultValue;
+	}
+
 	Property(Class<?> valueClass) {
 		this(valueClass, null);
 	}
@@ -14,6 +25,4 @@ public enum Property {
 		this.defaultValue = defaultValue;
 	}
 
-	Class<?> valueClass;
-	Object defaultValue;
 }

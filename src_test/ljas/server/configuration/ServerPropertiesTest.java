@@ -12,7 +12,8 @@ public class ServerPropertiesTest {
 	@Test
 	public void testGet_NoValueSet_MustReturnDefaultValue() {
 		ServerProperties properties = new ServerProperties();
-		assertEquals(Property.PORT.defaultValue, properties.get(Property.PORT));
+		assertEquals(Property.PORT.getDefaultValue(),
+				properties.get(Property.PORT));
 	}
 
 	@Test

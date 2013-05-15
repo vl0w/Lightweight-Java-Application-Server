@@ -3,13 +3,13 @@ package ljas.state.login;
 public class LoginRefusedMessage implements LoginMessage {
 	private static final long serialVersionUID = 6599405984948483674L;
 
-	public static LoginRefusedMessage SERVER_FULL = new LoginRefusedMessage(
+	public static final LoginRefusedMessage SERVER_FULL = new LoginRefusedMessage(
 			"Server is full");
-	public static LoginRefusedMessage ILLEGAL_STATE = new LoginRefusedMessage(
+	public static final LoginRefusedMessage ILLEGAL_STATE = new LoginRefusedMessage(
 			"Server has illegal state");
-	public static LoginRefusedMessage INVALID_APPLICATION = new LoginRefusedMessage(
+	public static final LoginRefusedMessage INVALID_APPLICATION = new LoginRefusedMessage(
 			"Client does not use the same application as the server");
-	public static LoginRefusedMessage UNKNOWN_EXCEPTION_OCCURED = new LoginRefusedMessage(
+	public static final LoginRefusedMessage UNKNOWN_EXCEPTION_OCCURED = new LoginRefusedMessage(
 			"Unknown server exception occured");
 
 	private final String reason;

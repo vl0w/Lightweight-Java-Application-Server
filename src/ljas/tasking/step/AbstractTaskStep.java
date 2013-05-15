@@ -8,7 +8,7 @@ import ljas.tasking.TaskStepResult;
 public abstract class AbstractTaskStep implements TaskStep, Serializable {
 	private static final long serialVersionUID = 908625176942848978L;
 
-	protected TaskStepResult result;
+	private TaskStepResult result;
 	private TaskException exception;
 
 	public AbstractTaskStep() {

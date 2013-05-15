@@ -15,8 +15,8 @@ public class ServerProperties {
 	public <V> V get(Property property) {
 		Object propertyValue = properties.get(property);
 
-		if (propertyValue == null && property.defaultValue != null) {
-			return (V) property.defaultValue;
+		if (propertyValue == null && property.getDefaultValue() != null) {
+			return (V) property.getDefaultValue();
 		}
 
 		return (V) propertyValue;
@@ -24,10 +24,10 @@ public class ServerProperties {
 	}
 
 	public <V> void set(Property property, V value) {
-		if (!property.valueClass.equals(value.getClass())) {
+		if (!property.getValueClass().equals(value.getClass())) {
 			throw new IllegalArgumentException("The property "
 					+ property.name() + " expects a "
-					+ property.valueClass.getSimpleName());
+					+ property.getValueClass().getSimpleName());
 		}
 
 		properties.put(property, value);
@@ -35,7 +35,7 @@ public class ServerProperties {
 
 	public boolean isSet(Property property) {
 		return properties.containsKey(property)
-				|| property.defaultValue != null;
+				|| property.getDefaultValue() != null;
 	}
 
 	@Override

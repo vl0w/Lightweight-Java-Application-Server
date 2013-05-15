@@ -21,7 +21,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class ApplicationImplementation implements Application {
 
-	Map<Session, Map<Class<?>, Object>> sessionObjects;
+	private Map<Session, Map<Class<?>, Object>> sessionObjects;
 	private Class<? extends Application> applicationClass;
 
 	public ApplicationImplementation(
