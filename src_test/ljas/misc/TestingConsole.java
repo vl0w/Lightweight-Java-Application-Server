@@ -8,9 +8,10 @@ import java.util.Scanner;
 
 import ljas.client.Client;
 import ljas.exception.ConnectionRefusedException;
-import ljas.functional.ServerManager;
 import ljas.functional.ServerTestCase;
+import ljas.functional.application.TestApplicationImpl;
 import ljas.functional.tasks.SleepTask;
+import ljas.server.Server;
 import ljas.tasking.Task;
 import ljas.tasking.observation.NullTaskObserver;
 
@@ -44,8 +45,8 @@ public class TestingConsole {
 	}
 
 	public static void main(String[] args) throws Exception {
-		// Start by default
-		ServerManager.getServer().startup();
+		Server server = new Server(new TestApplicationImpl());
+		server.startup();
 
 		String input;
 		do {
@@ -59,12 +60,12 @@ public class TestingConsole {
 			switch (input) {
 			case "start":
 			case "on":
-				ServerManager.getServer().startup();
+				server.startup();
 				break;
 			case "kill":
 			case "stop":
 			case "off":
-				ServerManager.getServer().shutdown();
+				server.shutdown();
 				break;
 			case "connect":
 				connectClient();
@@ -93,7 +94,7 @@ public class TestingConsole {
 			}
 
 		} while (!input.equals("exit"));
-		ServerManager.getServer().shutdown();
+		server.shutdown();
 	}
 
 	private static void printClients() {

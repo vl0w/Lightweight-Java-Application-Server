@@ -6,10 +6,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import ljas.client.Client;
 import ljas.exception.SessionException;
-import ljas.functional.ServerManager;
 import ljas.functional.ServerTestCase;
 import ljas.functional.tasks.AdditionTask;
-import ljas.server.Server;
 
 import org.junit.Test;
 
@@ -18,47 +16,41 @@ public class StartupShutdownTest extends ServerTestCase {
 	@Test(timeout = TEST_TIMEOUT)
 	public void testSingleStartupShutdown_CheckConnectedClients()
 			throws Exception {
-		Server server = ServerManager.getServer();
-
 		createAndConnectClient();
 		createAndConnectClient();
 		createAndConnectClient();
 
-		server.shutdown();
+		getServer().shutdown();
 		assertServerOffline();
 	}
 
 	@Test(timeout = TEST_TIMEOUT)
 	public void testMultipleStartupShutdown_CheckInteractions()
 			throws Exception {
-		Server server = ServerManager.getServer();
-
-		server.startup();
+		getServer().startup();
 		assertServerOnline();
 
-		server.shutdown();
+		getServer().shutdown();
 		assertServerOffline();
 
-		server.startup();
+		getServer().startup();
 		assertServerOnline();
 
-		server.shutdown();
+		getServer().shutdown();
 		assertServerOffline();
 	}
 
 	private void assertServerOnline() throws Exception {
-		Server server = ServerManager.getServer();
-		assertTrue(server.isOnline());
-		assertFalse(server.getServerSocket().isClosed());
+		assertTrue(getServer().isOnline());
+		assertFalse(getServer().getServerSocket().isClosed());
 
 		assertClientInteractionsPossible();
 	}
 
 	private void assertServerOffline() throws Exception {
-		Server server = ServerManager.getServer();
-		assertFalse(server.isOnline());
-		assertTrue(server.getServerSocket().isClosed());
-		assertTrue(server.getSessions().isEmpty());
+		assertFalse(getServer().isOnline());
+		assertTrue(getServer().getServerSocket().isClosed());
+		assertTrue(getServer().getSessions().isEmpty());
 		assertClientInteractionsImpossible();
 	}
 

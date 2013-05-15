@@ -12,6 +12,7 @@ import ljas.client.ClientImpl;
 import ljas.exception.ConnectionRefusedException;
 import ljas.exception.SessionException;
 import ljas.functional.application.TestApplication;
+import ljas.functional.application.TestApplicationImpl;
 import ljas.server.Server;
 import ljas.server.configuration.Property;
 
@@ -22,18 +23,29 @@ public class ServerTestCase {
 	public static final int TEST_TIMEOUT = 10000;
 	public static final String APPLICATION_IDENTIFIER = "ljas.testing";
 	public static final String APPLICATION_VERSION = "1.0";
+	private Server server;
 
 	@Before
-	public void setUp() throws Exception {
-		ServerManager.startupServer();
-		assertTrue("Server is not online!", ServerManager.getServer()
-				.isOnline());
+	public void startServer() throws Exception {
+		server = new Server(new TestApplicationImpl());
+
+		// Set properties
+		server.getProperties().set(Property.LOG4J_PATH,
+				"ljas/functional/log4j-tests.xml");
+		server.getProperties().set(Property.MAXIMUM_CLIENTS, 5);
+
+		server.startup();
+
+		assertTrue("Server is not online!", server.isOnline());
 	}
 
 	@After
-	public void tearDown() throws Exception {
-		ServerManager.shutdownServer();
-		Server server = ServerManager.getServer();
+	public void stopServer() throws Exception {
+		if (server.isOnline()) {
+			server.shutdown();
+			server.getProperties().reset();
+		}
+
 		assertFalse("Server is still online!", server.isOnline());
 	}
 
@@ -63,8 +75,8 @@ public class ServerTestCase {
 
 	protected List<Client> createClients() throws ConnectionRefusedException,
 			SessionException, IOException {
-		int maximumClients = ServerManager.getServer().getProperties()
-				.get(Property.MAXIMUM_CLIENTS);
+		int maximumClients = server.getProperties().get(
+				Property.MAXIMUM_CLIENTS);
 		return createClients(maximumClients);
 	}
 
@@ -80,4 +92,7 @@ public class ServerTestCase {
 		return clients;
 	}
 
+	protected Server getServer() {
+		return server;
+	}
 }
