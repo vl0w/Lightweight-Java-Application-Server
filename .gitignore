@@ -8,3 +8,5 @@
 # Folders #
 target/
 bin/
+.sonar/
+.settings/
