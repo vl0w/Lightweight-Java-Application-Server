@@ -58,8 +58,7 @@ public abstract class Task implements Serializable {
 
 	@Override
 	public int hashCode() {
-		int h = (int) id;
-		return h;
+		return (int) id;
 	}
 
 	@Override
