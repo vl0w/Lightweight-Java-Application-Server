@@ -100,7 +100,9 @@ public final class Server implements SessionHolder {
 		if (properties.isSet(Property.LOG4J_PATH)) {
 			String path = properties.get(Property.LOG4J_PATH).toString();
 			URL url = getClass().getClassLoader().getResource(path);
-			DOMConfigurator.configure(url);
+			if (url != null) {
+				DOMConfigurator.configure(url);
+			}
 		} else {
 			BasicConfigurator.configure();
 		}

@@ -30,8 +30,6 @@ public class ServerTestCase {
 		server = new Server(new TestApplicationImpl());
 
 		// Set properties
-		server.getProperties().set(Property.LOG4J_PATH,
-				"ljas/functional/log4j-tests.xml");
 		server.getProperties().set(Property.MAXIMUM_CLIENTS, 5);
 
 		server.startup();
