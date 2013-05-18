@@ -1,13 +1,8 @@
 package ljas.client;
 
-import java.io.IOException;
-import java.net.ConnectException;
-
 import ljas.application.Application;
-import ljas.application.LoginParameters;
 import ljas.exception.ApplicationException;
 import ljas.exception.ConnectionRefusedException;
-import ljas.exception.DisconnectException;
 import ljas.exception.SessionException;
 import ljas.session.Disconnectable;
 import ljas.session.Session;
@@ -27,14 +22,10 @@ public interface Client extends Disconnectable {
 	 *            The ip address of the server
 	 * @param port
 	 *            The port of the server
-	 * @param parameters
-	 *            The parameters. See {@link LoginParameters}
 	 * @throws ConnectionRefusedException
 	 *             Occurs when the server refused the connection attempt
-	 * @throws DisconnectException
 	 * @throws ConnectException
-	 *             Occurs when the server could not be reached
-	 * @throws IOException
+	 *             Occurs when the server could not be contacted
 	 */
 	void connect(String ip, int port) throws ConnectionRefusedException,
 			SessionException;
