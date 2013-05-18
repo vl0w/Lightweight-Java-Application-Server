@@ -4,10 +4,9 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import javax.net.SocketFactory;
-
 import ljas.client.Client;
 import ljas.exception.SessionException;
+import ljas.session.Address;
 import ljas.session.Session;
 import ljas.session.SessionObserver;
 
@@ -24,7 +23,7 @@ public class SocketSession implements Session {
 	public SocketSession() {
 		this.socket = null;
 		this.observer = null;
-		this.socketFactory = new SimpleSocketFactory();
+		this.socketFactory = new SocketFactory();
 		this.inputListenerRunnable = new SocketInputListenerRunnable();
 	}
 
@@ -45,13 +44,13 @@ public class SocketSession implements Session {
 	}
 
 	@Override
-	public void connect(String ip, int port) throws SessionException {
+	public void connect(Address address) throws SessionException {
 		if (socket != null) {
 			disconnect();
 		}
 
 		try {
-			socket = socketFactory.createSocket(ip, port);
+			socket = socketFactory.createSocket(address);
 			socket.setKeepAlive(true);
 		} catch (Exception e) {
 			throw new SessionException(e);

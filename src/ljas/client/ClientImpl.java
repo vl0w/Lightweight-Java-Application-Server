@@ -13,6 +13,7 @@ import ljas.exception.DisconnectException;
 import ljas.exception.RequestTimedOutException;
 import ljas.exception.SessionException;
 import ljas.exception.TaskException;
+import ljas.session.Address;
 import ljas.session.Session;
 import ljas.session.SessionFactory;
 import ljas.state.SystemAvailabilityState;
@@ -65,10 +66,9 @@ public class ClientImpl implements Client {
 
 		try {
 			session = SessionFactory.prepareSession(this);
-
 			LoginParameters loginParameters = new LoginParameters(application);
-			ClientLoginHandler loginHandler = new ClientLoginHandler(ip, port,
-					session, loginParameters);
+			ClientLoginHandler loginHandler = new ClientLoginHandler(
+					new Address(ip, port), session, loginParameters);
 
 			LoginMessage loginMessage = loginHandler.block();
 

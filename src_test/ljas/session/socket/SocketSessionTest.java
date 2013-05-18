@@ -13,9 +13,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import ljas.exception.SessionException;
+import ljas.session.Address;
 import ljas.session.SessionObserver;
-import ljas.session.socket.SimpleSocketFactory;
-import ljas.session.socket.SocketSession;
 
 import org.junit.Test;
 
@@ -45,23 +44,22 @@ public class SocketSessionTest {
 	public void testConnect_NotConnected_Connect() throws SessionException,
 			UnknownHostException, IOException {
 		// Initialization
-		final String ip = "localhost";
-		final int port = 1337;
+		Address address = Address.parseFromString("localhost:1337");
 
 		// Mocking & Stubbing
 		Socket socket = mock(Socket.class);
-		SimpleSocketFactory socketFactory = mock(SimpleSocketFactory.class);
+		SocketFactory socketFactory = mock(SocketFactory.class);
 		SessionObserver sessionObserver = mock(SessionObserver.class);
 
-		when(socketFactory.createSocket(ip, port)).thenReturn(socket);
+		when(socketFactory.createSocket(address)).thenReturn(socket);
 
 		// Run
 		SocketSession session = createSession(sessionObserver);
 		session.setSocketFactory(socketFactory);
-		session.connect(ip, port);
+		session.connect(address);
 
 		// Verifications
-		verify(socketFactory).createSocket(ip, port);
+		verify(socketFactory).createSocket(address);
 
 		// Asserts
 		assertTrue(session.isConnected());
@@ -72,27 +70,26 @@ public class SocketSessionTest {
 	public void testConnect_AlreadyConnected_DisconnectAndConnect()
 			throws SessionException, UnknownHostException, IOException {
 		// Initialization
-		final String ip = "localhost";
-		final int port = 1337;
+		Address address = Address.parseFromString("localhost:1337");
 
 		// Mocking & Stubbing
 		Socket socket = mock(Socket.class);
-		SimpleSocketFactory socketFactory = mock(SimpleSocketFactory.class);
+		SocketFactory socketFactory = mock(SocketFactory.class);
 		SessionObserver sessionObserver = mock(SessionObserver.class);
 
-		when(socketFactory.createSocket(ip, port)).thenReturn(socket);
+		when(socketFactory.createSocket(address)).thenReturn(socket);
 
 		// Run
 		SocketSession session = createSession(socket, sessionObserver);
 		session.setSocketFactory(socketFactory);
-		session.connect(ip, port);
+		session.connect(address);
 
 		// Verifications: Disconnected
 		verify(socket).close();
 		verify(sessionObserver).notifySessionDisconnected(session);
 
 		// Verifications: Connected
-		verify(socketFactory).createSocket(ip, port);
+		verify(socketFactory).createSocket(address);
 
 		// Asserts
 		assertTrue(session.isConnected());
