@@ -7,5 +7,4 @@ package ljas.testing;
  * 
  */
 public interface IntegrationTest {
-
 }
