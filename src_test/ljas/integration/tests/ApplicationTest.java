@@ -1,12 +1,12 @@
-package ljas.functional.tests;
+package ljas.integration.tests;
 
 import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.UndeclaredThrowableException;
 
 import ljas.client.Client;
-import ljas.functional.ServerTestCase;
-import ljas.functional.application.TestApplication;
+import ljas.integration.ServerTestCase;
+import ljas.integration.application.TestApplication;
 
 import org.junit.Test;
 

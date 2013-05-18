@@ -1,4 +1,4 @@
-package ljas.functional.tests;
+package ljas.integration.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import ljas.client.Client;
 import ljas.exception.ApplicationException;
 import ljas.exception.TaskException;
-import ljas.functional.ServerTestCase;
+import ljas.integration.ServerTestCase;
 import ljas.tasking.Task;
 import ljas.tasking.flow.TaskFlow;
 import ljas.tasking.flow.TaskFlowBuilder;

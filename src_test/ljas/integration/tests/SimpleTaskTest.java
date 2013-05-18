@@ -1,9 +1,9 @@
-package ljas.functional.tests;
+package ljas.integration.tests;
 
 import static org.junit.Assert.assertEquals;
 import ljas.client.Client;
-import ljas.functional.ServerTestCase;
-import ljas.functional.tasks.AdditionTask;
+import ljas.integration.ServerTestCase;
+import ljas.integration.tasks.AdditionTask;
 import ljas.tasking.observation.NullTaskObserver;
 import ljas.threading.ThreadBlocker;
 

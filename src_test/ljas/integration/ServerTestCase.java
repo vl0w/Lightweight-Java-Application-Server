@@ -1,4 +1,4 @@
-package ljas.functional;
+package ljas.integration;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -11,8 +11,8 @@ import ljas.client.Client;
 import ljas.client.ClientImpl;
 import ljas.exception.ConnectionRefusedException;
 import ljas.exception.SessionException;
-import ljas.functional.application.TestApplication;
-import ljas.functional.application.TestApplicationImpl;
+import ljas.integration.application.TestApplication;
+import ljas.integration.application.TestApplicationImpl;
 import ljas.server.Server;
 import ljas.server.configuration.Property;
 

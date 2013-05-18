@@ -1,4 +1,4 @@
-package ljas.functional.tasks;
+package ljas.integration.tasks;
 
 import ljas.client.Client;
 import ljas.tasking.facades.SimpleClientToServerTask;

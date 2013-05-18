@@ -1,4 +1,4 @@
-package ljas.functional.tests;
+package ljas.integration.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -6,8 +6,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import ljas.client.Client;
 import ljas.exception.SessionException;
-import ljas.functional.ServerTestCase;
-import ljas.functional.tasks.AdditionTask;
+import ljas.integration.ServerTestCase;
+import ljas.integration.tasks.AdditionTask;
 
 import org.junit.Test;
 

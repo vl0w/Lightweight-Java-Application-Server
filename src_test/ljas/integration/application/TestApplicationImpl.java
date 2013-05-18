@@ -1,4 +1,4 @@
-package ljas.functional.application;
+package ljas.integration.application;
 
 import ljas.application.ApplicationImplementation;
 import ljas.application.annotations.Cached;

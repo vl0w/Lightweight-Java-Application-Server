@@ -1,11 +1,11 @@
-package ljas.functional.tests;
+package ljas.integration.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import ljas.client.Client;
 import ljas.exception.ConnectionRefusedException;
-import ljas.functional.ServerTestCase;
+import ljas.integration.ServerTestCase;
 import ljas.state.login.LoginRefusedMessage;
 
 import org.junit.Test;

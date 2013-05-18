@@ -8,9 +8,9 @@ import java.util.Scanner;
 
 import ljas.client.Client;
 import ljas.exception.ConnectionRefusedException;
-import ljas.functional.ServerTestCase;
-import ljas.functional.application.TestApplicationImpl;
-import ljas.functional.tasks.SleepTask;
+import ljas.integration.ServerTestCase;
+import ljas.integration.application.TestApplicationImpl;
+import ljas.integration.tasks.SleepTask;
 import ljas.server.Server;
 import ljas.tasking.Task;
 import ljas.tasking.observation.NullTaskObserver;
