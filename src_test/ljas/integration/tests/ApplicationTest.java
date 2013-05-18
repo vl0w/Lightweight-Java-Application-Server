@@ -7,9 +7,12 @@ import java.lang.reflect.UndeclaredThrowableException;
 import ljas.client.Client;
 import ljas.integration.ServerTestCase;
 import ljas.integration.application.TestApplication;
+import ljas.testing.IntegrationTest;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(IntegrationTest.class)
 public class ApplicationTest extends ServerTestCase {
 	@Test(timeout = TEST_TIMEOUT)
 	public void testApplication() throws Exception {

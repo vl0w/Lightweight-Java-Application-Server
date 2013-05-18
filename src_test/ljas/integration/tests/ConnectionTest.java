@@ -7,9 +7,12 @@ import ljas.client.Client;
 import ljas.exception.ConnectionRefusedException;
 import ljas.integration.ServerTestCase;
 import ljas.state.login.LoginRefusedMessage;
+import ljas.testing.IntegrationTest;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(IntegrationTest.class)
 public class ConnectionTest extends ServerTestCase {
 
 	@Test(timeout = TEST_TIMEOUT)

@@ -8,9 +8,12 @@ import ljas.client.Client;
 import ljas.exception.SessionException;
 import ljas.integration.ServerTestCase;
 import ljas.integration.tasks.AdditionTask;
+import ljas.testing.IntegrationTest;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(IntegrationTest.class)
 public class StartupShutdownTest extends ServerTestCase {
 
 	@Test(timeout = TEST_TIMEOUT)

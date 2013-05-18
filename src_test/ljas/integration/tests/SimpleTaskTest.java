@@ -5,10 +5,13 @@ import ljas.client.Client;
 import ljas.integration.ServerTestCase;
 import ljas.integration.tasks.AdditionTask;
 import ljas.tasking.observation.NullTaskObserver;
+import ljas.testing.IntegrationTest;
 import ljas.threading.ThreadBlocker;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(IntegrationTest.class)
 public class SimpleTaskTest extends ServerTestCase {
 
 	@Test(timeout = TEST_TIMEOUT)

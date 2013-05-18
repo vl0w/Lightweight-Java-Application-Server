@@ -17,10 +17,13 @@ import ljas.tasking.flow.TaskFlowBuilder;
 import ljas.tasking.observation.TaskObserver;
 import ljas.tasking.step.AbstractTaskStep;
 import ljas.tasking.step.ExecutingContext;
+import ljas.testing.IntegrationTest;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(IntegrationTest.class)
 public class MultiStepTaskTest extends ServerTestCase implements Serializable {
 	private static final long serialVersionUID = -2756653997232376462L;
 	public static AtomicInteger counter;

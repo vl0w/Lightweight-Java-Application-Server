@@ -1,4 +1,4 @@
-package ljas.misc;
+package ljas.testing.misc;
 
 import java.net.ConnectException;
 import java.util.Collection;
