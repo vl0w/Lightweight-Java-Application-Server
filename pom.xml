@@ -7,7 +7,7 @@
 		<java.version>1.7</java.version>
 		<coverage.reports.dir>${basedir}/target/coverage-reports</coverage.reports.dir>
 		<sonar.jacoco.reportPath>${coverage.reports.dir}/jacoco-unit.exec</sonar.jacoco.reportPath>
-		<sonar.jacoco.itReportPath>${coverage.reports.dir}/jacoco-it.exec</sonar.jacoco.itReportPath>
+		<sonar.jacoco.itReportPath>${coverage.reports.dir}/jacoco-ittt.exec</sonar.jacoco.itReportPath>
 		<sonar.jacoco.jar>${basedir}/lib/jacocoagent.jar</sonar.jacoco.jar>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 	</properties>
@@ -36,19 +36,39 @@
 					<excludes>
 						<exclude>ljas/integration/**/*.class</exclude>
 					</excludes>
-					<!--  Currently not used --><excludedGroups>ljas.testing.IntegrationTest</excludedGroups>
+					<!-- Currently not used -->
+					<excludedGroups>ljas.testing.IntegrationTest</excludedGroups>
 				</configuration>
 			</plugin>
-			
+
 			<!-- For integration test code coverage! -->
-			<!-- <plugin> <artifactId>maven-failsafe-plugin</artifactId> <version>2.12</version> 
-				<dependencies> <dependency> <groupId>org.apache.maven.surefire</groupId> 
-				<artifactId>surefire-junit4</artifactId> <version>2.14.1</version> </dependency> 
-				</dependencies> <configuration> <groups>ljas.testing.IntegrationTest</groups> 
-				</configuration> <executions> <execution> <goals> <goal>integration-test</goal> 
-				</goals> <configuration> <argLine>-javaagent:${sonar.jacoco.jar}=destfile=${sonar.jacoco.itReportPath},includes=ljas.integration.tests*</argLine> 
-				<includes> <include>**/*.class</include> </includes> </configuration> </execution> 
-				</executions> </plugin> -->
+			<plugin>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.12</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.maven.surefire</groupId>
+						<artifactId>surefire-junit4</artifactId>
+						<version>2.14.1</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<groups>ljas.testing.IntegrationTest</groups>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+						</goals>
+						<configuration>
+							<argLine>-javaagent:${sonar.jacoco.jar}=destfile=${sonar.jacoco.itReportPath},includes=ljas.integration.tests*</argLine>
+							<includes>
+								<include>**/*.class</include>
+							</includes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3.2</version>
