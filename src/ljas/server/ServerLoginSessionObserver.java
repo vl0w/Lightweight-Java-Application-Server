@@ -1,11 +1,9 @@
-package ljas.server.login;
+package ljas.server;
 
 import ljas.application.LoginParameters;
 import ljas.exception.ApplicationException;
 import ljas.exception.ConnectionRefusedException;
 import ljas.exception.SessionException;
-import ljas.server.Server;
-import ljas.server.ServerTasksystemSessionObserver;
 import ljas.session.Session;
 import ljas.session.SessionObserver;
 import ljas.state.login.LoginAcceptedMessage;
@@ -20,7 +18,6 @@ public class ServerLoginSessionObserver implements SessionObserver {
 
 	@Override
 	public void notiyObjectReceived(Session session, Object obj) {
-
 		try {
 			LoginParameters parameters = (LoginParameters) obj;
 

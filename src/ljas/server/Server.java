@@ -1,12 +1,10 @@
 package ljas.server;
 
 import java.io.IOException;
-import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import ljas.application.Application;
 import ljas.application.ApplicationAnalyzer;
@@ -15,8 +13,10 @@ import ljas.exception.ApplicationException;
 import ljas.exception.ConnectionRefusedException;
 import ljas.server.configuration.Property;
 import ljas.server.configuration.ServerProperties;
-import ljas.server.login.ClientConnectionListenerRunnable;
+import ljas.server.socket.LoginObserver;
+import ljas.server.socket.ServerSocketBinder;
 import ljas.session.Session;
+import ljas.session.SessionFactory;
 import ljas.session.SessionHolder;
 import ljas.state.SystemAvailabilityState;
 import ljas.state.login.LoginRefusedMessage;
@@ -27,32 +27,28 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
-public final class Server implements SessionHolder {
+public final class Server implements SessionHolder, LoginObserver {
 	public static final String PROJECT_NAME = "LJAS";
 	public static final String PROJECT_HOMEPAGE = "http://github.com/vl0w/Lightweight-Java-Application-Server";
 	public static final String SERVER_VERSION = "1.2.0-SNAPSHOT";
 
 	private List<Session> sessions;
 	private SystemAvailabilityState state;
-	private ServerSocket serverSocket;
 	private Application application;
 	private TaskSystem taskSystem;
-	private ExecutorService clientConnectionListenerService;
 	private ServerProperties properties;
+	private ServerSocketBinder serverSocketBinder;
 
 	public Server(Application application) throws IOException {
 		this.application = application;
 		this.state = SystemAvailabilityState.OFFLINE;
 		this.sessions = new ArrayList<>();
 		this.properties = new ServerProperties();
+		this.serverSocketBinder = new ServerSocketBinder();
 	}
 
 	public ServerProperties getProperties() {
 		return properties;
-	}
-
-	public ServerSocket getServerSocket() {
-		return serverSocket;
 	}
 
 	public boolean isOnline() {
@@ -107,8 +103,7 @@ public final class Server implements SessionHolder {
 			BasicConfigurator.configure();
 		}
 
-		// Initialize systems
-		clientConnectionListenerService = Executors.newFixedThreadPool(5);
+		// Initialize system
 		taskSystem = new TaskSystemImpl(application);
 
 		// Check application
@@ -121,9 +116,7 @@ public final class Server implements SessionHolder {
 
 		getLogger().debug("Getting internet connection, starting socket");
 		int port = Integer.valueOf(properties.get(Property.PORT).toString());
-		serverSocket = new ServerSocket(port);
-
-		createConnectionListeners();
+		serverSocketBinder.bind(port, this);
 
 		getLogger().info(this + " has been started");
 		state = SystemAvailabilityState.ONLINE;
@@ -131,17 +124,14 @@ public final class Server implements SessionHolder {
 
 	public void shutdown() {
 		try {
-			getLogger().debug("Closing socket");
-			getServerSocket().close();
+			getLogger().debug("Unbinding server sockets");
+			serverSocketBinder.unbindAll();
 
 			getLogger().info("Closing client sessions");
 			List<Session> sessionsToClose = new ArrayList<>(sessions);
 			for (Session session : sessionsToClose) {
 				session.disconnect();
 			}
-
-			getLogger().debug("Killing threads");
-			clientConnectionListenerService.shutdownNow();
 
 			getLogger().debug("Shutdown executors");
 			taskSystem.shutdown();
@@ -183,18 +173,11 @@ public final class Server implements SessionHolder {
 		return PROJECT_NAME + "-server";
 	}
 
-	ExecutorService getClientConnectionListenerService() {
-		return clientConnectionListenerService;
-	}
-
-	private void createConnectionListeners() {
-		for (int i = 0; i < 5; i++) {
-
-			ClientConnectionListenerRunnable connectionListenerRunnable = new ClientConnectionListenerRunnable(
-					this);
-
-			clientConnectionListenerService.submit(connectionListenerRunnable);
-		}
+	@Override
+	public void onSocketConnect(Socket socket) {
+		Session session = SessionFactory.createSocketSession(socket);
+		session.setObserver(new ServerLoginSessionObserver(this));
+		addSession(session);
 	}
 
 	private void logServerInfo() {

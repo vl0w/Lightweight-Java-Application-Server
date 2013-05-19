@@ -1,19 +1,14 @@
 package ljas.server;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 
 import ljas.application.Application;
 import ljas.application.LoginParameters;
 import ljas.application.annotations.LJASApplication;
-import ljas.exception.ApplicationException;
 import ljas.exception.ConnectionRefusedException;
 import ljas.server.configuration.Property;
 import ljas.session.Session;
@@ -79,40 +74,6 @@ public class ServerTest {
 			assertEquals(LoginRefusedMessage.INVALID_APPLICATION,
 					e.getRefusedMessage());
 		}
-	}
-
-	@Test
-	public void testStartup() throws IOException, ApplicationException {
-		Server server = new Server(mock(App1.class));
-		try {
-			server.startup();
-
-			assertNotNull(server.getServerSocket());
-			assertFalse(server.getClientConnectionListenerService()
-					.isShutdown());
-			assertEquals(SystemAvailabilityState.ONLINE, server.getState());
-		} finally {
-			server.shutdown();
-		}
-	}
-
-	@Test
-	public void testShutdown() throws Exception {
-		Server server = new Server(mock(App1.class));
-
-		Session session1 = mock(Session.class);
-		Session session2 = mock(Session.class);
-		server.addSession(session1);
-		server.addSession(session2);
-
-		server.startup();
-		server.shutdown();
-
-		assertTrue(server.getServerSocket().isClosed());
-		verify(session1).disconnect();
-		verify(session2).disconnect();
-		assertTrue(server.getClientConnectionListenerService().isShutdown());
-		assertEquals(SystemAvailabilityState.OFFLINE, server.getState());
 	}
 
 	@LJASApplication(name = "App1", version = "1.0")

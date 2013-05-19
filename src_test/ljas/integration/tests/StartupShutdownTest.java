@@ -45,14 +45,12 @@ public class StartupShutdownTest extends ServerTestCase {
 
 	private void assertServerOnline() throws Exception {
 		assertTrue(getServer().isOnline());
-		assertFalse(getServer().getServerSocket().isClosed());
 
 		assertClientInteractionsPossible();
 	}
 
 	private void assertServerOffline() throws Exception {
 		assertFalse(getServer().isOnline());
-		assertTrue(getServer().getServerSocket().isClosed());
 		assertTrue(getServer().getSessions().isEmpty());
 		assertClientInteractionsImpossible();
 	}
