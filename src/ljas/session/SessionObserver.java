@@ -1,7 +1,7 @@
 package ljas.session;
 
 public interface SessionObserver {
-	public void notiyObjectReceived(Session session, Object obj);
+	public void onObjectReceived(Session session, Object obj);
 
-	public void notifySessionDisconnected(Session session);
+	public void onSessionDisconnected(Session session);
 }

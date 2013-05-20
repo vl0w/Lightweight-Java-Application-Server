@@ -14,7 +14,7 @@ public class TaskSystemSessionObserver implements SessionObserver {
 	}
 
 	@Override
-	public final void notiyObjectReceived(Session session, Object obj) {
+	public final void onObjectReceived(Session session, Object obj) {
 		if (obj instanceof Task) {
 			Task task = (Task) obj;
 			taskSystem.scheduleTask(task, session);
@@ -25,7 +25,7 @@ public class TaskSystemSessionObserver implements SessionObserver {
 	}
 
 	@Override
-	public void notifySessionDisconnected(Session session) {
+	public void onSessionDisconnected(Session session) {
 		// Nothing as default
 	}
 

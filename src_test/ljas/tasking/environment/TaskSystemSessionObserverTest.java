@@ -24,7 +24,7 @@ public class TaskSystemSessionObserverTest {
 		// Run test
 		TaskSystemSessionObserver observer = new TaskSystemSessionObserver(
 				taskSystem);
-		observer.notiyObjectReceived(session, task);
+		observer.onObjectReceived(session, task);
 
 		// Verifications
 		verify(taskSystem).scheduleTask(task, session);
@@ -40,7 +40,7 @@ public class TaskSystemSessionObserverTest {
 		// Run test
 		TaskSystemSessionObserver observer = new TaskSystemSessionObserver(
 				taskSystem);
-		observer.notiyObjectReceived(session, sendedObject);
+		observer.onObjectReceived(session, sendedObject);
 
 		// Verifications
 		verify(taskSystem, never()).scheduleTask(any(Task.class), eq(session));

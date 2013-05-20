@@ -14,7 +14,7 @@ public class ServerTasksystemSessionObserver extends TaskSystemSessionObserver {
 	}
 
 	@Override
-	public void notifySessionDisconnected(Session session) {
+	public void onSessionDisconnected(Session session) {
 		// Remove from Application
 		try {
 			server.getApplication().onSessionDisconnect(session);

@@ -14,7 +14,7 @@ public class ClientLoginSessionObserver implements SessionObserver {
 	}
 
 	@Override
-	public void notiyObjectReceived(Session session, Object obj) {
+	public void onObjectReceived(Session session, Object obj) {
 		LoginMessage message = null;
 
 		if (obj instanceof LoginMessage) {
@@ -27,7 +27,7 @@ public class ClientLoginSessionObserver implements SessionObserver {
 	}
 
 	@Override
-	public void notifySessionDisconnected(Session session) {
+	public void onSessionDisconnected(Session session) {
 		// TODO Auto-generated method stub
 
 	}

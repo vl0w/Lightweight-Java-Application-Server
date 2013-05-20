@@ -32,7 +32,7 @@ public class SocketSessionTest {
 
 		// Verifications
 		verify(socket).close();
-		verify(sessionObserver).notifySessionDisconnected(session);
+		verify(sessionObserver).onSessionDisconnected(session);
 
 		// Asserts
 		assertFalse(session.isConnected());
@@ -86,7 +86,7 @@ public class SocketSessionTest {
 
 		// Verifications: Disconnected
 		verify(socket).close();
-		verify(sessionObserver).notifySessionDisconnected(session);
+		verify(sessionObserver).onSessionDisconnected(session);
 
 		// Verifications: Connected
 		verify(socketFactory).createSocket(address);

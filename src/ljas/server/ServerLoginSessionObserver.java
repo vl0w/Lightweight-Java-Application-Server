@@ -17,7 +17,7 @@ public class ServerLoginSessionObserver implements SessionObserver {
 	}
 
 	@Override
-	public void notiyObjectReceived(Session session, Object obj) {
+	public void onObjectReceived(Session session, Object obj) {
 		try {
 			LoginParameters parameters = (LoginParameters) obj;
 
@@ -71,7 +71,7 @@ public class ServerLoginSessionObserver implements SessionObserver {
 	}
 
 	@Override
-	public void notifySessionDisconnected(Session session) {
+	public void onSessionDisconnected(Session session) {
 
 	}
 

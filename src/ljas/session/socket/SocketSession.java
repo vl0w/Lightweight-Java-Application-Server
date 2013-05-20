@@ -74,7 +74,7 @@ public class SocketSession implements Session {
 			inputListenerThread = null;
 
 			if (observer != null) {
-				observer.notifySessionDisconnected(this);
+				observer.onSessionDisconnected(this);
 			}
 
 			socket = null;

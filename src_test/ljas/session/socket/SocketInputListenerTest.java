@@ -39,7 +39,7 @@ public class SocketInputListenerTest {
 		listener.runCycle();
 
 		// Verifications
-		verify(observer).notiyObjectReceived(session, expectedObject);
+		verify(observer).onObjectReceived(session, expectedObject);
 
 	}
 
