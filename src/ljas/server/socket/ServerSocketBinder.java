@@ -7,8 +7,9 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ServerSocketBinder {
+public class ServerSocketBinder implements AutoCloseable {
 
+	private static final int ACCEPTOR_THREADS_PER_BINDING = 5;
 	private Map<Integer, ServerSocketBinding> bindings;
 
 	public ServerSocketBinder() {
@@ -17,22 +18,32 @@ public class ServerSocketBinder {
 
 	public void bind(int port, LoginObserver observer) throws IOException {
 		ServerSocket serverSocket = new ServerSocket(port);
-		ExecutorService acceptorService = Executors.newFixedThreadPool(5);
-		for (int i = 0; i < 5; i++) {
-			ServerSocketAcceptor socketAcceptor = new ServerSocketAcceptor(
-					serverSocket, observer);
-			acceptorService.submit(socketAcceptor);
-		}
+		ExecutorService service = createAcceptorService(observer, serverSocket);
 
 		ServerSocketBinding binding = new ServerSocketBinding(serverSocket,
-				acceptorService);
+				service);
 		bindings.put(port, binding);
 	}
 
-	public void unbindAll() throws IOException {
+	@Override
+	public void close() throws IOException {
 		for (ServerSocketBinding binding : bindings.values()) {
-			binding.unbind();
+			binding.close();
 		}
 		bindings = new HashMap<>();
 	}
+
+	private ExecutorService createAcceptorService(LoginObserver observer,
+			ServerSocket serverSocket) {
+		ExecutorService service = Executors
+				.newFixedThreadPool(ACCEPTOR_THREADS_PER_BINDING);
+
+		for (int i = 0; i < ACCEPTOR_THREADS_PER_BINDING; i++) {
+			ServerSocketAcceptor socketAcceptor = new ServerSocketAcceptor(
+					serverSocket, observer);
+			service.submit(socketAcceptor);
+		}
+		return service;
+	}
+
 }

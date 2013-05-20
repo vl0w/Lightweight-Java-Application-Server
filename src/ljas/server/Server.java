@@ -125,7 +125,7 @@ public final class Server implements SessionHolder, LoginObserver {
 	public void shutdown() {
 		try {
 			getLogger().debug("Unbinding server sockets");
-			serverSocketBinder.unbindAll();
+			serverSocketBinder.close();
 
 			getLogger().info("Closing client sessions");
 			List<Session> sessionsToClose = new ArrayList<>(sessions);

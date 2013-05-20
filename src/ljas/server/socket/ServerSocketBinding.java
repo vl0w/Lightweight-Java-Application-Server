@@ -4,19 +4,19 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.ExecutorService;
 
-public class ServerSocketBinding {
+public class ServerSocketBinding implements AutoCloseable {
 
 	private ServerSocket serverSocket;
-	private ExecutorService acceptorService;
+	private ExecutorService service;
 
-	public ServerSocketBinding(ServerSocket serverSocket,
-			ExecutorService acceptorService) {
+	public ServerSocketBinding(ServerSocket serverSocket, ExecutorService service) {
 		this.serverSocket = serverSocket;
-		this.acceptorService = acceptorService;
+		this.service = service;
 	}
 
-	public void unbind() throws IOException {
-		acceptorService.shutdownNow();
+	@Override
+	public void close() throws IOException {
 		serverSocket.close();
+		service.shutdownNow();
 	}
 }
