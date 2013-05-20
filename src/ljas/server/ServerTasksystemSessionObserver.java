@@ -15,17 +15,14 @@ public class ServerTasksystemSessionObserver extends TaskSystemSessionObserver {
 
 	@Override
 	public void onSessionDisconnected(Session session) {
+		server.getSessions().remove(session);
+
 		// Remove from Application
 		try {
 			server.getApplication().onSessionDisconnect(session);
 		} catch (ApplicationException e) {
 			server.getLogger().error(
 					"Error while deleting user from application", e);
-		}
-
-		// Remove from client list
-		if (!server.getSessions().remove(session)) {
-			server.getLogger().error("Unable to delete session from server");
 		}
 
 		server.getLogger().info(
