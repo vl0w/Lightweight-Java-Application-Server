@@ -177,7 +177,6 @@ public final class Server implements SessionHolder, LoginObserver {
 	public void onSocketConnect(Socket socket) {
 		Session session = SessionFactory.createSocketSession(socket);
 		session.setObserver(new ServerLoginSessionObserver(this));
-		addSession(session);
 	}
 
 	private void logServerInfo() {
