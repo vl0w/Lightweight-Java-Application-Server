@@ -27,7 +27,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
-public final class Server implements SessionHolder, LoginObserver {
+public class Server implements SessionHolder, LoginObserver {
 	public static final String PROJECT_NAME = "LJAS";
 	public static final String PROJECT_HOMEPAGE = "http://github.com/vl0w/Lightweight-Java-Application-Server";
 	public static final String SERVER_VERSION = "1.2.0-SNAPSHOT";
