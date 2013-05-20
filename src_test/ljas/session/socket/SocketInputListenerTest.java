@@ -11,12 +11,12 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import ljas.session.SessionObserver;
-import ljas.session.socket.SocketInputListenerRunnable;
+import ljas.session.socket.SocketInputListener;
 import ljas.session.socket.SocketSession;
 
 import org.junit.Test;
 
-public class SocketInputListenerRunnableTest {
+public class SocketInputListenerTest {
 
 	@Test
 	public void testRunCycle_ObjectReceived_NotifyObservers() throws Exception {
@@ -34,7 +34,7 @@ public class SocketInputListenerRunnableTest {
 		when(session.getObserver()).thenReturn(observer);
 
 		// Run
-		SocketInputListenerRunnable listener = new SocketInputListenerRunnable();
+		SocketInputListener listener = new SocketInputListener();
 		listener.setSession(session);
 		listener.runCycle();
 
@@ -54,7 +54,7 @@ public class SocketInputListenerRunnableTest {
 		when(socket.getInputStream()).thenThrow(new IOException());
 
 		// Run
-		SocketInputListenerRunnable listener = new SocketInputListenerRunnable();
+		SocketInputListener listener = new SocketInputListener();
 		listener.setSession(session);
 		listener.setDisconnectable(session);
 		listener.runCycle();

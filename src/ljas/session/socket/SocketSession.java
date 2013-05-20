@@ -16,7 +16,7 @@ public class SocketSession implements Session {
 
 	private Socket socket;
 	private SessionObserver observer;
-	private SocketInputListenerRunnable inputListenerRunnable;
+	private SocketInputListener inputListenerRunnable;
 	private SocketFactory socketFactory;
 	private Thread inputListenerThread;
 
@@ -24,12 +24,12 @@ public class SocketSession implements Session {
 		this.socket = null;
 		this.observer = null;
 		this.socketFactory = new SocketFactory();
-		this.inputListenerRunnable = new SocketInputListenerRunnable();
+		this.inputListenerRunnable = new SocketInputListener();
 	}
 
 	public SocketSession(Client client) {
 		this();
-		this.inputListenerRunnable = new SocketInputListenerRunnable(client);
+		this.inputListenerRunnable = new SocketInputListener(client);
 	}
 
 	public SocketSession(Socket socket) {
@@ -37,7 +37,7 @@ public class SocketSession implements Session {
 		this.socket = socket;
 		DisconnectableSocket disconnectableSocket = new DisconnectableSocket(
 				socket);
-		this.inputListenerRunnable = new SocketInputListenerRunnable(
+		this.inputListenerRunnable = new SocketInputListener(
 				disconnectableSocket);
 
 		getInputListenerThread().start();

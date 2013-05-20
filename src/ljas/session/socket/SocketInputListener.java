@@ -10,15 +10,15 @@ import ljas.threading.RepeatingRunnable;
 
 import org.apache.log4j.Logger;
 
-class SocketInputListenerRunnable extends RepeatingRunnable {
+class SocketInputListener extends RepeatingRunnable {
 
 	private SocketSession session;
 	private Disconnectable disconnectable;
 
-	public SocketInputListenerRunnable() {
+	public SocketInputListener() {
 	}
 
-	public SocketInputListenerRunnable(Disconnectable disconnectable) {
+	public SocketInputListener(Disconnectable disconnectable) {
 		this.disconnectable = disconnectable;
 	}
 
