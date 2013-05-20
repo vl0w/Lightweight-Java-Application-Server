@@ -72,7 +72,6 @@ public class ServerLoginSessionObserver implements SessionObserver {
 
 	@Override
 	public void notifySessionDisconnected(Session session) {
-		// TODO Auto-generated method stub
 
 	}
 
