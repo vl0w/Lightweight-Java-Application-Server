@@ -30,9 +30,6 @@ public class StartupShutdownTest extends ServerTestCase {
 	@Test(timeout = TEST_TIMEOUT)
 	public void testMultipleStartupShutdown_CheckInteractions()
 			throws Exception {
-		getServer().startup();
-		assertServerOnline();
-
 		getServer().shutdown();
 		assertServerOffline();
 

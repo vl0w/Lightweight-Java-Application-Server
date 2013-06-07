@@ -2,30 +2,27 @@ package ljas.server;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import ljas.application.Application;
-import ljas.application.ApplicationAnalyzer;
 import ljas.application.LoginParameters;
 import ljas.exception.ApplicationException;
 import ljas.exception.ConnectionRefusedException;
-import ljas.server.configuration.Property;
 import ljas.server.configuration.ServerProperties;
 import ljas.server.socket.LoginObserver;
 import ljas.server.socket.ServerSocketBinder;
+import ljas.server.state.OfflineState;
+import ljas.server.state.OnlineState;
+import ljas.server.state.ServerState;
+import ljas.server.state.StartupState;
 import ljas.session.Session;
 import ljas.session.SessionFactory;
 import ljas.session.SessionHolder;
-import ljas.state.SystemAvailabilityState;
-import ljas.state.login.LoginRefusedMessage;
 import ljas.tasking.environment.TaskSystem;
 import ljas.tasking.environment.TaskSystemImpl;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
 
 public class Server implements SessionHolder, LoginObserver {
 	public static final String PROJECT_NAME = "LJAS";
@@ -33,26 +30,47 @@ public class Server implements SessionHolder, LoginObserver {
 	public static final String SERVER_VERSION = "1.2.0-SNAPSHOT";
 
 	private List<Session> sessions;
-	private SystemAvailabilityState state;
 	private Application application;
 	private TaskSystem taskSystem;
 	private ServerProperties properties;
 	private ServerSocketBinder serverSocketBinder;
+	private ServerState currentState;
 
 	public Server(Application application) throws IOException {
 		this.application = application;
-		this.state = SystemAvailabilityState.OFFLINE;
 		this.sessions = new ArrayList<>();
 		this.properties = new ServerProperties();
 		this.serverSocketBinder = new ServerSocketBinder();
+		this.currentState = new OfflineState();
+		this.taskSystem = new TaskSystemImpl(application);
 	}
 
 	public ServerProperties getProperties() {
 		return properties;
 	}
 
+	public void setServerSocketBinder(ServerSocketBinder serverSocketBinder) {
+		this.serverSocketBinder = serverSocketBinder;
+	}
+
+	public ServerSocketBinder getServerSocketBinder() {
+		return serverSocketBinder;
+	}
+
+	public void setCurrentState(ServerState currentState) {
+		this.currentState = currentState;
+	}
+
 	public boolean isOnline() {
-		return state == SystemAvailabilityState.ONLINE;
+		return currentState.getClass().equals(OnlineState.class);
+	}
+
+	public boolean isOffline() {
+		return currentState.getClass().equals(OfflineState.class);
+	}
+
+	public boolean isStarting() {
+		return currentState.getClass().equals(StartupState.class);
 	}
 
 	public Logger getLogger() {
@@ -67,12 +85,8 @@ public class Server implements SessionHolder, LoginObserver {
 		return taskSystem;
 	}
 
-	public SystemAvailabilityState getState() {
-		return state;
-	}
-
-	public void setState(SystemAvailabilityState state) {
-		this.state = state;
+	public void setTaskSystem(TaskSystem taskSystem) {
+		this.taskSystem = taskSystem;
 	}
 
 	@Override
@@ -86,86 +100,26 @@ public class Server implements SessionHolder, LoginObserver {
 	}
 
 	public void startup() throws ApplicationException, IOException {
-		if (isOnline()) {
-			shutdown();
+		ServerState oldState = currentState;
+
+		currentState = new StartupState(this);
+		try {
+			currentState.startup();
+		} catch (ApplicationException | IOException e) {
+			currentState = oldState;
+			throw e;
 		}
-
-		state = SystemAvailabilityState.STARTUP;
-
-		// Logging
-		if (properties.isSet(Property.LOG4J_PATH)) {
-			String path = properties.get(Property.LOG4J_PATH).toString();
-			URL url = getClass().getClassLoader().getResource(path);
-			if (url != null) {
-				DOMConfigurator.configure(url);
-			}
-		} else {
-			BasicConfigurator.configure();
-		}
-
-		// Initialize system
-		taskSystem = new TaskSystemImpl(application);
-
-		// Check application
-		ApplicationAnalyzer.validateApplication(application.getClass());
-
-		logServerInfo();
-
-		getLogger().debug("Initializing application");
-		getApplication().init();
-
-		getLogger().debug("Getting internet connection, starting socket");
-		int port = Integer.valueOf(properties.get(Property.PORT).toString());
-		serverSocketBinder.bind(port, this);
-
-		getLogger().info(this + " has been started");
-		state = SystemAvailabilityState.ONLINE;
+		currentState = new OnlineState(this);
 	}
 
 	public void shutdown() {
-		try {
-			getLogger().debug("Unbinding server sockets");
-			serverSocketBinder.close();
-
-			getLogger().info("Closing client sessions");
-			List<Session> sessionsToClose = new ArrayList<>(sessions);
-			for (Session session : sessionsToClose) {
-				session.disconnect();
-			}
-
-			getLogger().debug("Shutdown executors");
-			taskSystem.shutdown();
-
-			getLogger().info(this + " is offline");
-			state = SystemAvailabilityState.OFFLINE;
-		} catch (Exception e) {
-			getLogger().error(e);
-		}
+		currentState.shutdown();
+		currentState = new OfflineState();
 	}
 
 	public void checkClient(LoginParameters parameters)
 			throws ConnectionRefusedException {
-
-		// Check server state
-		if (!isOnline()) {
-			throw new ConnectionRefusedException(
-					LoginRefusedMessage.ILLEGAL_STATE);
-		}
-
-		// Check server full
-		int maximumClients = Integer.valueOf(properties.get(
-				Property.MAXIMUM_CLIENTS).toString());
-		if (getSessions().size() >= maximumClients) {
-			throw new ConnectionRefusedException(
-					LoginRefusedMessage.SERVER_FULL);
-		}
-
-		// Check application
-		if (!ApplicationAnalyzer.areApplicationsEqual(
-				parameters.getClientApplicationClass(), application.getClass())) {
-			throw new ConnectionRefusedException(
-					LoginRefusedMessage.INVALID_APPLICATION);
-		}
+		currentState.checkClient(parameters);
 	}
 
 	@Override
@@ -179,20 +133,4 @@ public class Server implements SessionHolder, LoginObserver {
 		session.setObserver(new ServerLoginSessionObserver(this));
 	}
 
-	private void logServerInfo() {
-		String applicationName = ApplicationAnalyzer
-				.getApplicationName(application.getClass());
-		String applicationVersion = ApplicationAnalyzer
-				.getApplicationVersion(application.getClass());
-
-		getLogger().info(
-				"Starting " + this + " (v" + SERVER_VERSION
-						+ ") with application " + applicationName + " ("
-						+ applicationVersion + ")");
-
-		getLogger().info(
-				"See \"" + PROJECT_HOMEPAGE + "\" for more information");
-
-		getLogger().debug("Configuration: " + properties);
-	}
 }
