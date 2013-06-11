@@ -11,14 +11,6 @@ public class ClientLoginHandler extends ThreadBlocker<LoginMessage> {
 	private Session serverSession;
 	private Address address;
 
-	/**
-	 * TODO too much parameters
-	 * 
-	 * @param ip
-	 * @param port
-	 * @param serverSession
-	 * @param loginParameters
-	 */
 	public ClientLoginHandler(Address address, Session serverSession,
 			LoginParameters loginParameters) {
 		super(Client.REQUEST_TIMEOUT_MS);
