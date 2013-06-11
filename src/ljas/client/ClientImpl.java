@@ -23,7 +23,7 @@ import ljas.state.login.LoginRefusedMessage;
 import ljas.tasking.Task;
 import ljas.tasking.environment.TaskSystem;
 import ljas.tasking.environment.TaskSystemImpl;
-import ljas.tasking.environment.TaskSystemSessionObserver;
+import ljas.tasking.environment.TaskSystemSessionDataObserver;
 import ljas.tasking.observation.NullTaskObserver;
 import ljas.threading.ThreadBlocker;
 
@@ -74,9 +74,9 @@ public class ClientImpl implements Client {
 
 			if (loginMessage instanceof LoginAcceptedMessage) {
 				state = SystemAvailabilityState.ONLINE;
-				TaskSystemSessionObserver observer = new TaskSystemSessionObserver(
+				TaskSystemSessionDataObserver observer = new TaskSystemSessionDataObserver(
 						taskSystem);
-				session.setObserver(observer);
+				session.setDataObserver(observer);
 
 			} else if (loginMessage instanceof LoginRefusedMessage) {
 				state = SystemAvailabilityState.OFFLINE;
@@ -84,13 +84,13 @@ public class ClientImpl implements Client {
 				throw new ConnectionRefusedException(message);
 			}
 
-		} catch (Exception t) {
+		} catch (Exception e) {
 			state = SystemAvailabilityState.OFFLINE;
 			if (ConnectionRefusedException.class.getName().equals(
-					t.getClass().getName())) {
-				throw (ConnectionRefusedException) t;
+					e.getClass().getName())) {
+				throw (ConnectionRefusedException) e;
 			} else {
-				throw new SessionException(t);
+				throw new SessionException(e);
 			}
 		}
 	}

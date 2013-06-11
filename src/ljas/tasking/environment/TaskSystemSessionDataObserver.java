@@ -1,15 +1,15 @@
 package ljas.tasking.environment;
 
 import ljas.session.Session;
-import ljas.session.SessionObserver;
+import ljas.session.observer.SessionDataObserver;
 import ljas.tasking.Task;
 
 import org.apache.log4j.Logger;
 
-public class TaskSystemSessionObserver implements SessionObserver {
+public class TaskSystemSessionDataObserver implements SessionDataObserver {
 	private TaskSystem taskSystem;
 
-	public TaskSystemSessionObserver(TaskSystem taskSystem) {
+	public TaskSystemSessionDataObserver(TaskSystem taskSystem) {
 		this.taskSystem = taskSystem;
 	}
 
@@ -22,11 +22,6 @@ public class TaskSystemSessionObserver implements SessionObserver {
 			getLogger().warn(
 					"Session " + session + " sended unknown object " + obj);
 		}
-	}
-
-	@Override
-	public void onSessionDisconnected(Session session) {
-		// Nothing as default
 	}
 
 	private Logger getLogger() {

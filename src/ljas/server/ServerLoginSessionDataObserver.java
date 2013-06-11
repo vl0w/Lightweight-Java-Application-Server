@@ -5,14 +5,15 @@ import ljas.exception.ApplicationException;
 import ljas.exception.ConnectionRefusedException;
 import ljas.exception.SessionException;
 import ljas.session.Session;
-import ljas.session.SessionObserver;
+import ljas.session.observer.SessionDataObserver;
 import ljas.state.login.LoginAcceptedMessage;
 import ljas.state.login.LoginRefusedMessage;
+import ljas.tasking.environment.TaskSystemSessionDataObserver;
 
-public class ServerLoginSessionObserver implements SessionObserver {
+public class ServerLoginSessionDataObserver implements SessionDataObserver {
 	private Server server;
 
-	public ServerLoginSessionObserver(Server server) {
+	public ServerLoginSessionDataObserver(Server server) {
 		this.server = server;
 	}
 
@@ -31,16 +32,20 @@ public class ServerLoginSessionObserver implements SessionObserver {
 							+ server.getSessions().size()
 							+ " connection(s) overall");
 
+			// Handling the disconnection of the session
+			ServerDisconnectSessionObserver observer = new ServerDisconnectSessionObserver(
+					server);
+			session.setDisconnectObserver(observer);
+
+			// Handling new incoming data
+			session.setDataObserver(new TaskSystemSessionDataObserver(server
+					.getTaskSystem()));
+
 			// Create welcome-message
 			LoginAcceptedMessage welcome = new LoginAcceptedMessage();
 
 			// Send answer
 			session.sendObject(welcome);
-
-			// Create new Observer
-			ServerTasksystemSessionObserver observer = new ServerTasksystemSessionObserver(
-					server);
-			session.setObserver(observer);
 		} catch (ConnectionRefusedException cre) {
 			server.getLogger().info(
 					"New connection refused (" + session + "), "
@@ -69,10 +74,4 @@ public class ServerLoginSessionObserver implements SessionObserver {
 					"Error while refusing client login request", e);
 		}
 	}
-
-	@Override
-	public void onSessionDisconnected(Session session) {
-
-	}
-
 }

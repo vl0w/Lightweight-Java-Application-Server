@@ -68,7 +68,7 @@ class SocketInputListener extends RepeatingRunnable {
 
 	private void notifyObservers(Object receivedObject) {
 		if (receivedObject != null) {
-			session.getObserver().onObjectReceived(session, receivedObject);
+			session.getDataObserver().onObjectReceived(session, receivedObject);
 		}
 	}
 

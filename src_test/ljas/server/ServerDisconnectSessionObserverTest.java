@@ -12,7 +12,7 @@ import ljas.session.Session;
 
 import org.junit.Test;
 
-public class ServerTasksystemSessionObserverTest {
+public class ServerDisconnectSessionObserverTest {
 
 	@Test
 	public void testOnSessionDisconnect() throws IOException,
@@ -23,7 +23,7 @@ public class ServerTasksystemSessionObserverTest {
 
 		server.addSession(session);
 
-		ServerTasksystemSessionObserver observer = new ServerTasksystemSessionObserver(
+		ServerDisconnectSessionObserver observer = new ServerDisconnectSessionObserver(
 				server);
 		observer.onSessionDisconnected(session);
 

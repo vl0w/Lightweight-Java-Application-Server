@@ -10,9 +10,7 @@ import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import ljas.session.SessionObserver;
-import ljas.session.socket.SocketInputListener;
-import ljas.session.socket.SocketSession;
+import ljas.session.observer.SessionDataObserver;
 
 import org.junit.Test;
 
@@ -26,12 +24,12 @@ public class SocketInputListenerTest {
 		// Mocking & Stubbing
 		SocketSession session = mock(SocketSession.class);
 		Socket socket = mock(Socket.class);
-		SessionObserver observer = mock(SessionObserver.class);
+		SessionDataObserver observer = mock(SessionDataObserver.class);
 
 		when(session.getSocket()).thenReturn(socket);
 		when(socket.getInputStream()).thenReturn(
 				new FakedInputStream(expectedObject));
-		when(session.getObserver()).thenReturn(observer);
+		when(session.getDataObserver()).thenReturn(observer);
 
 		// Run
 		SocketInputListener listener = new SocketInputListener();

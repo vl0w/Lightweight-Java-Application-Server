@@ -14,7 +14,7 @@ import java.net.UnknownHostException;
 
 import ljas.exception.SessionException;
 import ljas.session.Address;
-import ljas.session.SessionObserver;
+import ljas.session.observer.SessionDisconnectObserver;
 
 import org.junit.Test;
 
@@ -24,15 +24,16 @@ public class SocketSessionTest {
 	public void testDisconnect() throws IOException {
 		// Mocking & Stubbing
 		Socket socket = mock(Socket.class);
-		SessionObserver sessionObserver = mock(SessionObserver.class);
+		SessionDisconnectObserver observer = mock(SessionDisconnectObserver.class);
 
 		// Run
-		SocketSession session = createSession(socket, sessionObserver);
+		SocketSession session = new SocketSession(socket);
+		session.setDisconnectObserver(observer);
 		session.disconnect();
 
 		// Verifications
 		verify(socket).close();
-		verify(sessionObserver).onSessionDisconnected(session);
+		verify(observer).onSessionDisconnected(session);
 
 		// Asserts
 		assertFalse(session.isConnected());
@@ -49,12 +50,11 @@ public class SocketSessionTest {
 		// Mocking & Stubbing
 		Socket socket = mock(Socket.class);
 		SocketFactory socketFactory = mock(SocketFactory.class);
-		SessionObserver sessionObserver = mock(SessionObserver.class);
 
 		when(socketFactory.createSocket(address)).thenReturn(socket);
 
 		// Run
-		SocketSession session = createSession(sessionObserver);
+		SocketSession session = new SocketSession(socket);
 		session.setSocketFactory(socketFactory);
 		session.connect(address);
 
@@ -75,18 +75,19 @@ public class SocketSessionTest {
 		// Mocking & Stubbing
 		Socket socket = mock(Socket.class);
 		SocketFactory socketFactory = mock(SocketFactory.class);
-		SessionObserver sessionObserver = mock(SessionObserver.class);
+		SessionDisconnectObserver observer = mock(SessionDisconnectObserver.class);
 
 		when(socketFactory.createSocket(address)).thenReturn(socket);
 
 		// Run
-		SocketSession session = createSession(socket, sessionObserver);
+		SocketSession session = new SocketSession(socket);
+		session.setDisconnectObserver(observer);
 		session.setSocketFactory(socketFactory);
 		session.connect(address);
 
 		// Verifications: Disconnected
 		verify(socket).close();
-		verify(sessionObserver).onSessionDisconnected(session);
+		verify(observer).onSessionDisconnected(session);
 
 		// Verifications: Connected
 		verify(socketFactory).createSocket(address);
@@ -94,20 +95,6 @@ public class SocketSessionTest {
 		// Asserts
 		assertTrue(session.isConnected());
 		assertNotNull(session.getSocket());
-	}
-
-	private SocketSession createSession(Socket socket,
-
-	SessionObserver observer) {
-		SocketSession socketSession = new SocketSession(socket);
-		socketSession.setObserver(observer);
-		return socketSession;
-	}
-
-	private SocketSession createSession(SessionObserver observer) {
-		SocketSession socketSession = new SocketSession();
-		socketSession.setObserver(observer);
-		return socketSession;
 	}
 
 }

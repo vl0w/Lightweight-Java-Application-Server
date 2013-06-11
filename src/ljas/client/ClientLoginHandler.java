@@ -29,9 +29,9 @@ public class ClientLoginHandler extends ThreadBlocker<LoginMessage> {
 
 	@Override
 	public LoginMessage block() throws Exception {
-		ClientLoginSessionObserver loginObserver = new ClientLoginSessionObserver(
+		ClientLoginSessionDataObserver loginObserver = new ClientLoginSessionDataObserver(
 				this);
-		serverSession.setObserver(loginObserver);
+		serverSession.setDataObserver(loginObserver);
 		serverSession.connect(address);
 		serverSession.sendObject(loginParameters);
 		return super.block();

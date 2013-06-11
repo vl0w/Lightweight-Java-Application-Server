@@ -2,14 +2,14 @@ package ljas.server;
 
 import ljas.exception.ApplicationException;
 import ljas.session.Session;
-import ljas.tasking.environment.TaskSystemSessionObserver;
+import ljas.session.observer.SessionDisconnectObserver;
 
-public class ServerTasksystemSessionObserver extends TaskSystemSessionObserver {
+public class ServerDisconnectSessionObserver implements
+		SessionDisconnectObserver {
 
 	private Server server;
 
-	public ServerTasksystemSessionObserver(Server server) {
-		super(server.getTaskSystem());
+	public ServerDisconnectSessionObserver(Server server) {
 		this.server = server;
 	}
 

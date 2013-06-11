@@ -130,7 +130,7 @@ public class Server implements SessionHolder, LoginObserver {
 	@Override
 	public void onSocketConnect(Socket socket) {
 		Session session = SessionFactory.createSocketSession(socket);
-		session.setObserver(new ServerLoginSessionObserver(this));
+		session.setDataObserver(new ServerLoginSessionDataObserver(this));
 	}
 
 }

@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ServerLoginSessionObserverTest {
+public class ServerLoginSessionDataObserverTest {
 
 	private Server server;
 	private Application serverApplication;
@@ -37,7 +37,7 @@ public class ServerLoginSessionObserverTest {
 		Session session = mock(Session.class);
 		LoginParameters loginParameters = mock(LoginParameters.class);
 
-		ServerLoginSessionObserver observer = new ServerLoginSessionObserver(
+		ServerLoginSessionDataObserver observer = new ServerLoginSessionDataObserver(
 				server);
 		observer.onObjectReceived(session, loginParameters);
 
@@ -48,7 +48,8 @@ public class ServerLoginSessionObserverTest {
 
 		// Verify calls on session
 		verify(session).sendObject(any(LoginAcceptedMessage.class));
-		verify(session).setObserver(any(ServerTasksystemSessionObserver.class));
+		verify(session).setDisconnectObserver(
+				any(ServerDisconnectSessionObserver.class));
 	}
 
 	@Test
@@ -58,7 +59,7 @@ public class ServerLoginSessionObserverTest {
 		Session session = mock(Session.class);
 		Object object = new Object();
 
-		ServerLoginSessionObserver observer = new ServerLoginSessionObserver(
+		ServerLoginSessionDataObserver observer = new ServerLoginSessionDataObserver(
 				server);
 		observer.onObjectReceived(session, object);
 
@@ -77,7 +78,7 @@ public class ServerLoginSessionObserverTest {
 				LoginRefusedMessage.SERVER_FULL);
 		doThrow(toBeThrown).when(server).checkClient(loginParameters);
 
-		ServerLoginSessionObserver observer = new ServerLoginSessionObserver(
+		ServerLoginSessionDataObserver observer = new ServerLoginSessionDataObserver(
 				server);
 		observer.onObjectReceived(session, loginParameters);
 
@@ -94,7 +95,7 @@ public class ServerLoginSessionObserverTest {
 		doThrow(ApplicationException.class).when(serverApplication)
 				.onSessionConnect(session, loginParameters);
 
-		ServerLoginSessionObserver observer = new ServerLoginSessionObserver(
+		ServerLoginSessionDataObserver observer = new ServerLoginSessionDataObserver(
 				server);
 		observer.onObjectReceived(session, loginParameters);
 

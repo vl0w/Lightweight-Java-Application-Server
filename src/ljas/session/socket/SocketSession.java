@@ -6,23 +6,20 @@ import java.net.Socket;
 
 import ljas.client.Client;
 import ljas.exception.SessionException;
+import ljas.session.AbstractSession;
 import ljas.session.Address;
-import ljas.session.Session;
-import ljas.session.SessionObserver;
 
 import org.apache.log4j.Logger;
 
-public class SocketSession implements Session {
+public class SocketSession extends AbstractSession {
 
 	private Socket socket;
-	private SessionObserver observer;
 	private SocketInputListener inputListenerRunnable;
 	private SocketFactory socketFactory;
 	private Thread inputListenerThread;
 
 	public SocketSession() {
 		this.socket = null;
-		this.observer = null;
 		this.socketFactory = new SocketFactory();
 		this.inputListenerRunnable = new SocketInputListener();
 	}
@@ -73,9 +70,7 @@ public class SocketSession implements Session {
 			getInputListenerThread().interrupt();
 			inputListenerThread = null;
 
-			if (observer != null) {
-				observer.onSessionDisconnected(this);
-			}
+			getDisconnectObserver().onSessionDisconnected(this);
 
 			socket = null;
 		}
@@ -90,11 +85,6 @@ public class SocketSession implements Session {
 		} catch (IOException e) {
 			throw new SessionException(e);
 		}
-	}
-
-	@Override
-	public void setObserver(SessionObserver observer) {
-		this.observer = observer;
 	}
 
 	@Override
@@ -122,10 +112,6 @@ public class SocketSession implements Session {
 
 	Socket getSocket() {
 		return socket;
-	}
-
-	SessionObserver getObserver() {
-		return observer;
 	}
 
 	void setSocketFactory(SocketFactory socketFactory) {

@@ -8,11 +8,11 @@ import static org.mockito.Mockito.verify;
 import ljas.session.Session;
 import ljas.tasking.Task;
 import ljas.tasking.environment.TaskSystem;
-import ljas.tasking.environment.TaskSystemSessionObserver;
+import ljas.tasking.environment.TaskSystemSessionDataObserver;
 
 import org.junit.Test;
 
-public class TaskSystemSessionObserverTest {
+public class TaskSystemSessionDataObserverTest {
 
 	@Test
 	public void testNotifyObjectReceived_IsATask_DelegateToTaskSystem() {
@@ -22,7 +22,7 @@ public class TaskSystemSessionObserverTest {
 		Task task = mock(Task.class);
 
 		// Run test
-		TaskSystemSessionObserver observer = new TaskSystemSessionObserver(
+		TaskSystemSessionDataObserver observer = new TaskSystemSessionDataObserver(
 				taskSystem);
 		observer.onObjectReceived(session, task);
 
@@ -38,7 +38,7 @@ public class TaskSystemSessionObserverTest {
 		Object sendedObject = new Object();
 
 		// Run test
-		TaskSystemSessionObserver observer = new TaskSystemSessionObserver(
+		TaskSystemSessionDataObserver observer = new TaskSystemSessionDataObserver(
 				taskSystem);
 		observer.onObjectReceived(session, sendedObject);
 
