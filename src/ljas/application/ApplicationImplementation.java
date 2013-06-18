@@ -61,13 +61,12 @@ public abstract class ApplicationImplementation implements Application {
 		return thread.getExecutingContext();
 	}
 
-	protected <V> V getObjectForCurrentSession(Class<V> clazz)
+	protected <V> V getSessionObject(Class<V> clazz)
 			throws ApplicationException {
 		Session session = getExecutingContext().getSenderSession();
 		return getSessionObject(session, clazz);
 	}
 
-	@SuppressWarnings("unchecked")
 	protected <V> V getSessionObject(Session session, Class<V> clazz)
 			throws ApplicationException {
 		if (!ApplicationAnalyzer.hasSessionObject(applicationClass, clazz)) {

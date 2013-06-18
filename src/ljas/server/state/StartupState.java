@@ -67,7 +67,7 @@ public class StartupState extends OfflineState {
 				.getApplicationVersion(applicationClass);
 
 		getLogger().info(
-				"Starting " + this + " (v" + Server.SERVER_VERSION
+				"Starting " + server + " (v" + Server.SERVER_VERSION
 						+ ") with application " + applicationName + " ("
 						+ applicationVersion + ")");
 
